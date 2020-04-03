@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>饿了么</title>
+    <link rel="shortcut icon" type="image/x-icon" href="qt/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="qt/css/index.css" />
+
+	<script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <script src="qt/js/jquery-3.2.1.min.js"></script>
+	<script src="qt/js/index.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="head">
+
+<!-- start of head -->
+    <div id="midOfHead">
+        <img src="https://a.msstatic.com/huya/main/img/logo.png" alt="饿了么" title="饿了么"/>
+        <ul id="ul1">
+			<li><a href="index.html">首页</a></li>
+            <li>直播</li>
+            <li>分类</li>
+            <li>商店</li>
+            <li>热卖</li>
+        </ul>
+	<form>
+        <input type="text" placeholder="鱼香肉丝" />
+	<input type="button" />
+
+        <div id="hotList">
+			<ul>
+            <div>热搜</div>
+			</ul>
+        </div>
+	</form>
+        <ul id="ul2">
+            <li>历史</li>
+            <li id="beforeLogin">登陆 &nbsp;| &nbsp;注册</li>
+			<li id="afterLogin"><img src=""/><div>昵称</div><div>注销</div></li>
+        </ul>
+    </div>
+
+
+
+
+
+
+</div>
+<!-- end of head -->
+
+<!-- start of left -->
+
+<div id="left">
+	<ul id="ul3">	
+		<li>购物车</li>
+		<li>全部食品</li>
+		<li>推荐食品</li>
+	</ul>
+
+	<ul id="elemOfLeft">
+
+		<li>
+			<div> 主食 </div>
+			<ul class="ul4">
+
+			</ul>
+		</li>
+
+
+		<li>
+			<div> 风味小炒 </div>
+			<ul class="ul4">
+
+			</ul>
+		</li>
+
+		<li>
+			<div> 汤类 </div>
+			<ul class="ul4">
+
+			</ul>
+		</li>
+
+		<li>
+			<div> 凉菜 </div>
+			<ul class="ul4">
+
+			</ul>
+		</li>
+	</ul>
+</div>
+<!-- end of left -->
+
+<!-- start of right -->
+	<div id="right">
+		<div id="imgScroll">
+
+			<img id="img1" src="https://huyaimg.msstatic.com/cdnimage/gamebanner/phpfb9xk51544496240.jpg">
+			<img id="img2" src="https://huyaimg.msstatic.com/cdnimage/gamebanner/phpFrpqoH1548667159.jpg">
+			<img id="img3"src="https://huyaimg.msstatic.com/cdnimage/gamebanner/phpVGfVzu1548730696.jpg">
+			<img id="img4" />
+		</div>		
+
+		<div id="show">	
+			<div id="headOfShow">
+				<div>菜单</div>
+				<ul>
+					<li>全部</li>
+					<li>热门</li>
+					<li>价格</li>
+					<li>好评</li>
+				</ul>
+			</div>
+			<ul id="bodyOfShow">
+				<li style="display: none;">
+					<table border="0px" cellspacing="0">
+						<tr>
+							<td colspan="2"><img src="https://huyaimg.msstatic.com/cdnimage/gamebanner/phpFrpqoH1548667159.jpg" /></td>
+						</tr>
+						<tr class="shodow">
+							<td colspan="2"></td>
+						</tr>
+						<tr class="foodName">
+							<td colspan="2">食品名称</td>
+						</tr>
+						<tr class="saleMsg">
+							<td>销售数量</td>
+							<td>好评率</td>
+						</tr>
+						<tr class="price">
+							<td>￥价格</td>
+							<td align="right">点击图标</td>
+						</tr>
+					</table>
+				</li>
+
+			</ul>
+
+			<div id="footOfShow">
+				<ul>
+					<li>上页</li>
+					<li id="pageNow"><input/> / <span></span></li>
+					<li>下页</li>
+				</ul>
+			</div>
+<!--商品购买表单-->
+            <table id="buyFood" cellspacing="0" align="center" style="display: none;">
+                <tr><td rowspan="5" id="buyImg"><img src="https://huyaimg.msstatic.com/cdnimage/gamebanner/phpFrpqoH1548667159.jpg"/></td><td id="buyFoodName" colspan="2">食品名称</td></tr>
+                <tr><<td id="comment" colspan="2">备注</td></tr>
+                <tr><td id="buySaleNumber">月售量</td><td id="buyGoodResponse">好评率</td></tr>
+                <tr><<td id="buyPrice" colspan="2">单价</td><td></td></tr>
+                <tr><<td id="buyNumber"><span>数量：</span><input   type="text" value="1" /></td><td align="right" style="cursor:pointer;"></td></tr>
+            </table>
+		</div>
+	</div>
+		
+<!-- end of right -->
+<!--登陆页面-->
+<div  id="loginWindow">
+	<div>
+		<!--用户登陆界面-->
+		<div class="loginText" id="userName" ><span>用户名</span><input type="text" value="wxp"/></div>
+		<div class="loginText" id="userPwd"><span>密码</span><input type="password"/></div>
+		<input type="button" value="登陆" id="userButton">
+
+		<!--管理员登陆界面-->
+		<div class="loginText" id="adminName"><span>管理员</span><input type="text" value="王贤朋"/></div>
+		<div class="loginText" id="adminPwd"><span>密码</span><input type="password"/></div>
+		<input type="button" value="登陆" id="adminButton">
+
+		<div id="loginChange">切换身份</div>
+		<div id="exitLogin">X</div>
+
+		<!--注册-->
+		<a id="register" href="register.html">注册</a>
+
+	</div>
+</div>
+<!--登陆页面结束-->
+
+<!--购物车页面-->
+
+<div id="buyCarWindow">
+	<div>
+		<table>
+			<tr>
+				<td colspan="7">
+					<div>购物车</div>
+					<button>提交购物车</button>
+				</td>
+			</tr>
+
+			<tr>
+				<th>序号</th><th>菜名</th><th>单价</th><th>数量</th>
+				<th>价格</th><th>种类</th><th>删除</th>
+			</tr>
+
+
+
+		</table>
+
+		<div id="footOfCar">
+			<ul>
+				<li>首页</li>
+				<li>上一页</li>
+				<li>下一页</li>
+				<li>尾页</li>
+			</ul>
+		</div>
+
+		<div id="exitCar">
+			X
+		</div>
+
+	</div>
+		</div>
+
+		<!--购物车页面结束-->
+
+</body>
+</html>

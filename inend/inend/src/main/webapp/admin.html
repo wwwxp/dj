@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员界面</title>
+    <link rel="stylesheet" type="text/css" href="qt/css/admin.css" />
+    <script src="qt/js/jquery-3.2.1.min.js"></script>
+    <script src="qt/js/admin.js"></script>
+</head>
+<body>
+
+<div id="left">
+    <div id="title">
+        管理员&nbsp;|&nbsp;
+        <span>界面</span>
+    </div>
+
+    <div id="content">
+        商品表
+    </div>
+
+</div>
+
+<div id="right">
+
+    <div id="goodsShow">
+        <div>
+            <table>
+                <tr>
+                    <td colspan="7">
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>名称</th><th>单价</th><th>成本</th><th>余量</th>
+                    <th>种类</th><th>图片</th><th>确认</th>
+                </tr>
+            </table>
+            <div id="footOfGoodsShow">
+                <ul>
+                    <li>上一页</li>
+                    <li>2/6</li>
+                    <li>下一页</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="getUV">
+        <button>生成UV</button><br/>
+        <div></div>
+    </div>
+
+    <div id="userImg">
+        <div><input placeholder="你要查询的用户"/><button></button></div>
+        <button id="newUserImg">生成最新画像</button>
+        <div></div>
+    </div>
+
+</div>
+
+<div id="bottom">
+    <ul>
+        <li>商品表</li>
+        <li>用户画像</li>
+        <li>UV量</li>
+    </ul>
+</div>
+
+</body>
+</html>

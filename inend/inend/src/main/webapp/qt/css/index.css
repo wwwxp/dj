@@ -1,0 +1,901 @@
+html{
+	height:100%;
+	font-size:100%;
+}
+
+body{
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+//background-color:black;
+	overflow-x:hidden;
+	background-color:rgba(200,200,200,0.3);
+}
+
+#head{
+	width:100%;
+	height:50px;
+	position:fixed;
+	top:0px;
+	left:0px;
+	background-color:white;
+	z-index:1000;
+
+}
+
+a{
+	color:black;
+	text-decoration:none;
+}
+
+ul{
+	margin:0px;
+	padding: 0px;
+	list-style:none none outside;
+}
+
+
+
+#midOfHead{
+	margin: 0px auto;
+
+	width:1200px;
+	height:50px;
+
+}
+
+#midOfHead li {
+	float:left;
+	margin-right:40px;
+	cursor:pointer;
+	line-height: 36px;
+
+}
+
+#midOfHead #ul1 li{
+
+	width:50px;
+	height:36px;
+	text-align:center;
+
+}
+
+#midOfHead #ul2 li:hover{
+
+	color:orange;
+}
+
+#midOfHead #ul1 li:hover{
+
+	background-color:orange;
+	color:white;
+	border-radius:36px;
+}
+
+#midOfHead img{
+	display: block;
+	width:120px;
+	height:36px;
+	line-height: 50px;
+	margin-top:7px;
+	float: left;
+	margin-right:50px;
+}
+
+#midOfHead ul{
+	float:left;
+	height:36px;
+	margin-top:7px;
+}
+
+#midOfHead form{
+
+	float:left;
+	width:190px;
+	height:36px;
+//background-color:red;
+	margin-top:7px;
+	margin-right:100px;
+	border-radius:36px;
+}
+
+
+
+#midOfHead input[type="text"]{
+	float:left;
+	height:36px;
+	width:150px;
+
+	box-sizing:border-box;
+
+	padding-left:20px;
+	border:none;
+	outline:none;
+	border-top-left-radius:36px;
+	border-bottom-left-radius:36px;
+	background-color:rgba(125,125,125,0.15);
+}
+
+#midOfHead input[type="button"]{
+
+	float:left;
+	height:36px;
+	width:40px;
+	box-sizing:border-box;
+
+	border:none;
+	outline:none;
+
+	border-top-right-radius:36px;
+	border-bottom-right-radius:36px;
+	background-color:rgba(125,125,125,0.15);
+	cursor:pointer;
+
+	background-image:url("../image/search.png");
+	background-repeat:no-repeat;
+	background-position:center center;
+}
+
+#midOfHead form:hover input[type="text"]{
+
+
+	border:1px solid orange;
+	border-right:none;
+	padding-left:19px;
+	background-color:white;
+
+
+}
+
+#midOfHead form:hover input[type="button"]{
+
+	border:1px solid orange;
+	border-left:none;
+	background-color:white;
+	background-image:url("../image/onSearch.png");
+
+}
+
+#hotList ul{
+    display:none;
+    width:300px;
+    height:340px;
+    background-color:white;
+    position:absolute;
+    top:40px;
+    z-index:300;
+    border-radius:5px;
+    border-top:3px solid orange;
+}
+
+#hotList li,#hotList ul > div{
+	width:90%;
+	margin-left:5%;
+	height:30px;
+	line-height:30px;
+//background-color:green;
+	float:left;
+	font-size:0.8rem;
+}
+
+#hotList li span:first-child{
+	display:block;
+	width:20px;
+	height:20px;
+	border-radius:20px;
+	background-color:orange;
+	color:white;
+	line-height:20px;
+	text-align:center;
+	float:left;
+	margin-top:5px;
+}
+
+#hotList li span:last-child{
+	color:#ccc;
+	height:30px;
+	display: block;
+	font-size:0.8rem;
+	line-height:30px;
+	float:left;
+	margin-left:30px;
+}
+
+#hotList li div{
+	float:left;
+	height:30px;
+	line-height:30px;
+	float:left;
+	margin-left:10px;
+}
+
+#hotList ul > div{
+	color:#ccc;
+	font-size:0.8rem;
+	padding-left:15px;
+}
+
+
+#midOfHead form:hover #hotList ul{
+    display: block;
+}
+
+#ul2{
+	font-size:0.9rem;
+	font-weight:lighter;
+
+}
+
+
+#left{
+	background-color:rgba(0,0,0,0.9);
+	width:250px;
+	position:fixed;
+	top:50px;
+	left:0px;
+	height:100%;
+	padding-top:0px;
+	color:#ccc;
+	overflow-y:scroll;
+	overflow-x:hidden;
+	box-sizing:border-box;
+
+}
+/* 各种浏览器的滑条 */
+#left::-webkit-scrollbar
+{
+	width: 10px;
+
+	background-color: rgba(0,0,0,0.9);
+}
+
+#left::-webkit-scrollbar-track
+{
+
+
+	border-radius: 10px;
+	background-color: rgba(0,0,0,0.9);
+}
+
+#left::-webkit-scrollbar-thumb
+{
+
+	border-radius: 10px;
+	background-color: #555;
+
+}
+
+#left::-webkit-scrollbar-thumb:hover
+{
+    opacity: 0.5;
+    curosr:pointer;
+}
+
+#left{
+    scrollbar-face-color: rgba(125,125,125,0.5);
+    scrollbar-track-color: black;
+}
+
+/* 各种浏览器的滑条结束 */
+
+#ul3{
+	width:100%;
+//background-color:red;
+
+}
+
+#ul3 li{
+	width:100%;
+	height:50px;
+	line-height:50px;
+	padding-left:40px;
+	cursor:pointer;
+	background:url(https://a.msstatic.com/huya/main/widget/sidebar/img/sidebar-icon-sub_7f49fae.png) 10px 15px no-repeat;
+}
+
+#elemOfLeft{
+	display:block;
+//background-color:white;
+}
+
+#elemOfLeft > li{
+	width:100%;
+	float:left;
+//background-color:red;
+
+}
+
+#elemOfLeft div{
+	width:100%;
+	height:50px;
+	line-height:50px;
+	padding-left:40px;
+	background:url(https://a.msstatic.com/huya/main/widget/sidebar/img/sidebar-icon-sub_7f49fae.png) 10px 15px no-repeat;
+
+}
+
+#elemOfLeft div:hover{
+	cursor:pointer;
+}
+
+.ul4 {
+
+	width:100%;
+	height:180px;
+	font-size:0.8rem;
+//background-color: green;
+}
+
+.ul4 > li{
+	display: block;
+	width:40%;
+	height:23px;
+	line-height:23px;
+	border-radius:23px;
+	float:left;
+	background-color:rgba(125,125,125,0.5);
+	margin-left:5%;
+	margin-top:10px;
+	text-align:center;
+	overflow:hidden;
+}
+
+.ul4 li:hover{
+
+	background-color:orange;
+	cursor:pointer;
+}
+
+#right{
+	width:75%;
+	position:absolute;
+	top:100px;
+	left:300px;
+	position:relative;
+}
+
+#imgScroll{
+
+	width:100%;
+	height:200px;
+
+}
+
+#img1{
+	width:50%;
+	height:150px;
+	position:absolute;
+	top:25px;
+	left:0px;
+}
+
+#img2{
+
+	width:50%;
+	height:200px;
+	position:absolute;
+	top:0px;
+	left:25%;
+	z-index:999;
+}
+
+#img3{
+	width:50%;
+	height:150px;
+	position:absolute;
+	top:25px;
+	right:0px;
+}
+
+#img4{
+	width:0px;
+	height:0px;
+	position:absolute;
+	top:100px;
+	left:100%;
+	opacity:0;
+}
+
+#show{
+	width:100%;
+	height:1000px;
+//background-color:red;
+	position:absolute;
+	top:250px;
+	left:0px;
+
+}
+
+#headOfShow{
+	width:100%;
+	height:60px;
+//background-color:green;
+
+}
+
+#headOfShow div{
+	float:left;
+	line-height:60px;
+	font-size:1.5rem;
+}
+
+#headOfShow ul{
+	display:block;
+	height:60px;
+	padding-top:20px;
+}
+
+#headOfShow ul li{
+	float:left;
+	width:50px;
+	height:20px;
+	font-size:0.7rem;
+	border-radius:20px;
+	border:1px solid rgba(125,125,125,0.6);
+	text-align:center;
+	line-height:20px;
+	margin-left:30px;
+	background-color:white;
+	cursor:pointer;
+}
+
+#headOfShow ul li:hover{
+	color:orange;
+}
+
+#bodyOfShow{
+	width:100%;
+	clear:both;
+//background-color: green;
+}
+
+#bodyOfShow li{
+	float:left;
+	margin-right:30px;
+	margin-left:30px;
+	margin-bottom: 30px;
+}
+
+#bodyOfShow li table{
+
+	width:300px;
+	height:275px;
+	border-radius:10px;
+	background-color:white;
+	position:relative;
+	margin:0px;
+	padding:0px;
+}
+
+#bodyOfShow li img{
+	display:block;
+	border-top-left-radius:10px;
+	border-top-right-radius:10px;
+	width:300px;
+	height:200px;
+	cursor:pointer;
+}
+
+#bodyOfShow li .shodow{
+	display: none;
+}
+
+#bodyOfShow li:hover .shodow{
+	display: block;
+	position:absolute;
+	top:0px;
+	left:0px;
+	border-top-left-radius:10px;
+	border-top-right-radius:10px;
+	width:300px;
+	height:200px;
+	background-color:rgba(0,0,0,0.5);
+	cursor:pointer;
+	transition:all 1.5s ease-out;
+}
+
+#bodyOfShow li .foodName,#bodyOfShow li .price,#bodyOfShow li .saleMsg{
+
+	width:300px;
+	height:25px;
+	color:#ccc;
+	font-size:0.8rem;
+}
+
+#bodyOfShow li .price{
+	color:orange;
+	font-size: 1.1rem;
+}
+
+#bodyOfShow li .price td:last-child:hover {
+	cursor:pointer;
+}
+
+#bodyOfShow li .price td:last-child {
+	background-image:url("../image/add.png");
+	background-repeat: no-repeat;
+	background-size:25px 25px;
+	background-position: 140px 0px;
+}
+
+
+
+#footOfShow{
+	width:100%;
+}
+
+#footOfShow ul{
+	display: block;
+	clear:both;
+	margin:0px auto;
+	width:600px;
+	height:50px;
+// background-color:green;
+}
+
+#footOfShow li{
+	width:75px;
+	height:50px;
+	text-align: center;
+	line-height: 50px;
+	float:left;
+	margin-left:50px;
+	margin-right:50px;
+	background-color: rgba(255,165,0,0.5);
+	font-weight:bold;
+	border-radius: 20px;
+
+}
+
+#footOfShow li:first-child:hover, #footOfShow li:last-child:hover {
+	cursor:pointer ;
+}
+#pageNow{
+	width:100px;
+}
+
+#footOfShow li input{
+	width: 30px;
+	height:30px;
+	border:0px;
+	background-color: white;
+	outline: none;
+	text-align: center;
+}
+
+/*购物界面*/
+#buyFood{
+	width:60%;
+	//height:250px;
+
+	margin:0 auto;
+	background-color: rgba(255,255,255,0.7);
+	border-radius: 20px;
+	padding:0px;
+}
+
+#buyFood tr{
+	height:50px;
+}
+
+#buyImg{
+	width:60%;
+	text-align: center;
+}
+
+#buyImg img{
+	width:60%;
+	height:60%;
+	border-radius: 100%;
+}
+
+#comment,#buySaleNumber,#buyGoodResponse{
+	color:#ccc;
+	font-size: 0.8rem;
+}
+
+#comment{
+	background-color: white;
+}
+
+#buyPrice{
+	color:orange;
+	font-size: 1.1rem;
+	background-color: white;
+}
+
+#buyNumber input{
+	width:50px;
+	height:40px;
+	border:1px solid orange;
+	border-radius:20px;
+	text-align: center;
+	outline:none;
+}
+#buyNumber span{
+	color:green;
+	font-size: 0.6rem;
+}
+
+#buyFood tr:last-child td:last-child {
+	background-image:url("../image/add.png");
+	background-repeat: no-repeat;
+	background-size:35px 35px;
+	background-position: 50px 10px;
+}
+
+/* 购物界面结束*/
+
+/* 登陆界面开始*/
+#loginWindow,#buyCarWindow{
+	position:fixed;
+	top:0px;
+	left:0px;
+	background-color:rgba(0,0,0,0.3);
+	width: 100%;
+	height:100%;
+	z-index: 9999;
+	display:none;
+}
+
+#loginWindow > div {
+	width:500px;
+	height:300px;
+	margin:200px auto;
+	background-color:white;
+	border-radius:10px;
+	padding-top:30px;
+	position:relative;
+}
+
+.loginText{
+	width:300px;
+	height:40px;
+	border-radius:10px;
+	box-sizing:border-box;
+	margin:0px auto;
+	margin-top:30px;
+	border:1px solid #5fb70a;
+	padding-left:10px;
+}
+
+
+.loginText span{
+	display:block;
+	height:40px;
+	width:50px;
+	line-height:40px;
+	float:left;
+}
+
+.loginText input{
+	margin-left:20px;
+	height:30px;
+	width:200px;
+	box-sizing:border-box;
+	line-height:40px;
+	margin-top:5px;
+	border:none;
+	outline:none;
+	float:left;
+}
+
+#loginWindow [type="button"]{
+	display:block;
+	width:300px;
+	height:40px;
+	border-radius:10px;
+	box-sizing:border-box;
+	margin:0px auto;
+	margin-top:30px;
+	border:none;
+
+	outline:none;
+	color:white;
+	background-color:#5fb70a;
+	cursor:pointer;
+
+}
+
+#adminName,#adminPwd{
+	border:1px solid orange;
+	display:none;
+}
+
+#adminButton[type="button"]{
+	background-color:orange;
+	display:none;
+}
+
+#loginChange {
+	position:absolute;
+	left:0px;
+	top:0px;
+	background-color:#5fb70a;
+	cursor:pointer;
+
+	width:100px;
+	height:30px;
+	text-align:center;
+	line-height:30px;
+	border-top-left-radius:10px;
+	border-bottom-right-radius:10px;
+	color:white;
+}
+
+#exitLogin {
+	position:absolute;
+	right:30px;
+	top:10px;
+	cursor:pointer;
+
+
+}
+
+#register{
+	position:absolute;
+	right:100px;
+	top:250px;
+	cursor:pointer;
+	text-decoration:underline;
+}
+
+
+#afterLogin{
+//background-color:green;
+	height:50px;
+	width: 100px;
+	margin-top:-7px;
+	display: none;
+	position: relative;
+}
+
+#afterLogin img{
+	width:30px;
+	height:30px;
+	margin-top:10px;
+	float:left;
+	border-radius:30px;
+	margin-right:5px;
+}
+
+#afterLogin div:nth-child(2){
+//background-color:red;
+	height:50px;
+	float:left;
+	line-height:50px;
+	font-size:0.7rem;
+
+}
+
+#afterLogin div:last-child{
+
+	position: absolute;
+	top:48px;
+	width:60px;
+	height:40px;
+	border-top:2px solid orange;
+	background-color:white;
+	border-radius:5px;
+	font-weight:bold;
+	color:green;
+	text-align: center;
+	display: none;
+}
+
+#afterLogin:hover div:last-child{
+	display: block;
+}
+
+/* 登陆界面结束*/
+
+
+/* 购物车界面开始*/
+
+#buyCarWindow > div{
+	width:700px;
+	height:400px;
+	margin:200px auto;
+	background-color:white;
+
+	position:relative;
+
+}
+
+#buyCarWindow table{
+	width:100%;
+	padding:0px;
+	border-collapse:collapse;
+
+}
+
+
+#buyCarWindow table tr{
+
+	height:30px;
+}
+
+#buyCarWindow table tr:nth-child(2n+2){
+	background-color:rgba(200,200,200,0.2);
+}
+
+#buyCarWindow table tr td{
+	text-align:center;
+}
+
+#buyCarWindow table tr:nth-child(1){
+	height:40px;
+	background-color:#7e6b5a;
+	color:white;
+}
+
+#buyCarWindow table tr:nth-child(2){
+	background-color:white;
+	border-bottom:1px solid #ccc;
+}
+
+
+#buyCarWindow table tr:nth-child(1) div{
+	float:left;
+	margin-left:30px;
+}
+
+#buyCarWindow table tr:nth-child(1) button{
+	float:right;
+
+	margin-right:50px;
+	border:0.5px solid black;
+	outline:none;
+	background-color:#ccc;
+	height:25px;
+	cursor:pointer;
+}
+
+#footOfCar{
+	width:100%;
+	height:40px;
+	position:absolute;
+	bottom:0px;
+	left:0px;
+	background-color:#7e6b5a;
+}
+
+#footOfCar li{
+	float:left;
+	margin-right:20px;
+	height:40px;
+	line-height:40px;
+
+}
+
+#footOfCar li:hover {
+	cursor:pointer;
+}
+
+#footOfCar > ul{
+	width:300px;
+	height:40px;
+	display:block;
+	margin:0px auto;
+//background-color:red;
+	color:white;
+}
+
+#exitCar {
+	position:absolute;
+	top:10px;
+	right:15px;
+	color:white;
+	cursor:pointer;
+}
+
+#buyCarWindow table tr td:last-child{
+	cursor:pointer;
+}
+
+
+
+
+/* 购物车界面结束*/
+
+

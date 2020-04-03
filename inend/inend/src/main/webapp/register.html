@@ -1,0 +1,123 @@
+<html>
+<head>
+	<title>登陆界面</title>
+
+	<style>
+		#regWindow{
+			position:fixed;
+			top:0px;
+			left:0px;
+			background-color:rgba(0,0,0,0.3);
+			width: 100%;
+			height:100%;
+			z-index: 9999;
+
+		}
+
+		#regWindow > div {
+			width:500px;
+			height:650px;
+			margin:50px auto;
+			background-color:white;
+			border-radius:10px;
+			padding-top:30px;
+			position:relative;
+		}
+
+		.loginText{
+			width:300px;
+			height:40px;
+			border-radius:10px;
+			box-sizing:border-box;
+			margin:0px auto;
+			margin-top:20px;
+			border:1px solid #5fb70a;
+			padding-left:10px;
+		}
+
+
+		.loginText span{
+			display:block;
+			height:40px;
+			width:50px;
+			line-height:40px;
+			float:left;
+		}
+
+		.loginText input{
+			margin-left:20px;
+			height:30px;
+			width:200px;
+			box-sizing:border-box;
+			line-height:40px;
+			margin-top:5px;
+			border:none;
+			outline:none;
+			float:left;
+		}
+
+		#regButton{
+			display:block;
+			width:300px;
+			height:40px;
+			border-radius:10px;
+			box-sizing:border-box;
+			margin:0px auto;
+			margin-top:30px;
+			border:none;
+
+			outline:none;
+			color:white;
+			background-color:#5fb70a;
+			cursor:pointer;
+
+		}
+
+	</style>
+
+
+</head>
+<body>
+<div id="regWindow">
+	<div>
+		<!--用户注册界面-->
+		<form id="reg" action="/register" method="post">
+			<div class="loginText"><span>用户名</span><input type="text" name="userName" value="Tom"/></div>
+			<div class="loginText"><span>密码</span><input type="password"/></div>
+			<div class="loginText"><span>确认</span><input type="password" name="pwd" id="pwdSure"/></div>
+			<div class="loginText"><span>姓名</span><input type="text" name="user" /></div>
+			<div class="loginText"><span>生日</span><input type="text" name="brith" id="brith" placeholder="如：2000-10-10"/></div>
+			<div class="loginText"><span>电话</span><input type="text" name="telphone" /></div>
+			<div class="loginText"><span>省份</span><input type="text" name="province"/></div>
+			<div class="loginText"><span>城市</span><input type="text" name="city"/></div>
+			<div class="loginText"><span>街道</span><input type="text" name="home"/></div>
+			<input type="submit" value="注册" id="regButton">
+		</form>
+	</div>
+</div>
+
+<script>
+    var pwd=document.getElementById("pwd");
+    var pwdSure=document.getElementById("pwdSure");
+	var submit=document.getElementById("regButton");
+
+	submit.onclick=function (ev) {
+		var rez=/^\d{4}-\d{2}-\d{2}$/
+		var brith=(document.getElementById("brith")).value
+		if(!rez.test(brith)){
+		    alert("生日格式错误")
+            return false;
+		}
+		return true;
+
+	}
+
+    pwdSure.onblur=function(){
+
+        if(pwdSure.value!=pwd.value)
+            alert("两次输入的密码不一致!")
+    }
+</script>
+
+</body>
+</html>
