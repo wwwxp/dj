@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ftpFileUpload">
+    <!-- ftp文件上传,查询所有文件信息 --> 
+    <select id="queryFileInfo" parameterType="hashMap" resultType="hashMap">
+      SELECT ID,FILE_NAME,NAME,FILE_PATH,FILE_TYPE,VERSION,
+      		 DATE_FORMAT(CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE, DESCRIPTION,STATE, PACKAGE_TYPE,
+      		 D.CONFIG_NAME,
+      		 CONCAT(VERSION,'（', D.CONFIG_NAME, '）') VERSION_TEXT
+      FROM DCF_FTP_FILE_SERVER LEFT JOIN DCF_FTP_CLUSTER_CONFIG C ON (ID = C.SERVICE_ID)
+      						   LEFT JOIN (SELECT H.CONFIG_NAME, H.CONFIG_VALUE 
+      									FROM DCF_GROUP_CONFIG H WHERE GROUP_CODE = 'WEB_BUS_PACKAGE_TYPE') D 
+      							ON (PACKAGE_TYPE = D.CONFIG_VALUE)
+      WHERE FILE_TYPE = #{FILE_TYPE}
+      <if test="VERSION != null and VERSION != ''">
+      	AND VERSION = #{VERSION}
+      </if> 
+      <if test="STATE != null and STATE != ''">
+      	AND STATE = #{STATE}
+      </if>
+      <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+		 AND PACKAGE_TYPE = #{PACKAGE_TYPE}
+	  </if>
+	  <if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+	  	AND C.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+	  </if>
+      ORDER BY VERSION DESC, D.CONFIG_VALUE, CRT_DATE DESC
+    </select>
+    
+    <!-- ftp文件上传,查询是否版本是否已经存在 --> 
+    <select id="queryFileVersionList" parameterType="hashMap" resultType="hashMap">
+      SELECT ID,FILE_NAME,NAME,FILE_PATH,FILE_TYPE,VERSION,
+      		 DATE_FORMAT(CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE, DESCRIPTION,STATE, PACKAGE_TYPE,
+      		 D.CONFIG_NAME,
+      		 CONCAT(VERSION,'（', D.CONFIG_NAME, '）') VERSION_TEXT
+      FROM DCF_FTP_FILE_SERVER LEFT JOIN (SELECT H.CONFIG_NAME, H.CONFIG_VALUE 
+      									FROM DCF_GROUP_CONFIG H WHERE GROUP_CODE = 'WEB_BUS_PACKAGE_TYPE') D 
+      							ON (PACKAGE_TYPE = D.CONFIG_VALUE)
+      WHERE FILE_TYPE = #{FILE_TYPE}
+      <if test="VERSION != null and VERSION != ''">
+      	AND VERSION = #{VERSION}
+      </if> 
+      <if test="STATE != null and STATE != ''">
+      	AND STATE = #{STATE}
+      </if>
+      <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+		 AND PACKAGE_TYPE = #{PACKAGE_TYPE}
+	  </if>
+    </select>
+    
+    <!-- ftp文件上传,查询所有文件信息 --> 
+    <select id="queryFileInfoList" parameterType="hashMap" resultType="hashMap">
+		  SELECT A.*,
+		       GROUP_CONCAT(D.BUS_CLUSTER_NAME ORDER BY D.BUS_CLUSTER_NAME) BUS_CLUSTER_LIST
+		  FROM (select A.ID,
+		               A.FILE_NAME,
+		               A.NAME,
+		               A.FILE_PATH,
+		               A.FILE_TYPE,
+		               A.VERSION,
+		               DATE_FORMAT(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') AS CRT_DATE,
+		               A.DESCRIPTION,
+		               A.STATE,
+		               A.PACKAGE_TYPE,
+		               C.CONFIG_NAME PACKAGE_TYPE_NAME,
+		               GROUP_CONCAT(b.CLUSTER_TYPE ORDER BY b.CLUSTER_TYPE) CLUSTER_TYPE_LIST
+		          from dcf_ftp_file_server A
+		          	LEFT JOIN dcf_deploy_task B ON A.ID = B.SERVER_ID
+		            LEFT JOIN DCF_GROUP_CONFIG C  ON A.PACKAGE_TYPE = C.CONFIG_VALUE
+				 WHERE C.GROUP_CODE = 'WEB_BUS_PACKAGE_TYPE'
+		         GROUP BY A.ID,A.FILE_NAME,A.NAME, A.FILE_PATH,A.FILE_TYPE, A.VERSION,
+		               A.CRT_DATE, A.DESCRIPTION,A.STATE, A.PACKAGE_TYPE, C.CONFIG_NAME) A
+		  LEFT JOIN (SELECT D.BUS_CLUSTER_NAME, C.BUS_CLUSTER_ID, C.SERVICE_ID
+		               FROM dcf_ftp_cluster_config c
+		               LEFT JOIN dcf_bus_main_cluster D
+		                 ON C.BUS_CLUSTER_ID = D.BUS_CLUSTER_ID) D
+		    ON A.ID = D.SERVICE_ID
+		WHERE A.FILE_TYPE = #{FILE_TYPE}
+      <if test="VERSION != null and VERSION != ''">
+      	AND A.VERSION = #{VERSION}
+      </if> 
+      <if test="STATE != null and STATE != ''">
+      	AND A.STATE = #{STATE}
+      </if>
+      <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+		 AND A.PACKAGE_TYPE = #{PACKAGE_TYPE}
+	  </if>
+	  GROUP BY A.ID,A.FILE_NAME,A.NAME, A.FILE_PATH,A.FILE_TYPE, A.VERSION,
+		       A.CRT_DATE, A.DESCRIPTION,A.STATE, A.PACKAGE_TYPE, A.PACKAGE_TYPE_NAME
+      ORDER BY A.PACKAGE_TYPE,A.CRT_DATE DESC
+    </select>
+    
+    <!-- ftp文件上传,删除文件信息 -->
+    <delete id="deleteFileInfo" parameterType="hashMap">
+      DELETE FROM DCF_FTP_FILE_SERVER WHERE ID=#{ID}
+    </delete>
+    
+     <!-- ftp文件上传,上传文件并保存信息到数据库 -->
+    <insert id="insertFileInfo" parameterType="map">
+    	INSERT INTO DCF_FTP_FILE_SERVER(
+    		ID,
+		 	FILE_NAME,
+		 	FILE_PATH,
+		 	FILE_TYPE,
+		 	PACKAGE_TYPE,
+    		CRT_DATE,
+    		VERSION,
+    		NAME,
+    		DESCRIPTION
+    		) VALUES(
+    		NEWID(),
+		 	#{FILE_NAME},
+		 	#{FILE_PATH},
+		 	#{FILE_TYPE},
+		 	#{PACKAGE_TYPE},
+		 	CURRENT_TIMESTAMP,
+		 	#{VERSION},
+		 	#{NAME},
+		 	#{DESCRIPTION})
+    </insert>
+    
+    <!-- 查询版本号是否重复 -->
+    <select id="queryVersionCount" parameterType="hashMap" resultType="hashMap">
+    	SELECT COUNT(1) SUM FROM DCF_FTP_FILE_SERVER S WHERE S.VERSION = #{VERSION} AND S.FILE_TYPE = #{FILE_TYPE}
+    	 <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+		  	AND S.PACKAGE_TYPE = #{PACKAGE_TYPE}
+		  </if>
+    </select>
+    
+    <!-- 非业务类查询当前版本和上一个版本号 -->
+    <select id="queryVersion" parameterType="hashMap" resultType="hashMap">
+    	SELECT S.VERSION FROM DCF_FTP_FILE_SERVER S WHERE S.FILE_TYPE = #{FILE_TYPE} 
+    	 <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+		  	AND S.PACKAGE_TYPE = #{PACKAGE_TYPE}
+		  </if>
+    	ORDER BY S.CRT_DATE DESC LIMIT 2
+    </select>
+    
+    <!-- 业务类查询当前版本和上一个版本的文件名,用于调用脚本传入参数 -->
+    <select id="queryServiceNameInfo" parameterType="hashMap" resultType="hashMap">
+    	SELECT S.FILE_NAME,S.NAME 
+    	FROM DCF_FTP_FILE_SERVER S 
+    	WHERE S.FILE_TYPE = #{FILE_TYPE} 
+    	 <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+		  	AND S.PACKAGE_TYPE = #{PACKAGE_TYPE}
+		  </if>
+    	ORDER BY S.CRT_DATE DESC LIMIT 2
+    </select>
+    
+    <!-- ftp文件上传,根据版本号删除文件信息 -->
+    <delete id="deleteFileInfoByVersion" parameterType="hashMap">
+      DELETE FROM DCF_FTP_FILE_SERVER WHERE VERSION=#{VERSION} AND FILE_TYPE = #{FILE_TYPE}
+    </delete>
+    
+    <!-- 查询集群当前版本对应的部署主机列表 -->
+    <select id="queryUploadHostList" parameterType="map" resultType="map">
+    	SELECT A.HOST_ID, A.HOST_NAME, A.HOST_IP, A.SSH_PORT, A.SSH_USER, A.SSH_PASSWD,
+    		   D.CLUSTER_NAME
+		FROM DCF_HOST_DEPLOY T LEFT JOIN DCF_HOST A ON (T.HOST_ID = A.HOST_ID)
+		JOIN DCF_BUSINESS_DEPLOY_LIST C ON (T.CLUSTER_ID = C.CLUSTER_ID AND T.HOST_ID = C.HOST_ID)
+		LEFT JOIN DCF_SERVICE_TYPE D ON (T.CLUSTER_ID = D.CLUSTER_ID)
+		WHERE T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND T.CLUSTER_ID = #{CLUSTER_ID}
+		  AND C.VERSION = #{VERSION}
+		  <if test="HOST_IP != null and HOST_IP != ''">
+		  	AND A.HOST_IP = #{HOST_IP}
+		  </if>
+    </select>
+    
+    <!-- 更新版本数据表记录 -->
+    <update id="updateFileInfo" parameterType="hashMap">
+    	UPDATE DCF_FTP_FILE_SERVER
+    	  <set> 
+    	    CRT_DATE = CURRENT_TIMESTAMP,
+    	    DESCRIPTION=#{DESCRIPTION},
+            <if test="FILE_NAME != null and FILE_NAME != ''">
+                FILE_NAME =  #{FILE_NAME},
+            </if>
+            </set>
+	   	   
+	 	WHERE ID=#{ID}
+    </update>
+    
+    <!-- 插入包与集群的关系表 -->
+    <insert id="insertFileClusterConfig" parameterType="map">
+    	INSERT INTO DCF_FTP_CLUSTER_CONFIG(
+    		SERVICE_ID,
+		 	BUS_CLUSTER_ID 
+    		) VALUES(
+		 	#{SERVICE_ID},
+		 	#{BUS_CLUSTER_ID}
+		 	 )
+    </insert>
+    
+     <!-- 根据版本删除集群-->
+    <delete id="deleteFileByServiceId" parameterType="hashMap">
+    	DELETE FROM DCF_FTP_CLUSTER_CONFIG  
+       	<where> 
+		    <if test="SERVER_ID != null and SERVER_ID !=''">
+		         SERVICE_ID = #{SERVER_ID}
+		    </if> 
+		   	<if test="ID != null and ID !=''">
+		         SERVICE_ID = #{ID}
+		    </if> 
+	  	</where>
+    </delete>
+    
+     <!-- 查询当前包类型的所属业务集群-->
+    <select id="queryClusterListByPackageType" parameterType="hashMap" resultType="hashMap">
+    	 SELECT B.BUS_CLUSTER_ID FROM DCF_FTP_CLUSTER_CONFIG B WHERE EXISTS 
+			(SELECT A.ID FROM DCF_FTP_FILE_SERVER A 
+				WHERE A.ID=B.SERVICE_ID 
+				  AND A.PACKAGE_TYPE IN (SELECT C.CONFIG_VALUE FROM DCF_GROUP_CONFIG C 
+				  		WHERE C.EXTENDS_FIELD=#{PACKAGE_TYPE})
+			) GROUP BY B.BUS_CLUSTER_ID
+    </select>
+    
+</mapper>

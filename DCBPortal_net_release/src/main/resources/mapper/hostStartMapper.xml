@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hostStart">
+    <!-- 查询包含在类型分类下的主机信息(billing,rent) -->
+    <select id="queryHostByDeployBybillingRent" parameterType="map" resultType="hashMap">
+	    SELECT
+			A.HOST_IP,
+			A.SSH_USER,
+			B.HOST_ID,
+			B.ID,
+			B. NAME,
+			B.CLUSTER_TYPE,
+			B.STATE,
+			B.RUN_STATE,
+			C.CLUSTER_NAME,
+			E.SUM,
+			F.JS_SUM,
+		    G.VERSION
+		FROM
+			DCF_HOST A,
+			DCF_SERVICE_TYPE C,
+			DCF_HOST_DEPLOY B
+			LEFT JOIN (
+				SELECT
+					COUNT(P.RUN_STATE) SUM,
+					P.HOST_ID
+				FROM
+					DCF_TASK_PROGRAM P,
+					DCF_DEPLOY_TASK T
+				WHERE
+					P.TASK_ID = T.TASK_ID
+				AND P.RUN_STATE = '1'
+				AND T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+				AND P.CLUSTER_ID = #{CLUSTER_ID}
+				GROUP BY
+					P.HOST_ID
+			) E ON (B.HOST_ID = E.HOST_ID)
+			LEFT JOIN (
+				SELECT
+					COUNT(P.RUN_STATE) JS_SUM
+				FROM
+					DCF_TASK_PROGRAM P,
+					DCF_DEPLOY_TASK T
+				WHERE
+					P.TASK_ID = T.TASK_ID
+				AND P.RUN_STATE = '1'
+				AND T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+				AND P.CLUSTER_ID = #{CLUSTER_ID}
+			) F ON 1 = 1
+			LEFT JOIN (
+		        <!--当部署了supervisor并且运行的主机，有业务程序在跑的才是真实的运行的-->
+				SELECT K.CLUSTER_ID, K.HOST_ID, K.STATUS, K.VERSION
+				FROM DCF_BUS_RELATION_CLUSTER_LIST X,  (SELECT DISTINCT BUS_CLUSTER_ID FROM DCF_BUS_RELATION_CLUSTER_LIST Y WHERE Y.CLUSTER_ID = #{CLUSTER_ID} ) Z,
+				     DCF_DEPLOY_INST_CONFIG K, DCF_TASK_PROGRAM P, DCF_DEPLOY_TASK T
+				WHERE X.BUS_CLUSTER_ID = Z.BUS_CLUSTER_ID
+				AND K.CLUSTER_ID = X.CLUSTER_ID
+				AND P.TASK_ID = T.TASK_ID
+				AND P.RUN_STATE = '1'
+				AND T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+				AND P.CLUSTER_ID = #{CLUSTER_ID}
+				AND X.CLUSTER_TYPE = 'jstorm'
+				AND K.STATUS = '1'
+				AND K.DEPLOY_FILE_TYPE = 'supervisor'
+			) G ON (B.HOST_ID = G.HOST_ID AND B.CLUSTER_ID = G.CLUSTER_ID)
+		WHERE
+			A.HOST_ID = B.HOST_ID
+			AND C.CLUSTER_ID = B.CLUSTER_ID
+			AND C.CLUSTER_TYPE = B.CLUSTER_TYPE
+			AND B.STATE = 1
+			AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+			AND B.CLUSTER_ID = #{CLUSTER_ID}
+			ORDER BY B.CLUSTER_TYPE ASC, C.CLUSTER_NAME ASC, INET_ATON(A.HOST_IP) ASC
+		
+        <!-- SELECT
+		A.HOST_IP,
+		A.SSH_USER,
+		B.HOST_ID,
+		B.ID,
+		B.NAME,
+		B.CLUSTER_TYPE,
+		B.STATE,
+		B.RUN_STATE,
+		C.CLUSTER_NAME,
+		E.SUM
+		FROM DCF_HOST A,
+			DCF_SERVICE_TYPE C,
+			DCF_HOST_DEPLOY B LEFT JOIN
+			(SELECT 
+				COUNT(P.RUN_STATE) SUM
+			FROM
+				DCF_TASK_PROGRAM P,
+				DCF_DEPLOY_TASK T
+			WHERE P.TASK_ID = T.TASK_ID
+			AND P.RUN_STATE = '1'
+			AND T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+			AND P.CLUSTER_ID = #{CLUSTER_ID}
+			) E ON 1=1
+		WHERE A.HOST_ID=B.HOST_ID
+		AND C.CLUSTER_ID = B.CLUSTER_ID
+		AND C.CLUSTER_TYPE = B.CLUSTER_TYPE
+		AND B.STATE = 1
+		AND B.CLUSTER_TYPE=#{CLUSTER_TYPE}
+		AND B.CLUSTER_ID = #{CLUSTER_ID}
+		ORDER BY B.CLUSTER_TYPE ASC, C.CLUSTER_NAME ASC, B.STATE DESC -->
+    </select>
+    
+    <!-- 查询包含在类型分类下的主机数量 -->
+    <select id="queryHostCountByDeploy" parameterType="map" resultType="hashMap">
+       SELECT COUNT(1) SUM
+		FROM DCF_HOST A,DCF_HOST_DEPLOY B
+		WHERE A.HOST_ID=B.HOST_ID
+		  AND B.STATE=0
+		  AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+    
+    <!-- 查询包含在类型分类下未运行的主机数量  -->
+    <select id="queryHostCountForStart" parameterType="map" resultType="hashMap">
+       SELECT COUNT(1) SUM
+		FROM DCF_HOST A,DCF_HOST_DEPLOY B
+		WHERE A.HOST_ID=B.HOST_ID
+		AND B.STATE = 1
+		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		AND B.CLUSTER_ID = #{CLUSTER_ID}
+    </select>
+    
+    <!-- 查询包含在类型分类下未部署的主机数量 -->
+    <select id="queryHostCountDeployed" parameterType="map" resultType="hashMap">
+       SELECT COUNT(1) SUM
+		FROM DCF_HOST A,DCF_HOST_DEPLOY B
+		WHERE A.HOST_ID=B.HOST_ID
+		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		AND B.CLUSTER_ID = #{CLUSTER_ID}
+		AND B.STATE = 1
+    </select>
+    
+    <!-- 查询未运行且已部署主机 -->
+    <select id="queryHostForStart" resultType="hashMap">
+		 SELECT 
+       		H.HOST_ID,
+       		H.HOST_IP,
+       		H.SSH_USER,
+       		D.VERSION,
+       		D.RUN_STATE
+		FROM DCF_HOST H,
+			 DCF_HOST_DEPLOY D
+		WHERE D.STATE = 1
+			AND H.HOST_ID = D.HOST_ID
+			<if test="HOST_ID != null and HOST_ID != ''">
+				AND D.HOST_ID = #{HOST_ID}
+			</if>
+    </select>
+    
+    <!-- 查询启停配置 (获取当前业务类型每台主机是否已经部署，部署版本) -->
+    <select id="queryStartHostList" resultType="hashMap">
+		SELECT DISTINCT A.HOST_ID, 
+			   E.HOST_IP,
+			   E.SSH_USER,
+			   E.HOST_NAME,
+			   A.CLUSTER_TYPE,
+			   A.VERSION,
+		  IF((SELECT COUNT(1) CNT FROM DCF_DEPLOY_INST_CONFIG T 
+				WHERE A.HOST_ID = T.HOST_ID 
+				  AND T.DEPLOY_TYPE = #{CLUSTER_TYPE}
+				  AND T.CLUSTER_ID = #{CLUSTER_ID}
+				  <if test='HOST_ID !=null  and HOST_ID !=""'>
+				  		AND T.HOST_ID=#{HOST_ID}
+				  </if>
+				  AND T.STATUS = '1') > 0, 1, 0) RUN_STATE
+		FROM DCF_HOST_DEPLOY A 
+			LEFT JOIN DCF_DEPLOY_INST_CONFIG B  ON (A.HOST_ID = B.HOST_ID)
+			LEFT JOIN DCF_HOST E ON (A.HOST_ID = E.HOST_ID)
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE}	
+		  AND A.CLUSTER_ID = #{CLUSTER_ID}
+		  AND EXISTS(SELECT ID FROM DCF_DEPLOY_VERSION_UPGRADE H 
+									WHERE A.HOST_ID = H.HOST_ID
+									  AND H.CLUSTER_TYPE = #{CLUSTER_TYPE}
+									  AND H.CLUSTER_ID = #{CLUSTER_ID}
+									  <if test='HOST_ID !=null and HOST_ID !=""'>
+									  	AND H.HOST_ID=#{HOST_ID}
+									  </if>
+									  AND H.STATE = '1')	
+		  ORDER BY INET_ATON(E.HOST_IP) ASC				      
+    </select>
+    
+    <!-- 查询组件部署主机即主机程序运行状态 -->
+    <select id="queryHostByStart" parameterType="map" resultType="map">
+    	SELECT
+		A.HOST_IP,
+		A.SSH_USER,
+		B.HOST_ID,
+		B.ID,
+		B.NAME,
+		B.CLUSTER_ID,
+		B.CLUSTER_TYPE,
+		B.STATE,
+		IF((SELECT COUNT(1) CNT FROM DCF_DEPLOY_INST_CONFIG T 
+				WHERE A.HOST_ID = T.HOST_ID 
+				  AND T.CLUSTER_ID = #{CLUSTER_ID}
+				  AND T.DEPLOY_TYPE = #{CLUSTER_TYPE}
+				  AND T.STATUS = '1') > 0, 1, 0) RUN_STATE,
+		C.CLUSTER_NAME,
+		C.CLUSTER_CODE,
+		E.SUM
+		FROM DCF_HOST A,
+			DCF_SERVICE_TYPE C,
+			DCF_HOST_DEPLOY B
+		LEFT JOIN
+		(SELECT
+				DISTINCT
+				P.HOST_ID,
+				P.RUN_STATE SUM
+			FROM
+				DCF_TASK_PROGRAM P,
+				DCF_DEPLOY_TASK T,
+				DCF_HOST_DEPLOY D
+			WHERE P.TASK_ID = T.TASK_ID
+			AND P.RUN_STATE = '1'
+			AND P.HOST_ID = D.HOST_ID
+			AND T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+			AND D.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		) E ON E.HOST_ID = B.HOST_ID
+		WHERE A.HOST_ID=B.HOST_ID
+		AND C.CLUSTER_ID = B.CLUSTER_ID
+		AND C.CLUSTER_TYPE = B.CLUSTER_TYPE
+		AND B.CLUSTER_ID = #{CLUSTER_ID}
+		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		AND EXISTS(SELECT ID FROM DCF_DEPLOY_VERSION_UPGRADE H 
+									WHERE B.HOST_ID = H.HOST_ID
+									  AND B.CLUSTER_ID = H.CLUSTER_ID
+									  AND H.CLUSTER_TYPE = #{CLUSTER_TYPE}
+									  AND H.STATE = '1')
+		ORDER BY B.CLUSTER_TYPE ASC, C.CLUSTER_NAME ASC, INET_ATON(A.HOST_IP) ASC
+    </select>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="operatorLogMapper">
+    <select id="queryOperatorModule" parameterType="map" resultType="map">
+        SELECT
+            DISTINCT
+            OPERATOR_MODULE
+        FROM DCF_NODE_OPERATOR_LOG
+        ORDER BY OPERATOR_MODULE ASC
+    </select>
+
+    <select id="queryOperatorLogInfo" parameterType="map" resultType="map">
+        SELECT
+            ID,
+            OPERATOR_MODULE,
+            OPERATOR_NAME,
+            LOG_CONTENT,
+            DATE_FORMAT(CREATED_DATE,'%Y-%m-%d %H:%i:%s') CREATED_DATE,
+            CREATED_USER
+        FROM
+            DCF_NODE_OPERATOR_LOG
+        <where>
+            <if test="OPERATOR_MODULE!=null and OPERATOR_MODULE!=''">
+                AND OPERATOR_MODULE=#{OPERATOR_MODULE}
+            </if>
+            <if test="LOG_CONTENT!=null and LOG_CONTENT!=''">
+                AND LOG_CONTENT LIKE '%${LOG_CONTENT}%'
+            </if>
+            <if test="START_TIME!=null and START_TIME!=''">
+                AND CREATED_DATE >= #{START_TIME}
+            </if>
+            <if test="END_TIME!=null and END_TIME!=''">
+                AND #{END_TIME} >= CREATED_DATE
+            </if>
+        </where>
+        ORDER BY CREATED_DATE DESC
+    </select>
+</mapper>

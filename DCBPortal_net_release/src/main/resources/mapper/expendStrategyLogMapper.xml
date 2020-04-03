@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 弹性伸缩处理结果日志表 -->
+<mapper namespace="expendStrategyLog">
+	<!-- 新增策略配置 -->
+	<insert id="addExpendStrategyLog" parameterType="map">
+		INSERT INTO dcf_expand_strategy_log(ID, STRATEGY_ID, TRIGGER_RESULT, HOST_IP_LIST, HOST_ID_LIST, EXEC_RESULT, EXEC_MESSAGE,RULE_MSG,HOST_NORM_MSG, CRT_DATE)
+		VALUES(NEWID(), #{STRATEGY_ID}, #{TRIGGER_RESULT}, #{HOST_IP_LIST}, #{HOST_ID_LIST}, #{EXEC_RESULT}, #{EXEC_MESSAGE},#{RULE_MSG},#{HOST_NORM_MSG}, NOW())
+	</insert>
+	
+	<!-- 查询内核信息 -->
+	<select id="queryStrategyConfigLogBySId" parameterType="map" resultType="map"> 
+		select a.PROGRAM_NAME,sum(
+		CASE c.EXEC_RESULT
+		WHEN 0 THEN (CASE WHEN b.OPERATOR_TYPE%2=1 THEN 1
+		ELSE 0 END)
+		ELSE 0 END) K_FAIL_NUM ,sum(
+		CASE c.EXEC_RESULT
+		WHEN 0 THEN (CASE WHEN b.OPERATOR_TYPE%2=0 THEN 1
+		ELSE 0 END)
+		ELSE 0 END) S_FAIL_NUM ,
+		sum(
+				CASE c.EXEC_RESULT
+				WHEN 1 THEN (CASE WHEN b.OPERATOR_TYPE%2=1 THEN 1
+				ELSE 0 END)
+				ELSE 0 END) K_NUM,
+		sum(
+				CASE c.EXEC_RESULT
+				WHEN 1 THEN (CASE WHEN b.OPERATOR_TYPE%2=0 THEN 1
+				ELSE 0 END)
+				ELSE 0 END) S_NUM FROM dcf_expand_strategy_log C LEFT JOIN dcf_expand_strategy_config B ON C.STRATEGY_ID = B.STRATEGY_ID
+		LEFT JOIN dcf_task_program a ON B.TASK_PROGRAM_ID = A.ID
+		WHERE 
+		 a.PROGRAM_NAME = #{PROGRAM_NAME}
+		GROUP BY a.PROGRAM_NAME
+				
+		
+	</select>
+	
+	<!-- 查询内核信息 -->
+	<select id="queryhosts" parameterType="map" resultType="map"> 
+     	 SELECT COUNT(A.CLUSTER_CODE) HOST_NUM FROM DCF_SERVICE_TYPE A LEFT JOIN DCF_HOST_DEPLOY B ON A.CLUSTER_ID = B.CLUSTER_ID
+          WHERE A.CLUSTER_CODE= #{CLUSTER_CODE}  GROUP BY A.CLUSTER_CODE
+	</select>
+</mapper>

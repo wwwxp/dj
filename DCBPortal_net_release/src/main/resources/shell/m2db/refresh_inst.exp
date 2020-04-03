@@ -1,0 +1,29 @@
+#!/usr/bin/expect
+
+set proc_id [lindex $argv 0]
+set time_out [lindex $argv 1]
+set tables [lindex $argv 2]
+
+set timeout 5 
+spawn acsql  
+	expect "Command>"
+	send "hbconnect -c $proc_id;\r"
+        set timeout $time_out
+        expect "procid $proc_id>" 
+        send "hbshm -f $tables;\r"
+        expect {
+          "refresh success!!" {
+            expect "procid $proc_id>"
+            send "quit;\r"
+            expect "Command>"
+            send "quit;\r"
+            exit 0
+          }
+         
+          "procid $proc_id>" {
+            send "quit;\r"
+            expect "Command>"
+            send "quit;\r"
+            exit 1
+          }
+        } 

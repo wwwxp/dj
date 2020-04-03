@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 伸缩报告Mapper -->
+<mapper namespace="expansionReport">
+	
+	<!-- 添加动态伸缩报告 -->
+	<insert id="addExpansionReport" parameterType="map">
+		INSERT INTO DCF_EXPANSION_REPORT(ID, TASK_PROGRAM_ID, OPERATOR_TYPE, CPU, MEM, DISK, BUSS_VOLUME, 
+			EXEC_TIME, ACTION_TYPE, RESULT_DESC, JOB_ID,HOST_IPS, CRT_DATE, EXEC_STATUS, STRATEGY_ID, FORECAST_REPORT_ID, ADVISE_NODE_COUNT)
+		VALUES(NEWID(), #{TASK_PROGRAM_ID}, #{OPERATOR_TYPE}, #{CPU}, #{MEM}, #{DISK}, #{BUSS_VOLUME}, 
+			#{EXEC_TIME}, #{ACTION_TYPE}, #{RESULT_DESC}, #{JOB_ID}, #{HOST_IPS}, NOW(), #{EXEC_STATUS}, #{STRATEGY_ID}, #{FORECAST_REPORT_ID},#{ADVISE_NODE_COUNT})
+	</insert>
+	
+	<!-- 查询该预测报告是否已经生成伸缩报告 -->
+	<select id="queryExpansionReport" parameterType="map" resultType="map">
+		SELECT ID, TASK_PROGRAM_ID, OPERATOR_TYPE, CPU, MEM, DISK, BUSS_VOLUME, 
+			EXEC_TIME, ACTION_TYPE, RESULT_DESC, JOB_ID,HOST_IPS, CRT_DATE, EXEC_STATUS, STRATEGY_ID, FORECAST_REPORT_ID,ADVISE_NODE_COUNT
+		FROM DCF_EXPANSION_REPORT
+		WHERE 1=1
+		<if test="FORECAST_REPORT_ID != null and FORECAST_REPORT_ID != ''">
+			AND FORECAST_REPORT_ID = #{FORECAST_REPORT_ID}
+		</if>
+		<if test="ID != null and ID != ''">
+			AND ID = #{ID}
+		</if>
+		<if test="EXEC_STATUS != null and EXEC_STATUS != ''">
+			AND EXEC_STATUS = #{EXEC_STATUS}
+		</if>
+	</select>
+	
+	<!-- 修改扩展报告执行状态 -->
+	<update id="updateExpansionReportStatus" parameterType="map">
+		UPDATE DCF_EXPANSION_REPORT SET EXEC_STATUS = #{EXEC_STATUS}, EXEC_TIME = NOW()
+		<if test="HOST_IPS != null and HOST_IPS != ''">
+			,HOST_IPS = #{HOST_IPS}
+		</if>
+		WHERE ID = #{ID}
+	</update>
+	
+	<!-- 修改策略配置 -->
+	<update id="updateStatusById" parameterType="map">
+		UPDATE DCF_EXPANSION_REPORT SET  EXEC_STATUS = #{EXEC_STATUS},JOB_ID=#{JOB_ID},
+		ACTION_TYPE=#{ACTION_TYPE} ,HOST_IPS=#{HOST_IPS}
+		WHERE ID = #{ID}
+	</update>
+		<!-- 查询策略配置 -->
+	<select id="queryExpansionReportList" parameterType="map" resultType="map">
+		SELECT A.ACTION_TYPE,A.BUSS_VOLUME,A.CPU,date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE,A.DISK,
+        date_format(A.EXEC_TIME, '%Y-%m-%d %H:%i:%s') EXEC_TIME,A.HOST_IPS,A.ID,A.JOB_ID,A.MEM,A.OPERATOR_TYPE,
+        A.RESULT_DESC,A.TASK_PROGRAM_ID,A.STRATEGY_ID,EXEC_STATUS,FORECAST_REPORT_ID,ADVISE_NODE_COUNT
+        FROM DCF_EXPANSION_REPORT A
+		WHERE 1=1
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID}
+		</if>
+		<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+			AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+		</if>
+		ORDER BY A.CRT_DATE DESC
+	</select>
+	
+</mapper>

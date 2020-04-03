@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.tydic.bp:bp-core-controller:1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/tydic/bp/bp-core-controller/1.0-SNAPSHOT/bp-core-controller-1.0-20191011.094138-59.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/tydic/bp/bp-core-controller/1.0-SNAPSHOT/bp-core-controller-1.0-20191011.094138-59-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/tydic/bp/bp-core-controller/1.0-SNAPSHOT/bp-core-controller-1.0-20191011.094138-59-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

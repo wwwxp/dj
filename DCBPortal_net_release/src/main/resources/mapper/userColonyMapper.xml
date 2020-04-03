@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--用户集群分配-->
+<mapper namespace="userColonyMapper">
+
+    <!--查询集群信息-->
+    <select id="queryColonyConfigList" parameterType="map" resultType="hashMap">
+          SELECT
+			  A.BUS_CLUSTER_CODE,A.BUS_CLUSTER_ID,A.BUS_CLUSTER_TYPE,CONCAT(A.BUS_CLUSTER_NAME,'(',A.BUS_CLUSTER_CODE,')') AS BUS_CLUSTER_NAME
+			FROM DCF_BUS_MAIN_CLUSTER A
+    </select>
+
+
+    <!--查询用户集群信息-->
+    <select id="queryUserColonyConfigList" parameterType="map" resultType="hashMap">
+        SELECT
+			A.BUS_CLUSTER_ID,
+			A.BUS_CLUSTER_NAME,
+			A.BUS_CLUSTER_CODE,
+			date_format(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+			A.BUS_CLUSTER_STATE,
+			group_concat(B.CLUSTER_NAME) BUS_CLUSTER_LIST
+		FROM
+			DCF_BUS_MAIN_CLUSTER A
+		LEFT JOIN (
+			SELECT
+				A.BUS_CLUSTER_ID,
+				A.CLUSTER_ID,
+				B.CLUSTER_NAME
+			FROM DCF_BUS_RELATION_CLUSTER_LIST A
+				 LEFT JOIN DCF_SERVICE_TYPE B ON A.CLUSTER_ID = B.CLUSTER_ID
+		) B ON A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+			LEFT JOIN DCF_BUS_ROLE_MAIN_LIST C ON
+				C.BUS_CLUSTER_ID=A.BUS_CLUSTER_ID
+		WHERE 1 = 1
+			AND C.ROLE_ID = #{ROLE_ID}
+		GROUP BY A.BUS_CLUSTER_ID,
+			A.BUS_CLUSTER_NAME,
+			A.BUS_CLUSTER_CODE,
+			A.BUS_CRT_TIME,
+			A.BUS_CLUSTER_STATE
+		ORDER BY
+			A.BUS_CLUSTER_NAME
+
+    </select>
+
+	<!--查询用户分配的业务程序列表-->
+	<select id="queryRoleProgramList" parameterType="map" resultType="map">
+		SELECT  A.BUS_CLUSTER_ID,B.BUS_CLUSTER_NAME
+		FROM DCF_BUS_CONFIG_LIST A JOIN DCF_BUS_MAIN_CLUSTER B
+		WHERE A.BUS_CLUSTER_ID=B.BUS_CLUSTER_ID AND A.ROLE_ID =#{ROLE_ID}
+		GROUP BY A.BUS_CLUSTER_ID
+		UNION
+		SELECT B.BUS_CLUSTER_ID,
+		D.BUS_CLUSTER_NAME
+		FROM DCF_BUS_PROGRAM_LIST A, DCF_TASK_PROGRAM B, DCF_SERVICE_TYPE C,
+		DCF_BUS_MAIN_CLUSTER D, DCF_DEPLOY_TASK E
+		WHERE A.TASK_PROGRAM_ID = B.ID
+		AND B.BUS_CLUSTER_ID = D.BUS_CLUSTER_ID
+		AND B.CLUSTER_ID = C.CLUSTER_ID
+		AND B.TASK_ID = E.TASK_ID
+		AND D.BUS_CLUSTER_STATE = '1'
+		AND C.TYPE = '3'
+		AND A.ROLE_ID = #{ROLE_ID}
+		GROUP BY D.BUS_CLUSTER_ID
+	 </select>
+
+    <!-- 删除用户集信息 -->
+	<delete id="delRoleMain" parameterType="map">
+			DELETE FROM DCF_BUS_ROLE_MAIN_LIST
+			WHERE ROLE_ID = #{ROLE_ID}
+	</delete>
+
+	<!-- 新增用户集群信息 -->
+	<insert id="addRoleMain" parameterType="map">
+		INSERT INTO DCF_BUS_ROLE_MAIN_LIST(ROLE_ID, BUS_CLUSTER_ID)
+		VALUES (#{ROLE_ID},#{BUS_CLUSTER_ID})
+	</insert>
+</mapper>

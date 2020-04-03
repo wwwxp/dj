@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 节点集群部署管理Mapper -->
+<mapper namespace="nodeClusterDeployMapper">
+	<select id="queryDeployedNodeAndVersion" parameterType="map" resultType="map">
+		SELECT
+			NODE_ID,VERSION
+		FROM
+			DCF_NODE_DEPLOY_LIST
+		WHERE
+			NODE_TYPE_ID = #{NODE_TYPE_ID}
+	</select>
+
+	<!-- 查询所有的集群类型 -->
+	<select id="queryNodeClusterProgramList" parameterType="map" resultType="map">
+		SELECT
+			DISTINCT
+			A.ID NODE_TYPE_ID,
+			A.NAME,
+			A.CODE,
+			A.DIFF_CFG,
+			A.RUN_WEB,
+			A.BUS_GROUP_ID,
+			A.START_VERSION,
+			A.CURR_VERSION,
+			A.DEFAULT_PATH,
+			CONCAT(A.NAME,'(',A.CODE,')','=',A.DEFAULT_PATH) NODE_TYPE_NAME
+		FROM
+			DCF_NODE_TYPE_CONFIG A
+			INNER JOIN DCF_NODE_TYPE_VERSION_LIST B ON A.ID = B.NODE_TYPE_ID
+	</select>
+
+	<!--查询程序版本列表信息-->
+	<select id="queryNodeTypeVersionList" parameterType="map" resultType="map">
+		SELECT A.ID VERSION_ID, A.FILE_NAME, A.FILE_PATH, A.VERSION, A.NODE_TYPE_ID, A.UPLOAD_DATE,
+			B.NAME NODE_TYPE_NAME, B.CODE NODE_TYPE_CODE,A.IS_FULL_VERSION,B.CONTEXT_CFG
+		FROM DCF_NODE_TYPE_VERSION_LIST A JOIN DCF_NODE_TYPE_CONFIG B ON (A.NODE_TYPE_ID = B.ID)
+		WHERE 1=1
+		<if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+			AND A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+		</if>
+		<if test="VERSION != null and VERSION != ''">
+			AND A.VERSION = #{VERSION}
+		</if>
+		ORDER BY A.VERSION DESC
+	</select>
+
+	<!--查询程序部署节点列表-->
+	<select id="queryNodeTypeHostList" parameterType="map" resultType="map">
+		SELECT
+			A.ID NODE_ID,
+			A.NODE_NAME,
+			A.NODE_HOST_ID,
+			A.NODE_TYPE_ID,
+			A.NODE_PATH,
+			A.BUS_GROUP_ID,
+			A.NODE_STATE,
+			A.NODE_DESC,
+			A.START_CMD,
+			B.HOST_NAME,
+			B.HOST_IP,
+			CONCAT(B.HOST_IP,IFNULL(B.HOST_NET_CARD,''),'(',B.SSH_USER,')') HOST_TEXT
+		FROM DCF_NODE_CONFIG A
+			INNER JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+		WHERE
+		  A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+		  ORDER BY INET_ATON(B.HOST_IP) ASC
+	</select>
+
+	<!--查询主机列表信息-->
+	<select id="queryNodeHostList" parameterType="map" resultType="map">
+		SELECT B.HOST_NAME, B.HOST_IP, B.HOST_NET_CARD, B.SSH_PORT, B.SSH_USER, B.SSH_PASSWD
+		FROM DCF_HOST B
+		WHERE 1=1
+		<if test="NODE_HOST_ID != null and NODE_HOST_ID != ''">
+			AND B.HOST_ID = #{NODE_HOST_ID}
+		</if>
+	</select>
+
+	<!--查询程序版本部署信息-->
+	<select id="queryNodeDeployList" parameterType="map" resultType="map">
+	  	SELECT A.ID, A.NODE_TYPE_ID, A.VERSION, A.NODE_ID,B.STATE
+		FROM DCF_NODE_DEPLOY_LIST A
+			LEFT JOIN DCF_NODE_START_LIST B ON A.NODE_ID = B.NODE_ID AND A.VERSION = B.VERSION
+		WHERE 1=1
+		<if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+			AND A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+		</if>
+		<if test="VERSION != null and VERSION != ''">
+			AND A.VERSION = #{VERSION}
+		</if>
+		<if test="NODE_ID != null and NODE_ID != ''">
+			AND A.NODE_ID = #{NODE_ID}
+		</if>
+	</select>
+
+	<!--查询节点列表中部署过该版本的节点-->
+	<select id="queryNodesDeployInVersion" parameterType="map" resultType="map">
+		SELECT
+			  A.NODE_ID,
+			  B.NODE_NAME,
+			  B.NODE_PATH,
+			  CONCAT(C.HOST_IP,'(',C.SSH_USER,')') HOST_INFO
+		FROM DCF_NODE_DEPLOY_LIST A
+			INNER JOIN DCF_NODE_CONFIG B ON A.NODE_ID = B.ID
+			INNER JOIN DCF_HOST C ON B.NODE_HOST_ID = C.HOST_ID
+		WHERE
+		 	A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+			<if test="VERSION!=null and VERSION!=''">
+				AND A.VERSION = #{VERSION}
+			</if>
+			AND A.NODE_ID IN
+			<foreach collection="NODE_IDS" item="NODE_ID" open="(" separator="," close=")">
+				#{NODE_ID}
+			</foreach>
+	</select>
+
+	<select id="queryNodeOnNodeDeployList" parameterType="map" resultType="map">
+		SELECT A.ID, A.NODE_TYPE_ID, A.VERSION, A.NODE_ID,B.FILE_NAME
+		FROM DCF_NODE_DEPLOY_LIST A
+			INNER JOIN DCF_NODE_TYPE_VERSION_LIST B ON B.NODE_TYPE_ID = A.NODE_TYPE_ID AND B.VERSION = A.VERSION
+		WHERE 1=1
+		<if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+			AND A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+		</if>
+		<if test="NODE_ID != null and NODE_ID != ''">
+			AND A.NODE_ID = #{NODE_ID}
+		</if>
+	</select>
+
+	<!--添加版本部署信息-->
+	<insert id="addNodeDeployList" parameterType="map">
+		INSERT INTO DCF_NODE_DEPLOY_LIST(NODE_TYPE_ID, VERSION, NODE_ID, CREATED_USER, CREATED_DATE)
+		VALUES(#{NODE_TYPE_ID}, #{VERSION}, #{NODE_ID}, #{CREATED_USER}, NOW())
+	</insert>
+
+	<!--修改版本部署信息-->
+	<update id="updateNodeDeployList" parameterType="map">
+		UPDATE DCF_NODE_DEPLOY_LIST SET UPDATE_USER = #{UPDATE_USER},UPDATE_DATE=NOW()
+		WHERE 1=1
+		<if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+			AND NODE_TYPE_ID = #{NODE_TYPE_ID}
+		</if>
+		<if test="VERSION != null and VERSION != ''">
+			AND VERSION = #{VERSION}
+		</if>
+		<if test="NODE_ID != null and NODE_ID != ''">
+			AND NODE_ID = #{NODE_ID}
+		</if>
+	</update>
+
+	<select id="queryRunWeb" parameterType="map" resultType="map">
+		SELECT RUN_WEB
+		  FROM DCF_NODE_TYPE_CONFIG
+		WHERE
+			ID=#{NODE_TYPE_ID}
+	</select>
+
+	<select id="queryFullVersion" parameterType="map" resultType="map">
+		SELECT IS_FULL_VERSION
+		  FROM DCF_NODE_TYPE_VERSION_LIST
+		WHERE
+			NODE_TYPE_ID=#{NODE_TYPE_ID} AND
+			VERSION = #{VERSION}
+	</select>
+
+	<!-- 获得该程序类型该版本最新的已部署程序 -->
+	<select id="queryDeployNodeOnNodeTypeAndVersion" parameterType="map" resultType="map">
+		SELECT
+			C.HOST_IP,C.SSH_PORT,C.SSH_USER,C.SSH_PASSWD,B.NODE_PATH
+		FROM DCF_NODE_DEPLOY_LIST A
+		  INNER JOIN DCF_NODE_CONFIG B ON A.NODE_ID = B.ID
+		  INNER JOIN DCF_HOST C ON B.NODE_HOST_ID = C.HOST_ID
+		WHERE
+			A.NODE_TYPE_ID = #{NODE_TYPE_ID} AND A.VERSION = #{VERSION}
+		ORDER BY A.CREATED_DATE DESC
+		LIMIT 0,1
+	</select>
+</mapper>

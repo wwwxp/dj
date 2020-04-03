@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 集群元素定义表 -->
+<mapper namespace="componentsConfig">
+	<!-- 查询组件模板列表 -->
+	<select id="queryComponentsConfigTemplateList" parameterType="map" resultType="map">
+		SELECT A.ID, A.CLUSTER_TYPE, A.CFG_TYPE, A.CFG_NAME, A.CFG_CODE, 
+			   A.CFG_DEFAULT CFG_VALUE, A.CFG_SEQ, A.CFG_STATE, A.CFG_IS_REQUIRED, A.CFG_IS_PASSWD
+		FROM DCF_COMPONENTS_CONFIG_TEMPLATE A
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		ORDER BY A.CFG_TYPE ASC, A.CFG_SEQ ASC, A.CFG_IS_REQUIRED DESC
+	</select>
+	
+	<!-- 查询组件配置信息 -->
+	<select id="queryComponentConfigList" parameterType="map" resultType="map">
+		SELECT A.ID, A.CLUSTER_TYPE,A.CLUSTER_ID, A.CFG_TYPE, A.CFG_CODE, A.CFG_NAME, A.CFG_VALUE,A.CRT_DATE,
+			   B.CFG_IS_REQUIRED, B.CFG_IS_PASSWD, B.CFG_SEQ
+		FROM DCF_COMPONENTS_CONFIG A LEFT JOIN DCF_COMPONENTS_CONFIG_TEMPLATE B 
+				ON (A.CFG_TYPE = B.CFG_TYPE AND A.CLUSTER_TYPE = B.CLUSTER_TYPE AND A.CFG_CODE = B.CFG_CODE)
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		ORDER BY A.CFG_TYPE ASC, B.CFG_SEQ ASC, B.CFG_IS_REQUIRED DESC
+	</select>
+
+	<!-- 查询组件配置信息 -->
+	<select id="queryComponentConfigListByClusterCode" parameterType="map" resultType="map">
+		SELECT A.ID, A.CLUSTER_TYPE,A.CLUSTER_ID, A.CFG_TYPE, A.CFG_CODE, A.CFG_NAME, A.CFG_VALUE,A.CRT_DATE,
+			   B.CFG_IS_REQUIRED, B.CFG_IS_PASSWD, B.CFG_SEQ
+		FROM DCF_COMPONENTS_CONFIG A LEFT JOIN DCF_COMPONENTS_CONFIG_TEMPLATE B
+				ON (A.CFG_TYPE = B.CFG_TYPE AND A.CLUSTER_TYPE = B.CLUSTER_TYPE AND A.CFG_CODE = B.CFG_CODE)
+		WHERE A.CLUSTER_ID  in (select CLUSTER_ID from dcf_service_type a where a.CLUSTER_CODE= #{CLUSTER_CODE})
+		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+			AND a.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		</if>
+		<if test="CFG_TYPE != null and CFG_TYPE != ''">
+			AND a.CFG_TYPE = #{CFG_TYPE}
+		</if>
+		ORDER BY A.CFG_TYPE ASC, B.CFG_SEQ ASC, B.CFG_IS_REQUIRED DESC
+	</select>
+
+	
+	<!-- 批量添加集群扩展参数 -->
+	<insert id="addBatchConfigList" parameterType="java.util.List">
+		INSERT INTO DCF_COMPONENTS_CONFIG(ID, CLUSTER_TYPE, CLUSTER_ID, CFG_TYPE, CFG_CODE, CFG_NAME, CFG_VALUE, CRT_DATE)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(NEWID(), #{item.CLUSTER_TYPE}, #{item.CLUSTER_ID}, #{item.CFG_TYPE}, #{item.CFG_CODE}, #{item.CFG_NAME}, #{item.CFG_VALUE}, NOW())
+		</foreach>
+	</insert>
+	
+	<!-- 获取组件数据源参数 -->
+	<select id="queryComponentDsList" parameterType="map" resultType="map">
+		SELECT A.ID, A.CLUSTER_TYPE,A.CLUSTER_ID, A.CFG_TYPE, A.CFG_CODE, A.CFG_NAME, A.CFG_VALUE,A.CRT_DATE,
+			   B.CLUSTER_CODE, B.CLUSTER_NAME,
+			   C.CFG_IS_REQUIRED, C.CFG_IS_PASSWD, C.CFG_SEQ
+		FROM DCF_COMPONENTS_CONFIG A JOIN DCF_SERVICE_TYPE B ON (A.CLUSTER_ID = B.CLUSTER_ID) 
+			LEFT JOIN DCF_COMPONENTS_CONFIG_TEMPLATE C ON (A.CFG_TYPE = C.CFG_TYPE AND A.CLUSTER_TYPE = C.CLUSTER_TYPE AND A.CFG_CODE = C.CFG_CODE)
+		WHERE 1=1
+		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+			AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		</if>
+		ORDER BY A.CLUSTER_ID ASC, A.CFG_TYPE ASC
+	</select>
+	
+	<!-- 动态删除数据源 -->
+	<delete id="delComponentsConfigList" parameterType="map">
+		DELETE FROM DCF_COMPONENTS_CONFIG WHERE CLUSTER_ID = #{CLUSTER_ID}
+	</delete>
+
+	<!-- 获取dca组件zookeeper参数 -->
+	<select id="queryComponentDsListByDcaZk" parameterType="map" resultType="map">
+		 SELECT
+				A.ID,
+				A.CLUSTER_TYPE,
+				A.CLUSTER_ID,
+				A.CFG_TYPE,
+				A.CFG_CODE,
+				A.CFG_NAME,
+				A.CFG_VALUE,
+				A.CRT_DATE,
+				B.CLUSTER_CODE,
+				B.CLUSTER_NAME
+			FROM
+				DCF_COMPONENTS_CONFIG A
+			JOIN DCF_SERVICE_TYPE B ON A.CLUSTER_ID = B.CLUSTER_ID
+			WHERE
+				A.CLUSTER_TYPE = 'dca'
+			AND B.CLUSTER_CODE = #{CLUSTER_CODE}
+			AND A.CFG_TYPE = 'zookeeper'
+	</select>
+</mapper>

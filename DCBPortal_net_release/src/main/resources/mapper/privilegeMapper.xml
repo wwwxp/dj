@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="privilegeMapper">
+
+    <!-- 查询所有权限 -->
+    <select id="queryPrivilege" parameterType="hashMap" resultType="hashMap">
+        select PRIVILEGE_ID,
+				PRIVILEGE_CODE,
+				PRIVILEGE_NAME,
+				DESCRIPTION,
+				SUPER_CODE,
+				PRIVILEGE_TYPE,
+				URL,
+				STATE,
+				POSITION,
+				LAYER,
+				MENU_TARGET,
+				APP_ID,
+				PARENT_PRIVILEGE_ID,
+				IMAGE,
+				IMAGE_DIS,
+				CHECKED,
+				HOT_KEY,
+				TYPE,
+				GROUPS,
+				IS_LEAF
+        from tb_bp_sys_privilege
+        WHERE STATE = '1'
+    </select>
+
+    <!-- 删除权限 -->
+    <delete id="delPrivilege" parameterType="hashMap">
+        DELETE FROM TB_BP_SYS_PRIVILEGE WHERE PRIVILEGE_ID=#{PRIVILEGE_ID}
+    </delete>
+
+
+    <!-- 插入权限 -->
+    <select id="addPrivilege" parameterType="map">
+        INSERT INTO TB_BP_SYS_PRIVILEGE(
+        	PRIVILEGE_CODE,PRIVILEGE_NAME,DESCRIPTION,SUPER_CODE,PRIVILEGE_TYPE,URL,STATE,
+        	POSITION,LAYER,MENU_TARGET,APP_ID,PARENT_PRIVILEGE_ID,IMAGE,IMAGE_DIS,
+        	CHECKED,HOT_KEY,TYPE,GROUPS,IS_LEAF)
+        VALUES(
+        	#{PRIVILEGE_CODE},#{PRIVILEGE_NAME},#{DESCRIPTION},#{PARENT_PRIVILEGE_ID},#{PRIVILEGE_TYPE},#{URL},
+        	1,#{POSITION},4,'',NULL,#{PARENT_PRIVILEGE_ID},'new.gif','new_dis.gif',null,'','','',1)
+    </select>
+
+    <!-- 查询权限编码是否重复 -->
+    <select id="qeuryPrivilegeCode" parameterType="hashMap" resultType="hashMap">
+        SELECT COUNT(1) SUM FROM TB_BP_SYS_PRIVILEGE T
+        WHERE t.PRIVILEGE_CODE=#{PRIVILEGE_CODE}
+        <if test="SAVE_FLAG=='UPDATE'">
+            <![CDATA[
+				AND T.PRIVILEGE_ID<>#{PRIVILEGE_ID}
+			]]>
+        </if>
+    </select>
+
+    <!-- 权限管理权限修改 -->
+    <update id="updatePrivilege">
+        UPDATE TB_BP_SYS_PRIVILEGE T
+        SET T.PRIVILEGE_NAME = #{PRIVILEGE_NAME},
+        T.DESCRIPTION=#{DESCRIPTION},
+        T.PRIVILEGE_CODE=#{PRIVILEGE_CODE},
+        T.URL=#{URL},
+        <choose>
+            <when test="PRIVILEGE_TYPE==null">
+                T.PRIVILEGE_TYPE='',
+            </when>
+            <otherwise>
+                T.PRIVILEGE_TYPE=#{PRIVILEGE_TYPE},
+            </otherwise>
+        </choose>
+        T.POSITION=#{POSITION},
+        T.PARENT_PRIVILEGE_ID=#{PARENT_PRIVILEGE_ID}
+        WHERE T.PRIVILEGE_ID = #{PRIVILEGE_ID}
+    </update>
+    <!-- 查询操作模块类型数据 -->
+    <select id="queryOperateTypeList" parameterType="map" resultType="hashMap">
+        SELECT PRIVILEGE_NAME,PRIVILEGE_CODE
+        FROM TB_BP_SYS_PRIVILEGE
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="expendCfgMapper">
+    <select id="queryExpendCfgList" resultType="map" parameterType="map">
+      SELECT A.ID, A.EXPEND_SOURCE, B.CLUSTER_NAME, A.EXPEND_NUM, A.EXPEND_TYPE,
+        date_format(A.EXPEND_TIME,'%Y-%m-%d %H:%i:%s') EXPEND_TIME,
+        A.EXPEND_STATE,
+        date_format(A.EXPEND_FINAL_TIME,'%Y-%m-%d %H:%i:%s') EXPEND_FINAL_TIME,
+        date_format(A.CREATE_TIME,'%Y-%m-%d %H:%i:%s') CREATE_TIME
+      FROM DCF_EXPEND_CFG A LEFT JOIN DCF_SERVICE_TYPE B ON (A.CLUSTER_NAME = B.CLUSTER_ID)
+      WHERE 1=1
+      <if test="QRY_CLUSTER_NAME != null and QRY_CLUSTER_NAME != ''">
+          AND A.CLUSTER_NAME = #{QRY_CLUSTER_NAME}
+      </if>
+        <if test="QRY_EXPEND_TYPE != null and QRY_EXPEND_TYPE != ''">
+            AND A.EXPEND_TYPE = #{QRY_EXPEND_TYPE}
+        </if>
+    </select>
+
+    <!--添加数据扩展信息-->
+    <insert id="addExpendCfg" parameterType="map">
+        INSERT INTO DCF_EXPEND_CFG(EXPEND_SOURCE, CLUSTER_NAME, EXPEND_NUM, EXPEND_TYPE, EXPEND_TIME, EXPEND_STATE,EXPEND_FINAL_TIME,CREATE_TIME)
+        VALUES(#{EXPEND_SOURCE}, #{CLUSTER_NAME}, #{EXPEND_NUM}, #{EXPEND_TYPE},
+        <if test="EXPEND_TIME == '' || EXPEND_TIME == null">
+            NOW(),
+        </if>
+        <if test="EXPEND_TIME != null and EXPEND_TIME != ''">
+            #{EXPEND_TIME},
+        </if>
+        '0', #{EXPEND_FINAL_TIME}, NOW())
+    </insert>
+
+    <!--删除数据扩展信息-->
+    <delete id="delExpendCfg" parameterType="map">
+        DELETE FROM DCF_EXPEND_CFG WHERE ID = #{ID}
+    </delete>
+</mapper>

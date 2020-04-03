@@ -1,0 +1,23 @@
+#!/usr/bin/expect
+
+set proc_id [lindex $argv 0]
+set time_out [lindex $argv 1]
+
+set timeout 5 
+spawn acsql >/dev/null 2>&1
+	expect "Command>"
+	send "hbdestroy -p $proc_id;\r"
+	expect "please input YES or NO to continue:"
+	send "yes\r"
+        set timeout $time_out
+        expect {
+          "Destroy Shared Memory Success!" {
+            expect "Command>"
+            send "quit;\r"
+            exit 0
+          }
+          "Command>" {
+            send "quit;\r"
+            exit 1
+          }
+        }

@@ -1,0 +1,43 @@
+#!/usr/bin/expect
+
+set proc_id [lindex $argv 0]
+set time_out [lindex $argv 1]
+set cmd_line [lindex $argv 2] 
+set timeout 5 
+spawn acsql  
+	expect "Command>"
+	send "hbconnect -c $proc_id;\r"
+        set timeout $time_out
+        expect {
+			"procid $proc_id>" {
+				send "${cmd_line};\r"
+				expect {
+				  "success" {
+					expect "procid $proc_id>"
+					send "quit;\r"
+					expect "Command>"
+					send "quit;\r"
+					exit 0
+				  }
+
+				  "failed" {
+					expect "procid $proc_id>"
+					send "quit;\r"
+					expect "Command>"
+					send "quit;\r"
+					exit 1
+				  }
+				 
+				  "procid $proc_id>" {
+					send "quit;\r"
+					expect "Command>"
+					send "quit;\r"
+					exit 0
+				  }
+				}
+			}
+			"Command>" {
+				send "quit;\r"
+				exit 1
+			}
+		}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="config">
+
+    <!-- 查询	配置列表 --> 
+    <select id="queryConfigList" parameterType="map" resultType="hashMap">
+      SELECT  D.CONFIG_CODE,D.CONFIG_NAME,D.CONFIG_VALUE,
+       CONCAT(D.CONFIG_NAME,'(',D.CONFIG_VALUE,')') CONFIG_TEXT,D.CONFIG_DESC,D.EXTENDS_FIELD,D.GROUP_CODE,D.SEQ
+       FROM DCF_GROUP_CONFIG D
+       WHERE 1=1
+       <if test="GROUP_CODE != null and GROUP_CODE != ''">
+       		AND  D.GROUP_CODE = #{GROUP_CODE}
+       </if>
+        <if test="CONFIG_NAME != null and CONFIG_NAME != ''">
+       		AND  D.CONFIG_NAME = #{CONFIG_NAME}
+       </if>
+        <if test="EXTENDS_FIELD != null and EXTENDS_FIELD != ''">
+       		AND  D.EXTENDS_FIELD = #{EXTENDS_FIELD}
+       </if>
+       order by D.GROUP_CODE,D.SEQ
+    </select>
+
+    <!--查询配置参数信息-->
+    <select id="queryGroupConfigList" parameterType="map" resultType="hashMap">
+        SELECT  D.CONFIG_CODE,D.CONFIG_NAME,D.CONFIG_VALUE,
+        CONCAT(D.CONFIG_NAME,'(',D.CONFIG_VALUE,')') CONFIG_TEXT,D.CONFIG_DESC,D.EXTENDS_FIELD,D.GROUP_CODE,D.SEQ
+        FROM DCF_GROUP_CONFIG D
+        <where>
+            <if test="GROUP_CODE != null and GROUP_CODE != ''">
+                D.GROUP_CODE = #{GROUP_CODE}
+            </if>
+            <if test="CONFIG_NAME != null and CONFIG_NAME != ''">
+                AND D.CONFIG_NAME LIKE CONCAT('%', #{CONFIG_NAME}, '%')
+            </if>
+            <if test="EXTENDS_FIELD != null and EXTENDS_FIELD != ''">
+                AND D.EXTENDS_FIELD = #{EXTENDS_FIELD}
+            </if>
+        </where>
+        ORDER BY D.GROUP_CODE,D.SEQ
+    </select>
+
+    <!--查询属性组列表-->
+    <select id="queryGroupCodeList" parameterType="map" resultType="map">
+        SELECT GROUP_CODE FROM DCF_GROUP_CONFIG GROUP BY GROUP_CODE ORDER BY GROUP_CODE;
+    </select>
+
+    <!--修改参数配置信息-->
+    <update id="updateGroupConfig" parameterType="map">
+        UPDATE DCF_GROUP_CONFIG SET CONFIG_NAME = #{CONFIG_NAME}, CONFIG_VALUE = #{CONFIG_VALUE}, CONFIG_DESC = #{CONFIG_DESC},
+            SEQ = #{SEQ}, EXTENDS_FIELD = #{EXTENDS_FIELD}, GROUP_CODE = #{GROUP_CODE}
+        WHERE CONFIG_CODE = #{CONFIG_CODE}
+    </update>
+
+    <!--添加参数配置-->
+    <insert id="addGroupConfig" parameterType="map">
+        <selectKey order="BEFORE" resultType="int" keyProperty="CONFIG_CODE">
+            SELECT MAX(IFNULL(CONFIG_CODE,0) + 1) CONFIG_CODE FROM DCF_GROUP_CONFIG
+        </selectKey>
+        INSERT INTO DCF_GROUP_CONFIG(CONFIG_CODE, CONFIG_NAME, CONFIG_VALUE, CONFIG_DESC, SEQ, EXTENDS_FIELD, GROUP_CODE)
+        VALUES(#{CONFIG_CODE}, #{CONFIG_NAME}, #{CONFIG_VALUE}, #{CONFIG_DESC}, #{SEQ}, #{EXTENDS_FIELD}, #{GROUP_CODE})
+    </insert>
+
+    <!--删除参数配置-->
+    <delete id="delGroupConfig" parameterType="map">
+        DELETE FROM DCF_GROUP_CONFIG WHERE CONFIG_CODE = #{CONFIG_CODE}
+    </delete>
+
+    <!--获取随机生成的ID-->
+    <select id="queryNewID" parameterType="map" resultType="map">
+        SELECT NEWID() AS NEW_ID
+    </select>
+</mapper>

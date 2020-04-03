@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务主集群和组件、业务程序管理配置文件 -->
+<mapper namespace="userCfgFileMapper">
+
+		<!--删除权限 -->
+	<delete id="delCfgFileByRoleId" parameterType="map">
+		DELETE FROM DCF_BUS_CONFIG_LIST WHERE ROLE_ID = #{ROLE_ID}
+	</delete>
+	
+	<!--批量添加权限 -->
+	<insert id="addCfgFileList" parameterType="java.util.List">
+		INSERT INTO DCF_BUS_CONFIG_LIST(ID, ROLE_ID,CLUSTER_TYPE,VERSION,PACKAGE_TYPE,BUS_CLUSTER_ID,FILE_PATH,FILE_NAME) values
+<!-- 		(NEWID(),#{ROLE_ID},#{CLUSTER_ID},#{VERSION},#{PACKAGE_TYPE},#{BUS_CLUSTER_ID},#{FILE_PATH})
+ -->
+		 <foreach collection="list" item="item" index="index" separator=",">			
+			(NEWID(),#{item.ROLE_ID},#{item.CLUSTER_TYPE},#{item.VERSION},#{item.PACKAGE_TYPE},#{item.BUS_CLUSTER_ID},#{item.FILE_PATH},#{item.FILE_NAME})
+		
+		
+		</foreach> 
+	</insert>
+	
+	<!--查询所有的角色的权限-->
+	<select id="queryUserCfgPrivilegeList" parameterType="map" resultType="map">
+		 SELECT
+			A.ID,
+			A.ROLE_ID,
+			A.CLUSTER_TYPE,
+			A.VERSION,
+			A.PACKAGE_TYPE,
+			A.BUS_CLUSTER_ID,
+			A.FILE_PATH
+		FROM
+			DCF_BUS_CONFIG_LIST A
+		WHERE
+			A.ROLE_ID = #{ROLE_ID}
+	</select>
+	
+	<!--查询所有的角色的权限,根据用户ID-->
+	<select id="queryUserRoleByEmpeeId" parameterType="map" resultType="map">
+		SELECT
+			B.ROLE_ID
+		FROM
+			DCF_BUS_USER_ROLE A
+		LEFT JOIN DCF_BUS_CONFIG_LIST B ON A.ROLE_ID = B.ROLE_ID
+		WHERE
+			A.EMPEE_ID = #{EMPEE_ID}
+		AND B.FILE_PATH =  #{FILE_PATH}
+	</select>
+	
+</mapper>

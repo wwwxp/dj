@@ -1,0 +1,22 @@
+body {	
+	margin: auto;
+	background: #FFFFFF;
+	font-family: Î¢ÈíÑÅºÚ;
+	font-size: 14px;
+	
+}
+* {
+	padding: 0px;
+	margin: 0px;
+}
+
+
+/* ¹¤¾ßÀ¸ */
+.jtopo_toolbar{
+	padding-left:20px;
+	background-color: rgb(216, 231, 242);
+	width: 832px;
+	height: 28px;
+	padding-top: 7px;"
+}
+

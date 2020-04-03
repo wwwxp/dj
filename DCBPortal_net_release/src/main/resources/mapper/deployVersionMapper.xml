@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="deployVersion">
+	<!-- 查询主机部署版本 -->
+	<select id="queryDeployVersionByHostId" parameterType="map" resultType="map">
+		SELECT A.ID, A.CLUSTER_ID, A.CLUSTER_TYPE, A.VERSION, A.UPGRADE_TIME, A.HOST_ID, A.STATE
+		FROM DCF_DEPLOY_VERSION_UPGRADE A
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND A.HOST_ID = #{HOST_ID}
+		  AND STATE = '1'
+		ORDER BY A.VERSION*1 DESC
+	</select>
+
+	<!--查询集群部署版本列表-->
+	<select id="queryDeployVersionByCluster" parameterType="map" resultType="map">
+		SELECT A.CLUSTER_ID, A.CLUSTER_TYPE, A.VERSION, A.STATE
+		FROM DCF_DEPLOY_VERSION_UPGRADE A
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND STATE = '1'
+		GROUP BY A.CLUSTER_ID, A.CLUSTER_TYPE, A.VERSION, A.STATE
+		ORDER BY A.VERSION*1 DESC
+	</select>
+	
+	<!-- 唯一确定当前主机是否已经部署当前版本，如果部署过当前版本这直接覆盖 -->
+	<select id="queryDeployVersionByUniqueCondition" parameterType="map" resultType="map">
+		SELECT A.ID, A.CLUSTER_TYPE, A.VERSION, A.UPGRADE_TIME, A.HOST_ID, A.STATE
+		FROM DCF_DEPLOY_VERSION_UPGRADE A
+		WHERE STATE = '1'
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND A.CLUSTER_ID = #{CLUSTER_ID}
+		  AND A.HOST_ID = #{HOST_ID}
+		  AND A.VERSION = #{VERSION} 
+	</select>
+	
+	<!-- 添加主机部署程序版本 -->
+	<insert id="addDeployVersion" parameterType="map">
+		INSERT INTO DCF_DEPLOY_VERSION_UPGRADE(ID, CLUSTER_ID, CLUSTER_TYPE, VERSION, UPGRADE_TIME, HOST_ID, STATE)
+		VALUES (NEWID(), #{CLUSTER_ID}, #{CLUSTER_TYPE}, #{VERSION}, now(), #{HOST_ID}, #{STATE})
+	</insert>
+	
+	<!-- 修改当前版本重新部署时间 -->
+	<update id="updateDeployVersion" parameterType="map">
+		UPDATE DCF_DEPLOY_VERSION_UPGRADE 
+		   SET UPGRADE_TIME = now()
+		WHERE CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND HOST_ID = #{HOST_ID}
+		  AND VERSION = #{VERSION} 
+	</update>
+	
+	<!-- 根据version查询所有已部署的主机 -->
+	<select id="selectDeployHostByVersion" parameterType="map" resultType="map">
+		SELECT DISTINCT U.HOST_ID,U.VERSION,
+			H.HOST_IP,H.SSH_PORT,
+			H.SSH_USER,H.SSH_PASSWD,
+			B.CLUSTER_DEPLOY_PATH
+		FROM DCF_DEPLOY_VERSION_UPGRADE U LEFT JOIN DCF_HOST H ON U.HOST_ID=H.HOST_ID
+			 LEFT JOIN DCF_SERVICE_TYPE B  ON (U.CLUSTER_ID = B.CLUSTER_ID)
+		WHERE U.VERSION = #{VERSION}
+	</select>
+	
+	<!-- 根据version删除 -->
+	<delete id="deleteDeployVersionByVersion" parameterType="map">
+		DELETE FROM DCF_DEPLOY_VERSION_UPGRADE WHERE VERSION=#{VERSION}
+	</delete>
+	
+	<!-- 组件主机划分删除主机(该主机所有版本部署版本都会删除) -->
+	<delete id="delDeployListByHost" parameterType="map">
+		DELETE FROM DCF_DEPLOY_VERSION_UPGRADE 
+		WHERE CLUSTER_ID = #{CLUSTER_ID}
+		  AND CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND HOST_ID = #{HOST_ID}
+	</delete>
+</mapper>

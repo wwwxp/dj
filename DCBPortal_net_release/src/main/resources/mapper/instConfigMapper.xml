@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="instConfig">
+	<!-- 添加部署主机信息 -->
+    <insert id="addDcfDeployInstConfig" parameterType="map">
+    	INSERT INTO DCF_DEPLOY_INST_CONFIG(INST_ID, CLUSTER_ID, HOST_ID, DEPLOY_FILE_TYPE, FILE_PATH, 
+    		 DEPLOY_TYPE, INST_PATH, STATUS,MODIFY_TIME, VERSION,SOFT_LINK_PATH, CONFIG_PATH
+			<if test="PORT != null and PORT != ''">
+				,PORT
+			</if>
+    		 <if test="IS_MONITOR != null and IS_MONITOR != ''">
+    		 	,IS_MONITOR
+    		 </if>
+    		 )
+		VALUES(NEWID(), #{CLUSTER_ID}, #{HOST_ID}, #{DEPLOY_FILE_TYPE}, #{FILE_PATH}, 
+			 #{DEPLOY_TYPE}, #{INST_PATH}, #{STATUS}, now(), #{VERSION},#{SOFT_LINK_PATH}, #{CONFIG_PATH}
+			<if test="PORT != null and PORT != ''">
+				,#{PORT}
+			</if>
+			 <if test="IS_MONITOR != null and IS_MONITOR != ''">
+			 	,#{IS_MONITOR}
+			 </if>
+			 )
+    </insert>
+    
+    <!-- 添加部署主机信息 -->
+    <insert id="addDcfDeployInstConfigByDcasAndDcam" parameterType="map">
+    	INSERT INTO DCF_DEPLOY_INST_CONFIG(INST_ID, CLUSTER_ID, HOST_ID, DEPLOY_FILE_TYPE, FILE_PATH, 
+    		 DEPLOY_TYPE, INST_PATH, STATUS,MODIFY_TIME, VERSION,SOFT_LINK_PATH, PM2_NAME, CONFIG_PATH)
+		VALUES(NEWID(), #{CLUSTER_ID}, #{HOST_ID}, #{DEPLOY_FILE_TYPE}, #{FILE_PATH}, 
+			 #{DEPLOY_TYPE}, #{INST_PATH}, #{STATUS}, now(), #{VERSION},#{SOFT_LINK_PATH}, #{PM2_NAME}, #{CONFIG_PATH})
+    </insert>
+    
+    <!-- 添加部署主机信息 -->
+    <insert id="addDcfDeployInstConfigByRedis" parameterType="map">
+    	INSERT INTO DCF_DEPLOY_INST_CONFIG(INST_ID, CLUSTER_ID, HOST_ID, DEPLOY_FILE_TYPE, FILE_PATH, 
+    		 DEPLOY_TYPE, INST_PATH, STATUS,MODIFY_TIME, VERSION,SOFT_LINK_PATH, PORT, DAEMON_STATE)
+		VALUES(NEWID(),#{CLUSTER_ID}, #{HOST_ID}, #{DEPLOY_FILE_TYPE}, #{FILE_PATH}, 
+			 #{DEPLOY_TYPE}, #{INST_PATH}, #{STATUS}, now(), #{VERSION},#{SOFT_LINK_PATH}, #{PORT}, #{DAEMON_STATE})
+    </insert>
+    
+    <!-- 获取当前主机所有的部署程序 -->
+    <select id="queryInstConfigByHost" parameterType="map" resultType="map">
+    	SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+    		   A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,A.VERSION,
+    		   substring_index(A.INST_PATH,"/", 1) INST_NAME,
+    		   substring_index(A.INST_PATH,"/", -1) FILE_NAME,
+    		   B.HOST_NAME,B.HOST_IP,A.MODIFY_TIME,
+    		   A.SOFT_LINK_PATH,
+    		   A.PORT,
+    		   A.DAEMON_STATE,
+    		   A.PM2_NAME
+    	FROM DCF_DEPLOY_INST_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+    	WHERE A.DEPLOY_TYPE = #{DEPLOY_TYPE}
+    	AND A.HOST_ID IN (${HOST_ID})
+    	AND A.IS_MONITOR = '1'
+    	<if test="STATUS != null and STATUS != ''">
+    		AND A.STATUS = #{STATUS}
+    	</if>
+    	<if test="INST_ID != null and INST_ID != ''">
+    		AND A.INST_ID = #{INST_ID}
+    	</if>
+    	<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+    		AND A.CLUSTER_ID = #{CLUSTER_ID}
+    	</if>
+    	<if test="DEPLOT_FILE_TYPE != null and DEPLOT_FILE_TYPE != ''">
+    		AND A.DEPLOY_FILE_TYPE = #{DEPLOT_FILE_TYPE}
+    	</if>
+    	ORDER BY INET_ATON(B.HOST_IP),A.DEPLOY_FILE_TYPE,A.INST_PATH
+    </select>
+    
+    <!-- 查询实例配置文件 -->
+    <select id="queryInstConfigById" parameterType="map" resultType="map">
+    	SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+    		    A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,A.SOFT_LINK_PATH,A.VERSION,
+    		   substring_index(A.INST_PATH,"/", 1) INST_NAME,A.MODIFY_TIME
+    	FROM DCF_DEPLOY_INST_CONFIG A
+    	WHERE A.INST_ID = #{INST_ID}
+    </select>
+    
+    <!-- 查询主机发布类型 -->
+    <select id="queryInstConfigList" parameterType="map" resultType="map">
+    	SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+    		   A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,A.SOFT_LINK_PATH,
+    		   substring_index(A.INST_PATH,"/", 1) INST_NAME,
+    		   B.HOST_IP,B.HOST_NAME,A.MODIFY_TIME,
+    		   C.CLUSTER_CODE,
+    		   C.CLUSTER_DEPLOY_PATH
+    	FROM DCF_DEPLOY_INST_CONFIG A 
+    		 LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+    		 LEFT JOIN DCF_SERVICE_TYPE C ON (A.CLUSTER_ID = C.CLUSTER_ID)
+    	WHERE A.STATUS = '1'
+   		<if test="DEPLOY_TYPE != null and DEPLOY_TYPE != ''">
+	  		AND A.DEPLOY_TYPE = #{DEPLOY_TYPE}
+	  	</if>
+	  	<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+	  		AND A.CLUSTER_ID = #{CLUSTER_ID}
+	  	</if>
+    </select>
+
+    <!-- 查询一台主机、同一分类下 正在运行的程序总数-->
+    <select id="queryInstConfigCount" parameterType="map" resultType="map">
+    	SELECT COUNT(1) RUN_COUNT FROM DCF_DEPLOY_INST_CONFIG
+		WHERE STATUS=1
+		<if test="DEPLOY_TYPE != null and DEPLOY_TYPE != ''">
+			AND DEPLOY_TYPE=#{DEPLOY_TYPE} 
+		</if>
+		<if test="HOST_ID != null and HOST_ID != ''">
+			AND HOST_ID=#{HOST_ID}
+		</if>
+		<if test="VERSION != null and VERSION != ''">
+			AND VERSION=#{VERSION}
+		</if>
+    </select>
+    
+     <!-- 修改实例状态 -->
+    <update id="updateDcfDeployInstConfig" parameterType="map">
+    	UPDATE DCF_DEPLOY_INST_CONFIG 
+    	   SET STATUS = #{STATUS},
+    	       MODIFY_TIME = now() 
+    	       <if test="DAEMON_STATE != null and DAEMON_STATE != ''">
+    	       	 ,DAEMON_STATE = #{DAEMON_STATE}
+    	       </if>
+    	WHERE INST_ID = #{INST_ID}
+    </update>
+    
+    <!-- 根据业务集群ID查询关联Jstorm集群Nimbus列表 -->
+    <select id="queryBusNimbusListByBusClusterId" parameterType="map" resultType="map">
+    	<!-- 该SQL是必须找Nimbus主机提交Topology图 -->
+    	<!-- SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+			 A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,A.MODIFY_TIME,
+			 A.VERSION,
+			 B.SSH_USER,B.SSH_PASSWD,A.SOFT_LINK_PATH,
+			 B.HOST_IP,
+			 B.SSH_PORT,
+			 B.HOST_NAME,
+			 T.CLUSTER_TYPE,
+			 T.CLUSTER_DEPLOY_PATH,
+			 T.CLUSTER_NAME,
+			 T.CLUSTER_CODE
+		FROM DCF_DEPLOY_INST_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+     		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID = A.CLUSTER_ID)
+			WHERE A.DEPLOY_FILE_TYPE IN ('nimbus')
+				AND A.STATUS = '1'
+				下面这个条件的作用是用当前Billing集群ID查询出关联的JStorm集群ID
+				AND A.CLUSTER_ID IN (SELECT CLUSTER_ID 
+										FROM DCF_BUS_RELATION_CLUSTER_LIST 
+										WHERE BUS_CLUSTER_ID IN (SELECT BUS_CLUSTER_ID 
+																	FROM DCF_BUS_RELATION_CLUSTER_LIST 
+																	WHERE CLUSTER_ID = #{CLUSTER_ID}) 
+										  AND CLUSTER_TYPE='jstorm' )
+			ORDER BY A.VERSION DESC -->
+		
+		<!-- 下面这个SQL就是提交Topology不需要必须找Nimbus提交Topology，只要是Jstorm集群中的主机就能提交Topology -->
+		SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+			 A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,A.MODIFY_TIME,
+			 A.VERSION,
+			 B.SSH_USER,B.SSH_PASSWD,A.SOFT_LINK_PATH,
+			 B.HOST_IP,
+			 B.SSH_PORT,
+			 B.HOST_NAME,
+			 T.CLUSTER_TYPE,
+			 T.CLUSTER_DEPLOY_PATH,
+			 T.CLUSTER_NAME,
+			 T.CLUSTER_CODE
+		FROM DCF_DEPLOY_INST_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+     		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID = A.CLUSTER_ID)
+			JOIN (SELECT DISTINCT HOST_ID FROM DCF_BUSINESS_DEPLOY_LIST WHERE CLUSTER_ID = #{CLUSTER_ID}) G ON (A.HOST_ID = G.HOST_ID)
+			WHERE A.STATUS = '1' 
+			  AND A.CLUSTER_ID IN (SELECT CLUSTER_ID 
+										FROM DCF_BUS_RELATION_CLUSTER_LIST 
+										WHERE BUS_CLUSTER_ID IN (SELECT BUS_CLUSTER_ID 
+														FROM DCF_BUS_RELATION_CLUSTER_LIST 
+														WHERE CLUSTER_ID = #{CLUSTER_ID}) 
+										  AND CLUSTER_TYPE='jstorm' )
+				<!-- 判断业务集群关联的Jstorm集群存在活跃的Nimbus -->
+				AND EXISTS(SELECT HOST_ID FROM DCF_DEPLOY_INST_CONFIG 
+							WHERE CLUSTER_ID IN (SELECT CLUSTER_ID 
+								FROM DCF_BUS_RELATION_CLUSTER_LIST 
+								WHERE BUS_CLUSTER_ID IN (SELECT BUS_CLUSTER_ID 
+														FROM DCF_BUS_RELATION_CLUSTER_LIST 
+														WHERE CLUSTER_ID = #{CLUSTER_ID}) 
+							  AND CLUSTER_TYPE='jstorm') 
+								AND STATUS = '1'
+								AND DEPLOY_FILE_TYPE = 'nimbus')
+			ORDER BY A.VERSION DESC, A.DEPLOY_FILE_TYPE ASC
+    </select>
+    
+    <!-- 查询配置信息 -->
+    <select id="queryInstConfigInfo" parameterType="map" resultType="map">
+    	SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+    		   A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,
+    		   DATE_FORMAT(A.MODIFY_TIME,'%Y-%m-%d %H:%i:%s') AS MODIFY_TIME,
+    		   A.VERSION,B.SSH_USER,B.SSH_PASSWD,A.SOFT_LINK_PATH,
+    		   SUBSTRING_INDEX(A.INST_PATH,"/", 1) INST_NAME,
+    		   SUBSTRING_INDEX(A.INST_PATH,"/", -1) FILE_NAME,
+    		   A.CONFIG_PATH,
+    		   A.PORT,
+    		   A.DAEMON_STATE,
+    		   A.PM2_NAME,
+    		   B.HOST_IP,
+    		   B.HOST_NAME,
+    		   CONCAT(B.HOST_IP, '(', B.SSH_USER, ')') HOST_INFO,
+    		   T.CLUSTER_TYPE,
+    		   T.CLUSTER_DEPLOY_PATH,
+    		   T.CLUSTER_NAME
+    	FROM DCF_DEPLOY_INST_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID = A.CLUSTER_ID)
+		JOIN DCF_HOST_DEPLOY M ON (A.CLUSTER_ID = M.CLUSTER_ID AND A.HOST_ID = M.HOST_ID)
+    	WHERE A.IS_MONITOR = '1'
+    	<if test="HOST_ID != null and HOST_ID != ''">
+    		AND A.HOST_ID = #{HOST_ID}
+    	</if>
+		<if test="HOST_IP != null and HOST_IP != ''">
+    		AND B.HOST_IP = #{HOST_IP}
+    	</if>
+    	<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+    		AND A.CLUSTER_ID = #{CLUSTER_ID}
+    	</if>
+    	<if test="DEPLOY_TYPE != null and DEPLOY_TYPE != ''">
+    		AND A.DEPLOY_TYPE = #{DEPLOY_TYPE}
+    	</if>
+    	<if test="DEPLOY_FILE_TYPE != null and DEPLOY_FILE_TYPE != ''">
+    		AND A.DEPLOY_FILE_TYPE = #{DEPLOY_FILE_TYPE}
+    	</if>
+		<if test="VERSION != null and VERSION != ''">
+			AND A.VERSION LIKE CONCAT(#{VERSION},'%')
+		</if>
+		<if test="STATUS != null and STATUS != ''">
+			AND A.STATUS = #{STATUS}
+		</if>
+    	ORDER BY A.CLUSTER_ID,A.DEPLOY_TYPE,INET_ATON(B.HOST_IP),A.DEPLOY_FILE_TYPE,INST_NAME
+    </select>
+    
+    <!-- 查询配置信息 -->
+    <select id="queryNimbusListByState" parameterType="map" resultType="map">
+    	SELECT A.INST_ID,A.CLUSTER_ID, A.HOST_ID, A.DEPLOY_FILE_TYPE, A.FILE_PATH, 
+    		   A.DEPLOY_TYPE,A.STATUS,A.INST_PATH,A.MODIFY_TIME,
+    		   A.VERSION,B.SSH_USER,B.SSH_PASSWD,A.SOFT_LINK_PATH,
+    		   substring_index(A.INST_PATH,"/", 1) INST_NAME,
+    		   substring_index(A.INST_PATH,"/", -1) FILE_NAME,
+    		   B.HOST_IP,
+    		   B.HOST_NAME,
+    		   T.CLUSTER_TYPE
+    	FROM DCF_DEPLOY_INST_CONFIG A
+		LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID = A.CLUSTER_ID)
+    	WHERE 1=1
+    	<if test="STATUS != null and STATUS != ''">
+    		AND A.STATUS = #{STATUS}
+    	</if>
+		<if test="HOST_IP != null and HOST_IP != ''">
+    		AND B.HOST_IP = #{HOST_IP}
+    	</if>
+    	<if test="DEPLOY_TYPE != null and DEPLOY_TYPE != ''">
+    		AND A.DEPLOY_TYPE = #{DEPLOY_TYPE}
+    	</if>
+    	<if test="DEPLOY_FILE_TYPE != null and DEPLOY_FILE_TYPE != ''">
+    		AND A.DEPLOY_FILE_TYPE = #{DEPLOY_FILE_TYPE}
+    	</if>
+    	 
+    	ORDER BY A.DEPLOY_TYPE,INET_ATON(B.HOST_IP),A.DEPLOY_FILE_TYPE,INST_NAME
+    </select>
+    
+    <!-- 批量查询同主机、同分类下 正在运行程序信息-->
+    <select id="batchQueryInstConfigInfo" parameterType="map" resultType="map">
+    	SELECT COUNT(1)+'' RUN_COUNT,HOST_ID,DEPLOY_TYPE
+		FROM DCF_DEPLOY_INST_CONFIG 
+		WHERE 
+		<foreach collection="successList" index="index" item="item" separator="OR">
+           	( HOST_ID=#{item.HOST_ID} AND DEPLOY_TYPE=#{item.DEPLOY_TYPE} AND STATUS=1)
+       	</foreach>
+       	GROUP BY HOST_ID,DEPLOY_TYPE
+    </select>
+    
+    <!-- 查询当前主机实例是否已经存在数据，如果存在则直接修改数据，否则添加实例数据 -->
+    <select id="queryConfigInfoByConditions" parameterType="map" resultType="map">
+    	SELECT INST_ID,CLUSTER_ID, HOST_ID, DEPLOY_FILE_TYPE,FILE_PATH, 
+			DEPLOY_TYPE,STATUS,INST_PATH,MODIFY_TIME,SOFT_LINK_PATH, PORT, DAEMON_STATE
+    	FROM DCF_DEPLOY_INST_CONFIG
+		WHERE CLUSTER_ID = #{CLUSTER_ID}
+			AND HOST_ID = #{HOST_ID} 
+			AND FILE_PATH = #{FILE_PATH}
+			AND DEPLOY_TYPE = #{DEPLOY_TYPE} 
+			AND DEPLOY_FILE_TYPE = #{DEPLOY_FILE_TYPE}  
+			AND INST_PATH = #{INST_PATH}
+    </select>
+    
+    <!-- 修改实例数据 -->
+    <update id="updateConfigInfoByConditions" parameterType="map">
+		UPDATE DCF_DEPLOY_INST_CONFIG 
+		   SET STATUS = #{STATUS}, 
+		   	   VERSION = #{VERSION},
+		   	   SOFT_LINK_PATH = #{SOFT_LINK_PATH},
+		   	   CONFIG_PATH = #{CONFIG_PATH},
+		   	   INST_PATH = #{INST_PATH},
+		       MODIFY_TIME = NOW()
+		       <if test="PM2_NAME != null and PM2_NAME != ''">
+		       		,PM2_NAME = #{PM2_NAME}
+		       </if>
+			<if test="PORT != null and PORT != ''">
+				,PORT = #{PORT}
+			</if>
+		WHERE CLUSTER_ID = #{CLUSTER_ID}
+		  AND HOST_ID = #{HOST_ID}
+		  AND FILE_PATH = #{FILE_PATH}
+		  AND DEPLOY_TYPE = #{DEPLOY_TYPE}
+		  AND DEPLOY_FILE_TYPE = #{DEPLOY_FILE_TYPE}
+		  AND INST_PATH = #{INST_PATH}
+    </update>
+    
+    <!-- 修改Redis实例数据 -->
+    <update id="updateDcfDeployInstConfigByRedis" parameterType="map">
+    	UPDATE DCF_DEPLOY_INST_CONFIG 
+		   SET STATUS = #{STATUS}, 
+		   	   VERSION = #{VERSION},
+		   	   SOFT_LINK_PATH=#{SOFT_LINK_PATH},
+		   	   PORT=#{PORT},
+		   	   DAEMON_STATE=#{DAEMON_STATE},
+		       MODIFY_TIME = now()
+		WHERE HOST_ID = #{HOST_ID}
+		  AND FILE_PATH = #{FILE_PATH}
+		  AND DEPLOY_TYPE = #{DEPLOY_TYPE}
+		  AND DEPLOY_FILE_TYPE = #{DEPLOY_FILE_TYPE}
+    </update>
+    
+    <!-- 删除M2DB主机实例 -->
+    <delete id="delDcfDeployInstConfigByM2db" parameterType="map">
+    	DELETE FROM DCF_DEPLOY_INST_CONFIG 
+    	WHERE DEPLOY_TYPE = #{DEPLOY_TYPE}
+    	 AND INST_PATH = #{INST_PATH}
+    	 AND HOST_ID = #{HOST_ID}
+    	 AND CLUSTER_ID = #{CLUSTER_ID}
+    	 AND STATUS = #{STATUS}
+    </delete>
+    
+    <!-- 判断M2DB实例是否已经存在启动版本，如果同一台主机同个实例已经存在启动状态进程则不能再次启动 -->
+    <select id="queryM2dbInstList" parameterType="map" resultType="map">
+    	SELECT A.INST_ID, A.CLUSTER_ID,A.HOST_ID, A.DEPLOY_TYPE, A.STATUS,
+			   A.INST_PATH, A.VERSION
+		FROM DCF_DEPLOY_INST_CONFIG A
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		  AND A.HOST_ID = #{HOST_ID}
+		  AND A.STATUS = #{STATUS}
+		  AND A.INST_PATH = #{INST_PATH}
+    </select>
+    
+    <!-- ftp文件上传,删除文件信息 -->
+    <delete id="deleteConfigByVersion" parameterType="hashMap">
+      DELETE FROM DCF_DEPLOY_INST_CONFIG WHERE VERSION=#{VERSION}
+    </delete>
+    
+    <!-- 配置文件修改,删除文件信息 -->
+    <delete id="deleteConfigByFilePath" parameterType="hashMap">
+      DELETE FROM DCF_DEPLOY_INST_CONFIG WHERE FILE_PATH=#{FILE_PATH}
+    </delete>
+    
+    <!-- 配置文件修改,删除文件信息 -->
+    <delete id="deleteConfigByInstId" parameterType="hashMap">
+      DELETE FROM DCF_DEPLOY_INST_CONFIG WHERE INST_ID=#{INST_ID}
+    </delete>
+    
+    <!-- 根据文件路径查询是否 -->
+    <select id="queryRunCountByPath" parameterType="map" resultType="map">
+    	SELECT count(1) RUN_COUNT
+    	FROM DCF_DEPLOY_INST_CONFIG
+		WHERE STATUS = '1' 
+		  AND (FILE_PATH = #{FILE_PATH} OR FILE_PATH =#{FILE_PATH_HALF})
+    </select>
+    
+    <!-- 查询正在运行的版 本 -->
+     <select id="queryRunVersionByHostId" parameterType="map" resultType="map">
+    	 SELECT A.VERSION FROM DCF_DEPLOY_INST_CONFIG A 
+    	 WHERE A.DEPLOY_TYPE = #{CLUSTER_TYPE} 
+    	   AND A.`STATUS` = '1'
+ 		   AND A.HOST_ID=#{HOST_ID}
+ 		   AND A.CLUSTER_ID = #{CLUSTER_ID}
+ 		   AND A.INST_PATH = #{INSTANCE_NAME}
+ 		 ORDER BY A.VERSION DESC
+    </select>
+    
+    <!-- 查询DMDB主模式关联的模式 -->
+    <select id="queryDmdbMainRefPatternList" parameterType="map" resultType="map">
+    	SELECT A.INST_ID FROM DCF_DEPLOY_INST_CONFIG A
+		WHERE A.FILE_PATH LIKE CONCAT(#{DMDB_PATH},'%')
+		  AND A.INST_ID != #{INST_ID}
+		  AND A.DEPLOY_TYPE = #{DEPLOY_TYPE}
+		  AND A.HOST_ID = #{HOST_ID}
+		  AND A.DEPLOY_FILE_TYPE IN ('instance_pattern')
+    </select>
+    
+    <!-- 查询DMDB主模式是否存在 -->
+    <select id="queryDmdbMainPatternList" parameterType="map" resultType="map">
+    	SELECT A.INST_ID FROM DCF_DEPLOY_INST_CONFIG A
+		WHERE A.FILE_PATH LIKE CONCAT(#{DMDB_PATH},'%')
+		  AND A.DEPLOY_TYPE = #{DEPLOY_TYPE}
+		  AND A.HOST_ID = #{HOST_ID}
+		  AND A.DEPLOY_FILE_TYPE IN ('main_pattern')
+		  AND A.STATUS = '1'
+    </select>
+
+	<!-- 查询实例配置文件 -->
+	<select id="queryInstConfigByClusterIdHostId" parameterType="map" resultType="map">
+		SELECT
+			A.INST_ID,
+			A.CLUSTER_ID,
+			A.HOST_ID,
+			A.DEPLOY_FILE_TYPE,
+			A.FILE_PATH,
+			A.DEPLOY_TYPE,
+			A. STATUS,
+			A.INST_PATH,
+			A.SOFT_LINK_PATH,
+			substring_index(A.INST_PATH, "/", 1) INST_NAME,
+			A.MODIFY_TIME
+		FROM
+			DCF_DEPLOY_INST_CONFIG A
+		RIGHT JOIN (
+			SELECT
+				C.CLUSTER_ID
+			FROM
+				DCF_HOST_DEPLOY C
+			WHERE
+				C.CLUSTER_ID IN (
+					SELECT
+						B.CLUSTER_ID
+					FROM
+						DCF_BUS_RELATION_CLUSTER_LIST B
+					WHERE
+						B.BUS_CLUSTER_ID IN (
+							SELECT
+								A.BUS_CLUSTER_ID
+							FROM
+								DCF_BUS_RELATION_CLUSTER_LIST A
+							WHERE
+								A.CLUSTER_ID = #{CLUSTER_ID}
+						)
+					AND B.CLUSTER_TYPE = 'JSTORM'
+				)
+			AND C.HOST_ID = #{HOST_ID}
+		) B ON A.CLUSTER_ID = B.CLUSTER_ID
+		WHERE
+			A.DEPLOY_FILE_TYPE = 'supervisor'
+		AND A.HOST_ID = #{HOST_ID}
+	</select>
+</mapper>

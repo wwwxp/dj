@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="startConfig">
+	<!-- 添加初始化配置 -->
+	<insert id="addStartConfig" parameterType="map">
+		INSERT INTO DCF_START_CONFIG(ID, BATCH_NAME, CLUSTER_ID, CLUSTER_TYPE, HOST_IP, HOST_ID, 
+			DEPLOY_FILE_TYPE, CONFIG_PATH, VERSION, UPDATE_DATE)
+		VALUES (NEWID(), #{BATCH_NAME}, #{CLUSTER_ID}, #{CLUSTER_TYPE}, #{HOST_IP}, #{HOST_ID}, 
+			#{DEPLOY_FILE_TYPE}, #{CONFIG_PATH}, #{VERSION}, NOW())
+	</insert>
+	
+	<!-- 批量添加配置信息 -->
+    <insert id="addBatchStartConfig" parameterType="java.util.List">
+    	INSERT INTO DCF_START_CONFIG(ID, BATCH_NAME, CLUSTER_ID, CLUSTER_TYPE, HOST_IP, HOST_ID, 
+    		DEPLOY_FILE_TYPE, CONFIG_PATH, VERSION, UPDATE_DATE)
+		VALUES
+		<foreach collection='list' item="item" index="index" separator=",">
+			(NEWID(), #{item.BATCH_NAME}, #{item.CLUSTER_ID}, #{item.CLUSTER_TYPE}, #{item.HOST_IP}, #{item.HOST_ID}, 
+				#{item.DEPLOY_FILE_TYPE}, #{item.CONFIG_PATH}, #{item.VERSION}, NOW())
+		</foreach>
+    </insert>
+	
+	<!-- 查询当前组件初始化配置 -->
+	<select id="queryStartConfigList" parameterType="map" resultType="map">
+		SELECT A.ID, A.BATCH_NAME, A.CLUSTER_ID, CONCAT(A.HOST_IP, '(', B.SSH_USER, ')') HOST_IP, A.HOST_ID, A.DEPLOY_FILE_TYPE, 
+			   A.CONFIG_PATH, A.VERSION,B.SSH_USER, 
+			   DATE_FORMAT(A.UPDATE_DATE,'%Y-%m-%d %H:%i:%s') AS UPDATE_DATE
+		FROM DCF_START_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		<if test="BATCH_NAME != null and BATCH_NAME != ''">
+			AND A.BATCH_NAME LIKE CONCAT('%', #{BATCH_NAME}, '%')
+		</if>
+		ORDER BY A.UPDATE_DATE DESC, A.BATCH_NAME
+	</select>
+	
+	<!-- 判断当前集群类型中该批次名称是否被使用 -->
+	<select id="queryBatchNameExistsList" parameterType="map" resultType="map">
+		SELECT A.ID, A.BATCH_NAME, A.CLUSTER_ID, A.HOST_IP, A.HOST_ID, A.DEPLOY_FILE_TYPE, 
+			   A.CONFIG_PATH, A.VERSION,B.SSH_USER, 
+			   DATE_FORMAT(A.UPDATE_DATE,'%Y-%m-%d %H:%i:%s') AS UPDATE_DATE
+		FROM DCF_START_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND A.BATCH_NAME = #{BATCH_NAME}
+	</select>
+	
+	<!-- 查询当前组件初始化配置 -->
+	<select id="queryStartConfig" parameterType="map" resultType="map">
+		SELECT A.ID, A.BATCH_NAME, A.CLUSTER_ID, A.HOST_IP, A.HOST_ID, A.DEPLOY_FILE_TYPE, 
+			   A.CONFIG_PATH, A.VERSION,B.SSH_USER, 
+			   DATE_FORMAT(A.UPDATE_DATE,'%Y-%m-%d %H:%i:%s') AS UPDATE_DATE
+		FROM DCF_START_CONFIG A LEFT JOIN DCF_HOST B ON (A.HOST_ID = B.HOST_ID)
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		<if test="BATCH_NAME != null and BATCH_NAME != ''">
+			AND A.BATCH_NAME = #{BATCH_NAME}
+		</if>
+		ORDER BY A.UPDATE_DATE DESC, A.BATCH_NAME
+	</select>
+
+	<!-- 根据组件类型删除配置信息 -->
+	<delete id="delStartConfigByCode" parameterType="map">
+		DELETE FROM DCF_START_CONFIG 
+		WHERE CLUSTER_ID = #{CLUSTER_ID} 
+		  AND BATCH_NAME = #{BATCH_NAME}
+	</delete>
+</mapper>

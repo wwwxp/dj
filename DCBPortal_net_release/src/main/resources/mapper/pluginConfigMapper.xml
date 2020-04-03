@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 查询插件配置 -->
+<mapper namespace="pluginConfig">
+	<!-- 查询插件配置列表 -->
+	<select id="queryPluginConfigList" parameterType="list" resultType="map">
+		SELECT A.CLUSTER_TYPE, A.BUS_CLUSTER_CODE, A.SOURCE_FILE_NAME, A.PLUGIN_FILE_NAME,
+			   A.NODE_NAME, A.NODE_DESC, A.PLUGIN_STATE
+		FROM DCF_PLUGIN_CONFIG A
+		WHERE A.PLUGIN_STATE = '1'
+		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+			AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+	</select>
+	
+</mapper>

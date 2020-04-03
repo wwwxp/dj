@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userRoleConfigMapper">
+    <!-- 查询用户 -->
+    <select id="queryEmpee" parameterType="hashMap" resultType="map">
+		 SELECT 
+		   	T.EMPEE_ID,
+		   	T.EMPEE_NAME,
+		   	T.EMPEE_ACCT
+		  FROM
+			tb_bp_sys_empee T
+		WHERE
+			T.STATE = 'G01' 	
+        <if test="EMPEE_NAME !=''">
+            and (T.empee_name like '%${EMPEE_NAME}%' or T.empee_acct like '%${EMPEE_NAME}%')
+        </if>
+        
+             AND T.EMPEE_ID != '1'
+        
+    </select>
+ 
+    <!-- 查询未绑定过的角色 -->
+    <select id="queryRoles" resultType="map">
+        SELECT ROLE_ID, ROLE_NAME
+		  FROM DCF_BUS_ROLE
+    </select>
+    
+    <!-- 查询员工已有角色 -->
+    <select id="queryEmpeeReadyRole" parameterType="hashMap" resultType="map">
+        SELECT S.ROLE_ID,S.ROLE_NAME,T.ID
+        FROM DCF_BUS_USER_ROLE T, DCF_BUS_ROLE S
+        WHERE T.ROLE_ID = S.ROLE_ID
+        AND T.EMPEE_ID = #{EMPEE_ID} 
+    </select>
+    
+    <!-- 删除员工的角色 -->
+    <delete id="delEmpeeRole" parameterType="hashMap">
+        DELETE FROM DCF_BUS_USER_ROLE WHERE EMPEE_ID= #{EMPEE_ID}
+    </delete>
+    
+     <!-- 查询员工角色 -->
+    <select id="queryRoleList" parameterType="hashMap" resultType="map">
+        SELECT S.ROLE_ID,S.ROLE_NAME,T.ID,T.EMPEE_ID
+        FROM DCF_BUS_USER_ROLE T, DCF_BUS_ROLE S
+        WHERE T.ROLE_ID = S.ROLE_ID
+        <foreach collection="list" index="index" item="item" open="and (" close=")" separator="or" > 
+       		 T.EMPEE_ID = #{item.EMPEE_ID} 
+        </foreach>
+    </select>
+    
+    
+    
+    
+    <!-- 插入用户角色关联表 -->
+    <insert id="insertBusEmpeeRole" parameterType="hashMap">
+        INSERT INTO DCF_BUS_USER_ROLE
+        VALUES (NEWID(),#{EMPEE_ID},#{ROLE_ID})
+    </insert>  
+</mapper>
+
+
+
+
+
+
+
+
+

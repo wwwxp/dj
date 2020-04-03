@@ -1,0 +1,54 @@
+.formTable { border: #ababab solid 1px; text-align: center; font-size: 12px; width:100%; border-collapse: collapse;}
+.formTable tr th {border: #ababab solid 1px; word-wrap:   break-word;   text-align: right; font-weight: normal; background-color: #f6f9fa; padding: 2px; }
+.formTable tr td {border: #ababab solid 1px; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff; word-wrap:break-word;  }
+
+
+.formTable2 { border: #ababab solid 1px; text-align: center; font-size: 12px; width:100%; border-collapse: collapse;}
+.formTable2 tr th {border: #ababab solid 1px; word-wrap:   break-word;   text-align: right; font-weight: normal; background-color: #f6f9fa; padding: 2px; }
+.formTable2 tr td {border: #ababab solid 1px; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff;overflow:hidden;white-space:nowrap; text-overflow:ellipsis; }
+
+
+/**使用miniui后的表格，需要单独使用此样式**/
+.formTable3 { border: #99b2c9 solid 1px; text-align: center; font-size: 12px; width:100%; border-collapse: collapse;}
+.th3 {border: #99b2c9 solid 1px; word-wrap:   break-word;   text-align: right; font-weight: normal; background-color: #f6f9fa; padding: 2px; }
+.td3 {border: #99b2c9 solid 1px; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff; word-wrap:break-word;  }
+.td_nowarp {border: #99b2c9 solid 1px; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff;overflow:hidden;white-space:nowrap; text-overflow:ellipsis; }
+.td3_border {border: #99b2c9 solid 1px; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff;}
+
+
+
+/*VK Style*/
+.formTable4 { border:#b1c3e0 solid 1px; text-align: center; font-size: 12px; width:100%; border-collapse: collapse;}
+.formTable4 tr th {border: #b1c3e0 solid 1px; word-wrap:   break-word;   text-align: right; font-weight: normal; background-color: #f6f9fa; padding: 2px; }
+.formTable4 tr td {border: #b1c3e0 solid 1px; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff; word-wrap:break-word;  }
+
+/*VK Style*/
+.formTable5 { border:none; text-align: center; font-size: 12px; width:100%; border-collapse: collapse;}
+.formTable5 tr th {border: none; word-wrap:   break-word;   text-align: right; font-weight: normal; padding: 2px; }
+.formTable5 tr td {border: none; text-align: left; padding: 2px; line-height: 20px; background-color: #ffffff; word-wrap:break-word;  }
+
+/*VK Style*/
+.formTable6 {width:100%;border:#99b2c9 solid 1px; text-align: center; font-size: 12px; border-collapse: collapse;}
+.formTable6 tr th {border: #99b2c9 solid 1px; word-wrap:   break-word;   text-align: right; font-weight: normal; padding: 2px; background-color: #f6f9fa;}
+.formTable6 tr td {border: #99b2c9 solid 1px; text-align: left; padding: 2px; height: 28px; line-height: 28px;  word-wrap:break-word;  }
+
+
+
+/*VK Style*/
+.formTable7 {width:100%;border:solid 1px #b1c3e0; text-align: center; font-size: 12px; border-collapse: collapse;}
+.formTable7 tr th {border: solid 1px #b1c3e0 ; word-wrap:   break-word;   text-align: right; font-weight: normal; padding: 2px; background-color: #ebeff8}
+.formTable7 tr td {border: solid 1px #b1c3e0 ; text-align: left; padding: 2px; height: 28px; line-height: 28px;  word-wrap:break-word;  }
+
+
+/*VK Style*/
+.formTable8 {width:100%;border:none; text-align: center; font-size: 12px; border-collapse: collapse;}
+.formTable8 tr th {border:none; word-wrap:   break-word;   text-align: right; font-weight: normal; padding: 2px; background-color: #ebeff8}
+.formTable8 tr td {border:none ; text-align: left; padding: 2px; height: 28px; line-height: 28px;  word-wrap:break-word;  }
+
+
+/*VK Style*/
+.formTable9 {width:100%;border:none; text-align: center; font-size: 12px; border-collapse: collapse;}
+.formTable9 tr th {border:none; word-wrap:   break-word;   text-align: right; font-weight: normal; padding: 2px; }
+.formTable9 tr td {border:none ; text-align: left; padding: 2px; height: 28px; line-height: 28px;  word-wrap:break-word;  }
+
+

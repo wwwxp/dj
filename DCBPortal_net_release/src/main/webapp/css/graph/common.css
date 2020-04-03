@@ -1,0 +1,188 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/*全局定义*/
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td{margin:0;padding:0}
+body{font-family:"微软雅黑";-webkit-text-size-adjust:100%;color:#333;font-size:10px;}
+h1,h2,h3,h4,h5,h6{font-size:100%;}
+address,cite,dfn,em,i,var,caption{font-style:normal;}
+ul,ol,li{list-style:none;}a,a img,button {cursor:pointer;}
+button,input,textarea{font-size:100%;border:none;background:none;}
+table{border-collapse:collapse;border-spacing:0;}
+img,input,spsx,button,textarea{border:0;vertical-align:middle;}
+a{text-transform:none;text-decoration:none;}
+*{outline:0;outline:none;box-sizing: border-box;}
+textarea{resize:none;}
+
+.clearfix:before,.clearfix:after{
+	clear: both;
+	content: ' ';
+  	display: table;
+}
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 5px solid transparent;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+}
+
+::-webkit-scrollbar-thumb {
+  min-height: 20px;
+  background-clip: content-box;
+  box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*浮动*/
+.fl{float:left;}.fr{float:right;}
+.clear{clear:both;height:0px;overflow: hidden;margin:0;padding:0;font-size:0;}
+
+/*间距*/
+.mt10{margin-top:10px !important;}
+.mt30{margin-top:30px !important;}
+
+/*tab切换*/
+.tabNav{overflow:hidden;zoom:1;border-bottom:0px solid #e1e1e1;margin-bottom:10px;font-size: 14px;}
+.tabNav a{display:block;float:left;margin-right:20px;cursor:pointer;text-decoration:none;color:#333;padding:0 10px;line-height:34px;}
+.tabNav .hover a{color:#0891d3;border-bottom:2px solid #0891d3;}
+.tabCnt .hover{display:block;}
+.tabPane{display:none;zoom:1;}
+
+
+.outer-table{
+	/*background: #fff;*/
+	margin-top: 5px;
+	border: 1px solid #ccc;
+	width: 100%;
+}
+.outer-table th{
+	/*width: 46px;*/
+	padding: 10px;
+	background: #f2f2f2;
+	border-right: 1px solid #ccc;
+	font-size: 16px;
+}
+.outer-table td{
+	/*padding: 10px;*/
+	padding-top: 10px;
+	font-size: 12px;
+	font-family: SimSun;
+}
+.outer-ul{
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
+.outer-ul>li{
+	/*padding: 0 10px;*/
+	height: 100%;
+	text-align: center;
+	display: table-cell;
+}
+.outer-ul>li+li{
+	border-left: 1px dashed #ccc;
+}
+.first-level{
+	min-width: 120px;
+	border-radius: 5px;
+	overflow: hidden;
+}
+.first-level .head{
+	padding: 2px;
+	font-weight: bold;
+	line-height: 16px;
+}
+.first-level.blue{
+	border: 1px solid #3595D6;
+	background: #def0fa;
+}
+.first-level.blue .head{
+	border-bottom: 1px solid #3595D6;
+	background: #b8dbf1;
+}
+.first-level.green{
+	border: 1px solid #97CB6F;
+	background: #F1F8EB;
+}
+.first-level.green .head{
+	border-bottom: 1px solid #97CB6F;
+	background: #c3e1b6;
+}
+.first-level .content{
+	display: inline-block;
+	background: url(../../images/deployGraph/blue1.png) no-repeat left center;
+	text-align: left;
+	padding: 5px 2px;
+	min-height: 40px;
+	padding-left: 50%;
+	line-height: 20px;
+}
+.first-level.blue .content{
+	background: url(../../images/deployGraph/blue1.png) no-repeat left center;
+}
+.first-level .content{
+	background: url(../../images/deployGraph/blue2.png) no-repeat left center;
+}
+.second-outer{
+	margin-top: 22px;
+	display: inline-block;
+}
+.second-outer li{
+	float: left;
+	/*padding-right: 15px;*/
+	margin-bottom: 10px;
+}
+.second-level{
+	border-radius: 5px;
+	width: 120px;
+	height: 76px;
+	padding: 2px;
+	overflow: hidden;
+}
+.second-level>div{
+	display: table-cell;
+	vertical-align: middle;
+	word-break:break-all;
+	line-height: 20px;
+	overflow: hidden;
+	font-weight: bold;
+	color: #5B6274;
+}
+.second-level:hover{
+	overflow: auto;
+}
+.second-level.red{
+	border: 1px solid #F4867B;
+	background: #FFEFED;
+}
+.second-level.yellow{
+	border: 1px solid #FFC156;
+	background: #fdf2e1;
+}
+.second-level em{
+	display: inline-block;
+	padding: 0 10px;
+	height: 15px;
+	line-height: 15px;
+	border-radius: 5px;
+	margin-left: 10px;
+}
+.second-level.yellow em{
+	background: #FFCD78;
+	color: #DD4E00;
+}
+.second-level.red em{
+	background: #f8aea7;
+	color: #BC2112;
+}

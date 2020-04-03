@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userMapper">
+    <!-- 查询用户 -->
+    <select id="queryEmpee" parameterType="hashMap" resultType="map">
+        SELECT
+			T.EMPEE_ID,
+			(
+				SELECT
+					GROUP_CONCAT(b.role_name)
+				FROM
+					tb_bp_sys_role b
+				WHERE
+					b.role_id IN (
+						SELECT
+							c.role_id
+						FROM
+							tb_bp_sys_empee_role c
+						WHERE
+							c.empee_id = t.empee_id
+					)
+			) AS ROLE_NAME,
+			T.PTY_ID,
+			T.EMPEE_NAME,
+			T.EMPEE_ACCT,
+			T.EMPEE_PWD,
+			T.EMPEE_ADDR_DESC,
+			T.EMPEE_EMAIL_ADDR,
+			T.EMPEE_MOB_NO,
+			T.EMPEE_TEL_NO,
+			T.EMPEE_PHS_NO,
+			T.STAFF_TYPE,
+			T.CERT_NBR,
+			T.LOGIN_NUM,
+			T.STATE,
+			T.LATN_ID,
+			T.USER_TYPE,
+			T.EMPEE_CODE,
+			T.CRT_DATE,
+			T.PWD_CRT_DATE,
+			T.TITLE,
+			T.SITE_ID,
+			T.IP_ADDRESS,
+			T.MAC,
+			T.EMPEE_LEVEL,
+			T.QQ,
+			T.MSN,
+			T.HR_PERSONID,
+			T.STYLE,
+			T.PTY_LATN_ID,
+			T.BILL_SERIAL_NBR,
+			T.GPROVICE,
+			T.URL_MAPPING
+		FROM
+			tb_bp_sys_empee T
+		WHERE
+			T.STATE = 'G01'
+        <if test="EMPEE_NAME !=''">
+            and (T.empee_name like '%${EMPEE_NAME}%' or T.empee_acct like '%${EMPEE_NAME}%')
+        </if>
+        <if test="EMPEE_ID !=1">
+             AND T.EMPEE_ID != 1
+        </if>
+    </select>
+
+    <!-- 查询角色 -->
+    <select id="queryUserRole" resultType="map">
+        SELECT ROLE_ID,ROLE_NAME FROM TB_BP_SYS_ROLE WHERE STATE = '1'
+    </select>
+    <!-- 查询用户账号是否重复 -->
+    <select id="queryUserAcctIsRepeat" resultType="map" parameterType="hashMap">
+        SELECT COUNT(*) SUM FROM TB_BP_SYS_EMPEE WHERE EMPEE_ACCT = #{EMPEE_ACCT} 
+        <if test="UPDATE_FLAG != null and UPDATE_FLAG != ''">
+            AND EMPEE_ID != #{EMPEE_ID}
+        </if>
+    </select>
+
+    <!-- 添加用户，保存关联关系 -->
+    <insert id="insertEmpReleashion" parameterType="hashMap">
+            INSERT  INTO TB_BP_SYS_EMPEE_ROLE
+            (ID,EMPEE_ID,ROLE_ID,CREATOR,CREATE_DATE,TYPE,PROPERTY,ROLE_EFF_UNIT,OFFSET0,DURATION0,
+            OFFSET1,DURATION1,OFFSET2,DURATION2,WEEK,LATN_ID,EFF_DATE,EXP_DATE,MAIN_ROLE_FLAG)
+            VALUES(NEWID(),
+            #{EMPEE_ID},#{ROLE_ID},'1',CURRENT_TIMESTAMP,'1',null,null,null,null,
+            null,null,1,1439,'1111111',null,CURRENT_TIMESTAMP,DATE('2099-12-30 23:59:59'),1)
+    </insert>
+
+    <!-- 添加用户 -->
+    <insert id="insertEmpee" parameterType="hashMap">
+        insert into tb_bp_sys_empee
+        (empee_id,pty_id,empee_name,empee_acct,empee_pwd,empee_addr_desc,empee_email_addr,empee_mob_no,
+        empee_tel_no,empee_phs_no,staff_type,cert_nbr,login_num,state,latn_id,user_type,
+        empee_code,crt_date,pwd_crt_date,title,site_id,ip_address,mac,empee_level,qq,msn,
+        hr_personid,style,pty_latn_id,bill_serial_nbr,gprovice,url_mapping)
+        values
+        (#{EMPEE_ID},null,#{EMPEE_NAME},#{EMPEE_ACCT},
+        #{EMPEE_PWD},#{EMPEE_ADDR_DESC},#{EMPEE_EMAIL_ADDR},#{EMPEE_MOB_NO},#{EMPEE_TEL_NO},
+        null,null,null,null,'G01',null,'EMPEE','superAdmin',null,CURRENT_TIMESTAMP,null,0,null,null,1,#{QQ},null,null,'IchannelUi.css',null,
+        null,null,null)
+    </insert>
+
+    <!-- 修改用户:删除关联关系 -->
+    <delete id="updateEmpee_delRelation" parameterType="hashMap">
+        delete from tb_bp_sys_empee_role where empee_id=#{EMPEE_ID}
+    </delete>
+
+    <!-- 修改用户：修改用户 -->
+    <update id="updateEmpee" parameterType="hashMap">
+        update tb_bp_sys_empee set EMPEE_NAME=#{EMPEE_NAME},
+        EMPEE_ACCT=#{EMPEE_ACCT},
+        EMPEE_PWD=#{EMPEE_PWD},
+        EMPEE_ADDR_DESC=#{EMPEE_ADDR_DESC},
+        EMPEE_EMAIL_ADDR=#{EMPEE_EMAIL_ADDR},
+        EMPEE_MOB_NO=#{EMPEE_MOB_NO},
+        EMPEE_TEL_NO=#{EMPEE_TEL_NO},
+        QQ=#{QQ}
+        where empee_id=#{EMPEE_ID}
+    </update>
+
+
+    <!-- 查询用户 -->
+    <select id="queryEmpeeById" parameterType="hashMap" resultType="map">
+        select  `EMPEE_ID`,
+				`PTY_ID`,
+				`EMPEE_NAME`,
+				`EMPEE_ACCT`,
+				`EMPEE_PWD`,
+				`EMPEE_ADDR_DESC`,
+				`EMPEE_EMAIL_ADDR`,
+				`EMPEE_MOB_NO`,
+				`EMPEE_TEL_NO`,
+				`EMPEE_PHS_NO`,
+				`STAFF_TYPE`,
+				`CERT_NBR`,
+				`LOGIN_NUM`,
+				`STATE`,
+				`LATN_ID`,
+				`USER_TYPE`,
+				`EMPEE_CODE`,
+				`CRT_DATE`,
+				`PWD_CRT_DATE`,
+				`TITLE`,
+				`SITE_ID`,
+				`IP_ADDRESS`,
+				`MAC`,
+				`EMPEE_LEVEL`,
+				`QQ`,
+				`MSN`,
+				`HR_PERSONID`,
+				`STYLE`,
+				`PTY_LATN_ID`,
+				`GPROVICE`,
+				`URL_MAPPING`,
+				`BILL_SERIAL_NBR`,
+				`QUERY_FLAG`,
+				`IP`,
+        (select group_concat(f.role_id)  from tb_bp_sys_empee_role f
+        where f.empee_id = t.empee_id)   ROLE_ID
+        from tb_bp_sys_empee t where t.empee_id = #{EMPPE_ID}
+    </select>
+
+    <!-- 删除用户:删除关联关系 -->
+    <delete id="deleteEmpeeRelation" parameterType="hashMap">
+        delete from tb_bp_sys_empee_role where empee_id=#{EMPEE_ID}
+    </delete>
+
+    <!-- 删除用户 -->
+    <update id="updateEmpeeForDelete" parameterType="hashMap">
+        update tb_bp_sys_empee set state='00X' where empee_id=#{EMPEE_ID}
+    </update>
+
+    <!-- 修改用户密码 -->
+    <update id="updatePasswordUser" parameterType="hashMap">
+        update tb_bp_sys_empee set EMPEE_PWD= #{newPassword} where state='G01' and EMPEE_ACCT=#{userName}
+    </update>
+    <!-- 查询用户输入的密码和原来的密码是否相同 -->
+    <select id="queryPasswordIsSame" parameterType="hashMap" resultType="map">
+        select count(1) COUNT from tb_bp_sys_empee f
+        where state='G01' and f.EMPEE_ACCT=#{userName} and   EMPEE_PWD = #{oldPassword}
+    </select>
+    <!-- 生成主键 -->
+    <select id="querySequece"  resultType="map">
+        select NEWID() EMPEE_ID FROM DUAL
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+

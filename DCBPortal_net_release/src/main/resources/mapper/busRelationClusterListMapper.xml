@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务主程序和组件、业务子程序中间管理表 -->
+<mapper namespace="busRelationClusterList">
+
+	<!-- 删除业务主程序关联程序 -->
+	<delete id="delBusRelationClusterList" parameterType="map">
+		DELETE FROM DCF_BUS_RELATION_CLUSTER_LIST 
+		WHERE BUS_CLUSTER_ID in
+		<foreach collection="list" open="(" separator="," close=")" item="item">
+			#{item.BUS_CLUSTER_ID}
+		</foreach>
+	</delete>
+	
+	<!-- 查询主业务集群关联子集群 -->
+	<select id="queryClusterByBusClusterId" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID, A.CLUSTER_ID, B.CLUSTER_TYPE, B.PERSONAL_CONF, B.CLUSTER_DEPLOY_PATH
+		FROM DCF_BUS_RELATION_CLUSTER_LIST A, DCF_SERVICE_TYPE B
+		WHERE A.CLUSTER_ID = B.CLUSTER_ID
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+	</select>
+	
+	<!-- 删除业务主程序关联程序 -->
+	<delete id="delete" parameterType="map">
+		DELETE FROM DCF_BUS_RELATION_CLUSTER_LIST 
+		WHERE CLUSTER_ID = #{CLUSTER_ID}
+	</delete>
+	
+	<!-- 删除业务主程序关联程序 -->
+	<delete id="batchDelete" parameterType="list">
+		DELETE FROM DCF_BUS_RELATION_CLUSTER_LIST 
+		where 
+			<foreach collection="list" open="" separator=" OR " close="" item="item">
+				(BUS_CLUSTER_ID = #{item.BUS_CLUSTER_ID} AND CLUSTER_ID = #{item.CLUSTER_ID})
+			</foreach>
+	</delete>
+	
+	<!-- 查询主业务集群关联组件集群 -->
+	<select id="queryComponentClusterByBusClusterId" parameterType="map" resultType="map">
+		SELECT
+			BUS_CLUSTER_ID,
+			CLUSTER_ID,
+			CLUSTER_TYPE,
+			CLUSTER_PARENT_TYPE
+		FROM
+			DCF_BUS_RELATION_CLUSTER_LIST
+		WHERE
+			BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		AND CLUSTER_PARENT_TYPE = #{CLUSTER_PARENT_TYPE}
+	</select>
+	
+	    <!--根据BUS_CLUSTER_ID查询关系表中的cluster_id-->
+    <select id="queryClusterIdByMainId" parameterType="map" resultType="map">
+        SELECT
+        BUS_CLUSTER_ID,
+        CLUSTER_ID,
+        CLUSTER_TYPE,
+        CLUSTER_PARENT_TYPE
+        FROM
+        DCF_BUS_RELATION_CLUSTER_LIST
+        WHERE
+        BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+        AND
+        CLUSTER_ID = #{CLUSTER_ID}
+    </select>
+    
+    <insert id="insert" parameterType="map">
+        INSERT INTO DCF_BUS_RELATION_CLUSTER_LIST (
+			BUS_CLUSTER_ID,
+			CLUSTER_ID,
+			CLUSTER_TYPE,
+			CLUSTER_PARENT_TYPE
+		)
+		VALUES
+		(
+			#{BUS_CLUSTER_ID},
+			#{CLUSTER_ID},
+			#{CLUSTER_TYPE},
+			#{CLUSTER_PARENT_TYPE}
+		)
+    </insert>
+
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO DCF_BUS_RELATION_CLUSTER_LIST (
+			BUS_CLUSTER_ID,
+			CLUSTER_ID,
+			CLUSTER_TYPE,
+			CLUSTER_PARENT_TYPE
+		)
+		<foreach collection="list" item="item" index="index" separator="union all">
+			(SELECT #{item.BUS_CLUSTER_ID},#{item.CLUSTER_ID},#{item.CLUSTER_TYPE},#{item.CLUSTER_PARENT_TYPE} FROM DUAL)
+		</foreach>
+    </insert>
+
+    <!--根据relation查找组件集群信息-->
+    <select id="queryComClusterInfoForUpdate" parameterType="map" resultType="map">
+        SELECT
+        CLUSTER_ID,
+        CLUSTER_TYPE,
+        CLUSTER_PARENT_TYPE
+        FROM
+        DCF_BUS_RELATION_CLUSTER_LIST
+        WHERE
+        BUS_CLUSTER_ID=#{BUS_CLUSTER_ID}
+        AND
+        CLUSTER_PARENT_TYPE = '1'
+    </select>
+
+    <!--根据relation查找业务集群信息-->
+    <select id="queryBusClusterInfoForUpdate" parameterType="map" resultType="hashMap">
+        SELECT
+        CLUSTER_ID,
+        CLUSTER_TYPE,
+        CLUSTER_PARENT_TYPE
+        FROM
+        DCF_BUS_RELATION_CLUSTER_LIST
+        WHERE
+        BUS_CLUSTER_ID=#{BUS_CLUSTER_ID}
+        AND
+        CLUSTER_PARENT_TYPE = '3'
+    </select>
+
+    <!-- 修改关联关系表，更新业务集群信息 -->
+    <update id="updateBusClusterRelation" parameterType="map">
+        UPDATE DCF_BUS_RELATION_CLUSTER_LIST SET
+        CLUSTER_TYPE = #{DCF_CLUSTER_ELE_TYPE},
+        CLUSTER_PARENT_TYPE = #{CLUSTER_PARENT_TYPE}
+        WHERE BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+    </update>
+
+    <!-- 修改关联关系表环节，更新业务/组件集群信息（查询） -->
+    <select id="checkComOrBusClusterRelation" parameterType="map" resultType="hashMap">
+        SELECT CLUSTER_ID, CLUSTER_TYPE, CLUSTER_PARENT_TYPE
+        FROM DCF_BUS_RELATION_CLUSTER_LIST
+        WHERE
+        BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+    </select>
+    
+    <!-- 查询业务主集群关联Jstorm集群 -->
+   	<select id="queryJstormByBusClusterId" parameterType="map" resultType="map">
+   		SELECT A.BUS_CLUSTER_ID, A.CLUSTER_ID, B.CLUSTER_CODE, B.CLUSTER_NAME, B.CLUSTER_TYPE
+		FROM DCF_BUS_RELATION_CLUSTER_LIST A JOIN DCF_SERVICE_TYPE B ON (A.CLUSTER_ID = B.CLUSTER_ID)
+		<where>
+			<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+				AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+			</if>
+			<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+				AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+			</if>
+		</where>
+   	</select>
+   	
+   	<!-- 根据ZK集群ID查询关联Jstorm集群信息 -->
+   	<select id="queryClusterListByZkClusterId" parameterType="map" resultType="map">
+   		SELECT A.CLUSTER_ID, A.CLUSTER_TYPE, B.CLUSTER_NAME, B.CLUSTER_TYPE, B.CLUSTER_CODE
+		FROM DCF_BUS_RELATION_CLUSTER_LIST A, DCF_SERVICE_TYPE B
+		WHERE A.CLUSTER_ID = B.CLUSTER_ID
+		AND A.CLUSTER_TYPE = 'jstorm'
+		AND A.BUS_CLUSTER_ID IN (SELECT BUS_CLUSTER_ID 
+									FROM DCF_BUS_RELATION_CLUSTER_LIST 
+									WHERE CLUSTER_ID = #{CLUSTER_ID})
+   	</select>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="masterStandby">
+     <!-- 查询主备切换操作记录 --> 
+    <select id="queryMasterStandby" parameterType="map" resultType="hashMap">
+      SELECT S.TOPOLOGY_GROUP,S.ACTION_FLAG 
+      FROM DCF_MASTER_STANDBY S
+      WHERE 1=1
+		<if test="TOPOLOGY_GROUP != null and TOPOLOGY_GROUP != ''">
+			AND S.TOPOLOGY_GROUP =#{TOPOLOGY_GROUP}
+		</if>
+    </select>
+    
+    <!-- 新增主备切换操作记录 -->
+    <insert id="insertMasterStandby" parameterType="map">
+    	INSERT INTO DCF_MASTER_STANDBY(TOPOLOGY_GROUP,ACTION_FLAG)
+    		VALUES(#{TOPOLOGY_GROUP},#{ACTION_FLAG})
+    </insert>
+    
+    <!-- 删除主备切换操作记录 -->
+    <delete id="delMasterStandby" parameterType="hashMap">
+      DELETE FROM DCF_MASTER_STANDBY WHERE TOPOLOGY_GROUP=#{TOPOLOGY_GROUP}
+    </delete>
+    
+    <!-- 更新主备切换操作记录-->
+    <update id="updateMasterStandby" parameterType="hashMap">
+       UPDATE DCF_MASTER_STANDBY
+		 SET ACTION_FLAG=#{ACTION_FLAG}
+		 WHERE TOPOLOGY_GROUP=#{TOPOLOGY_GROUP}
+    </update>
+    
+    <!-- 查询版本切换配置文件列表 -->
+    <select id="querySwitchConfigList" parameterType="map" resultType="map">
+    	SELECT A.BUS_SWITCH_TYPE, A.BUS_SWITCH_PAGE_URL, A.STATE, A.SWITCH_CONFIG_FILE, A.SWITCH_CLUSTER_TYPE
+		FROM DCF_VERSION_SWITCH_CONFIG A
+		WHERE A.SWITCH_CONFIG_FILE IS NOT NULL
+    </select>
+</mapper>

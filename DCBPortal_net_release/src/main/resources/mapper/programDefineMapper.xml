@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="programDefine">
+    <!-- 查询业务类型 --> 
+    <select id="queryProgramDefineList" parameterType="map" resultType="hashMap">
+    	SELECT A.PROGRAM_TYPE, A.SCRIPT_SH_NAME, A.SCRIPT_SH_EXAMPLE,A.MULTI_PROCESS,
+    		   A.PROGRAM_NAME, A.PROGRAM_GROUP, A.PROGRAM_CODE, A.PROGRAM_STATE, 
+    		   DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM  DCF_PROGRAM_DEFINE A
+		WHERE PROGRAM_STATE = '1'
+		<if test="PROGRAM_TYPE != null and PROGRAM_TYPE != ''">
+			AND A.PROGRAM_TYPE = #{PROGRAM_TYPE}
+		</if>
+		ORDER BY A.PROGRAM_NAME ASC, A.PROGRAM_TYPE
+    </select>
+    
+    <!-- 查询Topology业务类型 --> 
+    <select id="queryTopologyProgramDefineList" parameterType="map" resultType="hashMap">
+    	SELECT A.PROGRAM_TYPE, A.SCRIPT_SH_NAME, A.SCRIPT_SH_EXAMPLE,
+    		   A.PROGRAM_NAME, A.PROGRAM_GROUP, A.PROGRAM_CODE, A.PROGRAM_STATE, A.MULTI_PROCESS,
+    		   DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM  DCF_PROGRAM_DEFINE A
+		WHERE PROGRAM_STATE = '1'
+		  AND PROGRAM_CODE NOT IN (SELECT PROGRAM_CODE FROM DCF_TASK_PROGRAM 
+						WHERE PROGRAM_TYPE = #{PROGRAM_TYPE} 
+						  AND CLUSTER_ID = #{CLUSTER_ID}
+						  AND BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+						  AND TASK_ID = #{TASK_ID})
+		<if test="PROGRAM_TYPE != null and PROGRAM_TYPE != ''">
+			AND A.PROGRAM_TYPE = #{PROGRAM_TYPE}
+		</if>
+		ORDER BY A.PROGRAM_TYPE
+    </select>
+
+	<!-- 查询条件-查询业务类型 -->
+	<select id="queryProgramTypeList" parameterType="map" resultType="hashMap">
+		SELECT A.PROGRAM_TYPE
+		FROM  DCF_PROGRAM_DEFINE A
+		WHERE PROGRAM_STATE = '1'
+		<if test="PROGRAM_TYPE != null and PROGRAM_TYPE != ''">
+			AND A.PROGRAM_TYPE = #{PROGRAM_TYPE}
+		</if>
+		GROUP BY A.PROGRAM_TYPE
+	</select>
+
+	<!--查询条件-->
+	<select id="queryInfoBySearch" parameterType="map" resultType="hashMap">
+		SELECT A.PROGRAM_TYPE, A.SCRIPT_SH_NAME, A.SCRIPT_SH_EXAMPLE,
+    		   A.PROGRAM_NAME, A.PROGRAM_GROUP, A.PROGRAM_CODE, A.PROGRAM_STATE, 
+    		   DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM DCF_PROGRAM_DEFINE A
+		<where>
+			<if test="PROGRAM_TYPE != null and PROGRAM_TYPE != ''">
+				AND A.PROGRAM_TYPE = #{PROGRAM_TYPE}
+			</if>
+			<if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+				AND A.PROGRAM_CODE LIKE CONCAT('%',#{PROGRAM_CODE},'%')
+			</if>
+			<if test="PROGRAM_NAME != null and PROGRAM_NAME != ''">
+				AND A.PROGRAM_NAME LIKE CONCAT('%',#{PROGRAM_NAME},'%')
+			</if>
+		</where>
+		ORDER BY A.PROGRAM_TYPE
+	</select>
+
+	<!--校验唯一编码-->
+	<select id="validateProgramCode" parameterType="map" resultType="hashMap">
+		SELECT PROGRAM_CODE
+		FROM  DCF_PROGRAM_DEFINE
+		WHERE PROGRAM_CODE = #{PROGRAM_CODE}
+	</select>
+	
+	<!-- 查询程序所属组 -->
+	<select id="queryProgramGroupList" parameterType="map" resultType="map">
+		SELECT A.PROGRAM_CODE, A.PROGRAM_GROUP FROM DCF_PROGRAM_DEFINE A
+		WHERE A.PROGRAM_GROUP = #{PROGRAM_GROUP}
+		<if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+			AND A.PROGRAM_CODE != #{PROGRAM_CODE}
+		</if>
+	</select>
+
+	<!-- 查询列表 -->
+	<select id="queryProgramList" parameterType="map" resultType="hashMap">
+		SELECT T.PROGRAM_TYPE, T.SCRIPT_SH_NAME, T.SCRIPT_SH_EXAMPLE,T.MULTI_PROCESS,
+			   T.PROGRAM_NAME, T.PROGRAM_GROUP,T.PROGRAM_CODE, T.PROGRAM_STATE,
+			   CASE T.MULTI_PROCESS WHEN  '1' THEN '是' WHEN 0 THEN '否'  END MULTI_PROCESS_DESC,
+			   DATE_FORMAT(T.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM DCF_PROGRAM_DEFINE T
+		<where>
+			<if test="PROGRAM_TYPE != null and PROGRAM_TYPE != ''">
+				AND T.PROGRAM_TYPE = #{PROGRAM_TYPE}
+			</if>
+			<if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+				AND T.PROGRAM_CODE = #{PROGRAM_CODE}
+			</if>
+			<if test="PROGRAM_STATE != null and PROGRAM_STATE != ''">
+				AND T.PROGRAM_STATE = #{PROGRAM_STATE}
+			</if>
+			<if test="QUERY_PROGRAM_VALUE != null and QUERY_PROGRAM_VALUE != ''">
+				AND (T.PROGRAM_CODE LIKE CONCAT('%',#{QUERY_PROGRAM_VALUE},'%')
+				OR T.PROGRAM_NAME LIKE CONCAT('%',#{QUERY_PROGRAM_VALUE},'%'))
+			</if>
+		</where>
+		ORDER BY T.PROGRAM_TYPE
+	</select>
+
+	<!-- 新增程序 -->
+	<insert id="insertProgram" parameterType="hashMap">
+		INSERT INTO DCF_PROGRAM_DEFINE
+			(PROGRAM_TYPE,
+			PROGRAM_CODE,
+			PROGRAM_NAME,
+			PROGRAM_GROUP,
+			MULTI_PROCESS,
+			PROGRAM_STATE,
+			SCRIPT_SH_NAME,
+			SCRIPT_SH_EXAMPLE,
+			CRT_DATE)
+		VALUES
+			(#{PROGRAM_TYPE},
+			#{PROGRAM_CODE},
+			#{PROGRAM_NAME},
+			#{PROGRAM_GROUP},
+			#{MULTI_PROCESS},
+			1,
+			#{SCRIPT_SH_NAME},
+			#{SCRIPT_SH_EXAMPLE},
+			NOW())
+	</insert>
+
+	<!-- 更新程序 -->
+	<update id="updateProgram" parameterType="hashMap">
+		UPDATE DCF_PROGRAM_DEFINE
+		SET PROGRAM_NAME = #{PROGRAM_NAME},
+			SCRIPT_SH_NAME = #{SCRIPT_SH_NAME},
+			SCRIPT_SH_EXAMPLE = #{SCRIPT_SH_EXAMPLE},
+			PROGRAM_GROUP = #{PROGRAM_GROUP},
+			MULTI_PROCESS = #{MULTI_PROCESS},
+			CRT_DATE=NOW()
+		WHERE PROGRAM_CODE=#{PROGRAM_CODE}
+	</update>
+
+	<!-- 删除 -->
+	<delete id="delProgram" parameterType="hashMap">
+		DELETE FROM DCF_PROGRAM_DEFINE WHERE PROGRAM_CODE=#{PROGRAM_CODE}
+	</delete>
+
+	<!-- 查询程序定义信息 -->
+	<select id="queryProgramCodeList" parameterType="hashMap" resultType="map">
+		SELECT T.PROGRAM_STATE, T.PROGRAM_CODE,T.PROGRAM_NAME, T.SCRIPT_SH_NAME,T.PROGRAM_TYPE
+		FROM DCF_PROGRAM_DEFINE T
+		WHERE T.PROGRAM_CODE = #{PROGRAM_CODE}
+		<if test="PROGRAM_CODE_OLD != null and PROGRAM_CODE_OLD != ''">
+			AND T.PROGRAM_CODE != #{PROGRAM_CODE_OLD}
+		</if>
+	</select>
+
+	<!-- router查询列表 -->
+	<select id="queryProgramListForRouter" parameterType="map" resultType="hashMap">
+		SELECT T.PROGRAM_STATE, T.PROGRAM_CODE,T.PROGRAM_NAME,
+		T.SCRIPT_SH_NAME,T.PROGRAM_TYPE
+		FROM DCF_PROGRAM_DEFINE T
+		<where>
+			<if test="PROGRAM_TYPE != null and PROGRAM_TYPE != ''">
+				AND T.PROGRAM_TYPE = #{PROGRAM_TYPE}
+			</if>
+			<if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+				AND T.PROGRAM_CODE = #{PROGRAM_CODE}
+			</if>
+			<if test="PROGRAM_STATE != null and PROGRAM_STATE != ''">
+				AND T.PROGRAM_STATE = #{PROGRAM_STATE}
+			</if>
+			<if test="QUERY_PROGRAM_VALUE != null and QUERY_PROGRAM_VALUE != ''">
+				AND (T.PROGRAM_CODE LIKE CONCAT('%',#{QUERY_PROGRAM_VALUE},'%')
+				OR T.PROGRAM_NAME LIKE CONCAT('%',#{QUERY_PROGRAM_VALUE},'%'))
+			</if>
+		</where>
+		ORDER BY T.PROGRAM_TYPE
+	</select>
+</mapper>

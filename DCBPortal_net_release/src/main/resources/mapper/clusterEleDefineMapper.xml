@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 集群元素定义表 -->
+<mapper namespace="clusterEleDefine">
+	<!-- 查询所有的集群类型 -->
+	<select id="queryClusterEleList" parameterType="map" resultType="map">
+		SELECT
+		A.CLUSTER_ELE_ID,
+		A.CLUSTER_ELE_NAME CLUSTER_TYPE,
+		A.CLUSTER_ELE_NAME CLUSTER_NAME,
+		A.CLUSTER_ELE_TYPE,
+		A.CLUSTER_ELE_PERSONAL_CONF,
+		A.CLUSTER_ELE_DEFAULT_PATH,
+		A.CLUSTER_ELE_RUN_JSTORM RUN_JSTORM
+		FROM
+		DCF_CLUSTER_ELE_DEFINE A
+		<where>
+			<if test="TYPE != null and TYPE != ''">
+				AND A.CLUSTER_ELE_TYPE = #{TYPE}
+			</if>
+			<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+				AND A.CLUSTER_ELE_NAME = #{CLUSTER_TYPE}
+			</if>
+		</where>
+		ORDER BY A.CLUSTER_ELE_NAME ASC
+	</select>
+</mapper>

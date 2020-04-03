@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="monitorMapper">
+<!-- 离线OMC -->
+   <select id="queryLogRating" parameterType="map" resultType="map">
+   select  g.RATING_LOG_ID,
+	       g.SOURCE_ID,
+	       g.LATN_ID,
+	       g.PROCER_ID,
+	       case g.PROCER_ID when 'A' then '格式化' when 'C' then '批价' else g.PROCER_ID end PROCER_ID_NAME,
+	       g.NORMAL_RECORDS,
+	       g.INVALID_RECORDS,
+	       g.ABNORMAL_RECORDS,
+	       g.NOUSER_RECORDS,
+	       g.DUAL_RECORDS,
+	       g.ORI_CHARGE,
+	       g.DISCT_CHARGE,
+	       to_char(g.BEGIN_TIME,'yyyy-mm-dd hh24:mi:ss') BEGIN_TIME,
+	       to_char(g.END_TIME,'yyyy-mm-dd hh24:mi:ss') END_TIME, 
+	       g.LOG_STATE,
+	       g.STAFF_ID,
+	       g.ORI_CHARGE+g.DISCT_CHARGE TOTAL_CHARGE ,
+	       g.CHARGE_RECORDS,
+	       g.PARENT_SOURCE_ID,
+	       g.PROCER_ID_TMP,
+	       to_char(g.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss') CREATE_TIME,
+	       g.TOPIC,
+	       g.TOTAL_RECORDS,
+	       g.OPER_TYPE,
+	       f.MAPPING_NAME OPER_TYPE_NAME
+	  from LOG_RATING  g left join  par_oper_type_def f on g.OPER_TYPE=f.OPER_TYPE
+	  where 1=1
+	  <if test="BEGIN_TIME != null and  BEGIN_TIME != ''">
+	     and g.BEGIN_TIME &gt;= to_date(#{BEGIN_TIME},'yyyy-mm-dd hh24:mi:ss')
+	  </if>
+	  <if test="END_TIME !=  null and  END_TIME != ''">
+	     and g.END_TIME &lt;= to_date(#{END_TIME},'yyyy-mm-dd hh24:mi:ss')
+	  </if>
+	  <if test="TOPIC !=  null and TOPIC != ''">
+	     and g.TOPIC like '%'||#{TOPIC}||'%'
+	  </if> 
+	  <if test="PROCER_ID !=  null and PROCER_ID != ''">
+	     and g.PROCER_ID = #{PROCER_ID}
+	  </if>
+	  <if test="SOURCE_ID !=  null and SOURCE_ID != ''">
+	     and g.SOURCE_ID  like '%'||#{SOURCE_ID}||'%'
+	  </if> 
+	  
+	  <if test="OPER_TYPE !=  null and OPER_TYPE != ''">
+	     and g.OPER_TYPE  in (select  OPER_TYPE from  par_oper_type_def where  MAPPING_TYPE =#{OPER_TYPE})
+	  </if>
+	  
+	  <if test="ABNORMAL_PERCENT !=  null and ABNORMAL_PERCENT != ''">
+	     and (g.ABNORMAL_RECORDS/g.TOTAL_RECORDS)*100  >=#{ABNORMAL_PERCENT}
+	  </if>
+	  
+	  
+	  order by  g.CREATE_TIME desc
+   </select>
+   <!--    查询离线话单前一小时饼图数据 -->
+   <select id="queryLogRatingLineHourData" parameterType="map" resultType="map">
+    select sum(g2.NORMAL_RECORDS) NORMAL_RECORDS,
+	       sum(g2.INVALID_RECORDS) INVALID_RECORDS,
+	       sum(g2.ABNORMAL_RECORDS) ABNORMAL_RECORDS,
+	       sum(g2.NOUSER_RECORDS) NOUSER_RECORDS
+	  from (select g.NORMAL_RECORDS,
+	               g.INVALID_RECORDS,
+	               g.ABNORMAL_RECORDS,
+	               g.NOUSER_RECORDS
+	          from LOG_RATING g
+	         where g.END_TIME > sysdate - 1/ 24
+	           and g.PROCER_ID = #{PROCER_ID}) g2
+   
+   </select>
+<!--    查询离线话单当天柱状图数据 -->
+   <select id="queryLogRatingLineDayData" parameterType="map" resultType="map">
+    select case when g3.TOTAL_RECORDS is null then 0 else g3.TOTAL_RECORDS end  TOTAL_RECORDS, m2.MI,substr(m2.MI,12) MI_NONE_DATE
+		  from (select substr(m.mi, 1, 15) || '0' mi
+		          from (select to_char(SYSDATE - (1 / (24 * 6)) * rownum +
+		                               (1 / (24 * 6)),
+		                               'yyyy-mm-dd hh24:mi') mi
+		                  from dual
+		                connect by rownum &lt; 145) m
+		         where substr(m.mi, 1, 10) = to_char(sysdate, 'yyyy-mm-dd')) m2
+		  left join (select sum(g2.TOTAL_RECORDS) TOTAL_RECORDS, g2.END_TIME
+		               from (select g.TOTAL_RECORDS,
+		                            substr(to_char(g.END_TIME, 'yyyy-mm-dd hh24:mi'),
+		                                   1,
+		                                   15) || '0' END_TIME
+		                       from LOG_RATING g
+		                      where g.END_TIME > trunc(sysdate)
+		                        and g.PROCER_ID = 'C') g2
+		              group by g2.END_TIME) g3
+		    on m2.mi = g3.END_TIME
+		 order by m2.mi
+
+   </select>
+<!--    在线OMC实时统计 -->
+   <select id="queryDcfOmcPerfData" parameterType="map" resultType="map">
+	   select  NET_NAME,
+		       CCR_COUNT,
+		       CCA_COUNT,
+		       CCR_COUNT-CCA_COUNT DIFF_COUNT,
+		       DELAY_50,
+		       DELAY_100,
+		       DELAY_200,
+		       DELAY_500,
+		       DELAY_1000,
+		       DELAY_5000,
+		       DELAY_9999,
+		       to_char(BEGIN_TIME,'yyyy-mm-dd hh24:mi:ss') BEGIN_TIME,
+		       to_char(END_TIME,'yyyy-mm-dd hh24:mi:ss') END_TIME
+		  from DCF_OMC_PERF_DATA
+		  order by  BEGIN_TIME
+	   </select>
+<!-- 	   查询所有网元 -->
+	   <select id="queryNets" parameterType="map" resultType="map">
+	   select NET_NAME from DCF_OMC_PERF_DATA order by NET_NAME
+	   </select>
+	   
+	   <!--    查询在线话单当天柱状图数据 -->
+   <select id="queryDcfOmcPerfDataHistoryLineDayData" parameterType="map" resultType="map">
+  	 select case
+		         when y3.CCA_COUNT is null then
+		          0
+		         else
+		          y3.CCA_COUNT
+		       end CCA_COUNT,
+		       m2.MI,
+		       substr(m2.MI,12) MI_NONE_DATE
+		  from (select substr(m.mi, 1, 15) || '0' mi
+		          from (select to_char(SYSDATE - (1 / (24 * 6)) * rownum +
+		                               (1 / (24 * 6)),
+		                               'yyyy-mm-dd hh24:mi') mi
+		                  from dual
+		                connect by rownum &lt; 145) m
+		         where substr(m.mi, 1, 10) = to_char(sysdate, 'yyyy-mm-dd')) m2
+		  left join (
+		             
+		             select sum(y2.CCA_COUNT) CCA_COUNT, y2.END_TIME
+		               from (select y.CCA_COUNT,
+		                             substr(to_char(y.END_TIME, 'yyyy-mm-dd hh24:mi'),
+		                                    1,
+		                                    15) || '0' END_TIME
+		                        from dcf_omc_perf_data_history y
+		                       where y.END_TIME > trunc(sysdate)
+		                       and y.NET_NAME=#{NET_NAME}) y2
+		              group by y2.END_TIME) y3
+		    on m2.mi = y3.END_TIME
+		    order by m2.MI
+   </select>
+   
+<!-- 	   结果码描述 -->
+	   <select id="queryCodeRemarks" parameterType="map" resultType="map">
+		  select c.NET_NAME, c.RESULT_CODE, c.RECORDS, m.REMARKS
+          from dcf_omc_resultcode  c
+                left join (select p.OCP_RESULT_CODE, Max(p.REMARKS) REMARKS
+                             from sm_resultcode_map p
+                            group by p.OCP_RESULT_CODE) m
+                  on c.RESULT_CODE = m.OCP_RESULT_CODE
+                  where 1=1
+		          <if test="NET_NAME != null and  NET_NAME != ''">
+			     	and c.NET_NAME =#{NET_NAME}
+			   </if>
+               order by c.RESULT_CODE
+	   </select>
+<!-- 	   在线OMC历史数据明细 -->
+	   <select id="queryDcfOmcPerfDataHistory" parameterType="map" resultType="map">
+	   select  BATCH_ID,
+	           NET_NAME,
+		       CCR_COUNT,
+		       CCA_COUNT,
+		       DELAY_50,
+		       DELAY_100,
+		       DELAY_200,
+		       DELAY_500,
+		       DELAY_1000,
+		       DELAY_5000,
+		       DELAY_9999,
+		       BEGIN_TIME,
+		       END_TIME
+		  from dcf_omc_perf_data_history
+		  where 1=1
+		   <if test="BEGIN_TIME != null and  BEGIN_TIME != ''">
+	     and BEGIN_TIME &gt;= to_date(#{BEGIN_TIME},'yyyy-mm-dd hh24:mi:ss')
+	  </if>
+	  <if test="END_TIME !=  null and  END_TIME != ''">
+	     and END_TIME &lt;= to_date(#{END_TIME},'yyyy-mm-dd hh24:mi:ss')
+	  </if>
+	  <if test="NET_NAME !=  null and NET_NAME != ''">
+	     and NET_NAME like '%'||#{NET_NAME}||'%'
+	  </if>
+	  order by BEGIN_TIME desc,NET_NAME
+	   </select>
+<!-- 	    在线OMC历史明细结果码 -->
+	  <select id="queryHistoryResultCode" parameterType="map" resultType="map">
+		  select c.BATCH_ID,c.NET_NAME, c.RESULT_CODE, c.RECORDS, m.REMARKS
+          from dcf_omc_resultcode_history  c
+                left join (select p.OCP_RESULT_CODE, Max(p.REMARKS) REMARKS
+                             from sm_resultcode_map p
+                            group by p.OCP_RESULT_CODE) m
+                  on c.RESULT_CODE = m.OCP_RESULT_CODE
+                  where c.BATCH_ID=#{BATCH_ID}
+               order by c.RESULT_CODE
+	   </select>
+<!-- 	  在线OMC历史明细汇总 -->
+	  <select id="queryDcfOmcPerfDataInclude" parameterType="map" resultType="map">
+	    select NET_NAME,
+		       SUM(CCR_COUNT) CCR_COUNT,
+		       SUM(CCA_COUNT) CCA_COUNT,
+		       SUM(DELAY_50) DELAY_50,
+		       SUM(DELAY_100) DELAY_100,
+		       SUM(DELAY_200) DELAY_200,
+		       SUM(DELAY_500) DELAY_500,
+		       SUM(DELAY_1000) DELAY_1000,
+		       SUM(DELAY_5000) DELAY_5000,
+		       SUM(DELAY_9999) DELAY_9999,
+		       TO_CHAR(BEGIN_TIME,'yyyy-mm-dd') BEGIN_TIME
+		  from dcf_omc_perf_data_history
+		    where 1=1
+		   <if test="BEGIN_TIME != null and  BEGIN_TIME != ''">
+	    	 and BEGIN_TIME &gt;= to_date(#{BEGIN_TIME},'yyyy-mm-dd')
+		  </if>
+		  <if test="END_TIME !=  null and  END_TIME != ''">
+		     and END_TIME &lt;= to_date(#{END_TIME},'yyyy-mm-dd')
+		  </if>
+		  <if test="NET_NAME !=  null and NET_NAME != ''">
+		     and NET_NAME like '%'||#{NET_NAME}||'%'
+		  </if>
+		   group by NET_NAME ,TO_CHAR(BEGIN_TIME,'yyyy-mm-dd')
+		   order by BEGIN_TIME desc,NET_NAME
+	  </select>
+	  <!-- 	    在线OMC历史明细汇总结果码 -->
+	  <select id="queryHistoryIncludeResultCode" parameterType="map" resultType="map">
+		select c.NET_NAME, c.RESULT_CODE, c.RECORDS, m.REMARKS
+			  from (select y.NET_NAME, y.RESULT_CODE, sum(y.RECORDS) RECORDS
+			          from dcf_omc_resultcode_history y
+			          where TO_CHAR(y.BEGIN_TIME,'yyyy-mm-dd')=#{BEGIN_TIME} 
+			           and NET_NAME=#{NET_NAME}
+			         group by y.NET_NAME, y.RESULT_CODE) c
+			  left join (select p.OCP_RESULT_CODE, Max(p.REMARKS) REMARKS
+			               from sm_resultcode_map p
+			              group by p.OCP_RESULT_CODE) m
+			    on c.RESULT_CODE = m.OCP_RESULT_CODE
+			 order by c.RESULT_CODE
+	   </select>
+	  <!--在线OMC吞吐量表格查询 -->
+	  <select id="queryDcfOmcPerfDataMinitorGrid" parameterType="map" resultType="map">
+	    select  NET_NAME,
+           sum(CCR_COUNT)  CCR_COUNT,
+           sum(CCA_COUNT)  CCA_COUNT,
+           sum(DELAY_50)   DELAY_50,
+           sum(DELAY_100)  DELAY_100,
+           sum(DELAY_200)  DELAY_200,
+           sum(DELAY_500)  DELAY_500,
+           sum(DELAY_1000) DELAY_1000,
+           sum(DELAY_5000) DELAY_5000,
+           sum(DELAY_9999) DELAY_9999
+            from dcf_omc_perf_data_history y
+            where 1=1
+            <if test="startTime != null and startTime!=''">
+             and y.END_TIME > to_date(#{startTime},'yyyymmddhh24miss')
+            </if>
+            and y.END_TIME > trunc(sysdate)
+            group by y.NET_NAME
+	  </select>
+	  
+	  <!--在线OMC吞吐量图表查询 -->
+	  <select id="queryDcfOmcPerfDataMinitorCharts" parameterType="map" resultType="map">
+		  select     p.NET_NAME,
+		             p.MI, 
+		             substr( p.MI, 12) MI_NONE_DATE,
+		             case
+		               when ry.CCA_COUNT is null then
+		                0
+		               else
+		                ry.CCA_COUNT
+		             end CCA_COUNT
+		        from (select NET_NAME, MI
+		                from (select to_char(SYSDATE - (1 / (24 * 60)) * rownum ,
+		                                     'yyyy-mm-dd hh24:mi') mi
+		                        from dual
+		                      connect by rownum  &lt; 61),
+		                     (select distinct se.NET_NAME
+		                        from dcf_omc_perf_data_history se
+		                         where se.END_TIME> trunc(sysdate) 
+		                        )) p
+		        left join (select y.NET_NAME,
+						       ceil(sum(y.CCA_COUNT) / case
+						              when sum(y.duration) = 0 then
+						               1
+						              else
+						               sum(y.duration)
+						            end) CCA_COUNT,
+						       to_char(y.END_TIME, 'yyyy-mm-dd hh24:mi') END_TIME_MI
+						  from (select his.NET_NAME,
+						               his.CCA_COUNT,
+						               (his.END_TIME - his.BEGIN_TIME) * 24 * 60 * 60 duration,
+						               his.END_TIME
+						          from dcf_omc_perf_data_history his where his.END_TIME >(sysdate-1/24)) y
+ group by y.NET_NAME, to_char(y.END_TIME, 'yyyy-mm-dd hh24:mi')) ry
+		          on p.NET_NAME = ry.NET_NAME
+		         and p.MI = ry.END_TIME_MI
+		       order by p.NET_NAME asc, p.MI asc
+	  </select>
+	  
+      <!-- 离线OMC吞吐量表格查询 -->
+	  <select id="handlingCapacityGrid"  parameterType="map" resultType="map">
+		   select  g4.MAPPING_TYPE,
+		           MAX(g4.MAPPING_NAME) MAPPING_NAME,
+			       SUM(g4.SOURCE_ID) SOURCE_ID_COUNT,
+			       SUM(g4.NORMAL_RECORDS) NORMAL_RECORDS,
+			       SUM(g4.INVALID_RECORDS) INVALID_RECORDS,
+			       SUM(g4.ABNORMAL_RECORDS) ABNORMAL_RECORDS,
+			       SUM(g4.NOUSER_RECORDS) NOUSER_RECORDS,
+			       SUM(g4.NORMAL_RECORDS) + sum(g4.INVALID_RECORDS) +
+			       SUM(g4.ABNORMAL_RECORDS) + sum(g4.NOUSER_RECORDS) TOTAL_RECORDS,
+			       SUM(g4.CHARGE) CHARGE
+			  from (select g3.SOURCE_ID,
+			               g3.OPER_TYPE,
+			               g3.NORMAL_RECORDS,
+			               g3.INVALID_RECORDS,
+			               g3.ABNORMAL_RECORDS,
+			               g3.NOUSER_RECORDS,
+			               (g3.ORI_CHARGE + g3.DISCT_CHARGE) CHARGE,
+			               p.MAPPING_TYPE,
+			               p.MAPPING_NAME
+			          from (select sum(g2.SOURCE_ID) SOURCE_ID,
+			                       g2.OPER_TYPE,
+			                       sum(g2.NORMAL_RECORDS) NORMAL_RECORDS,
+			                       sum(g2.INVALID_RECORDS) INVALID_RECORDS,
+			                       sum(g2.ABNORMAL_RECORDS) ABNORMAL_RECORDS,
+			                       sum(g2.NOUSER_RECORDS) NOUSER_RECORDS,
+			                       sum(g2.ORI_CHARGE) ORI_CHARGE,
+			                       sum(g2.DISCT_CHARGE) DISCT_CHARGE
+			                  from (select case g.PROCER_ID
+	                                       when 'A' then
+	                                        1
+	                                       else
+	                                        0
+	                                       end  SOURCE_ID,
+			                               g.OPER_TYPE,
+			                               case g.PROCER_ID
+			                                 when 'C' then
+			                                  g.NORMAL_RECORDS
+			                                 else
+			                                  0
+			                               end NORMAL_RECORDS,
+			                               case g.PROCER_ID
+			                                 when 'A' then
+			                                  g.INVALID_RECORDS
+			                                 else
+			                                  0
+			                               end INVALID_RECORDS,
+			                               g.ABNORMAL_RECORDS,
+			                               case g.PROCER_ID
+			                                 when 'C' then
+			                                  g.NOUSER_RECORDS
+			                                 else
+			                                  0
+			                               end NOUSER_RECORDS,
+			                               case g.PROCER_ID
+			                                 when 'C' then
+			                                  g.ORI_CHARGE
+			                                 else
+			                                  0
+			                               end ORI_CHARGE,
+			                               case g.PROCER_ID
+			                                 when 'C' then
+			                                  g.DISCT_CHARGE
+			                                 else
+			                                  0
+			                               end DISCT_CHARGE
+			                        
+			                          from LOG_RATING g 
+			                          where 1=1
+			                          <if test="startTime != null and startTime!=''">
+			                         and g.END_TIME > to_date(#{startTime},'yyyymmddhh24miss')
+			                        </if>
+			                         and g.END_TIME > trunc(sysdate)
+			                         ) g2
+			                 group by  g2.OPER_TYPE) g3
+			          left join par_oper_type_def p
+			            on g3.OPER_TYPE = p.OPER_TYPE) g4
+			 group by g4.MAPPING_TYPE
+
+	  
+	  </select>
+	  
+	  
+	  <!--离线OMC吞吐量图表查询 -->
+	  <select id="handlingCapacityCharts" parameterType="map" resultType="map">
+	    select p.MAPPING_TYPE,
+		       p.MAPPING_NAME,
+		       p.MI,
+		       substr(p.MI, 12) MI_NONE_DATE,
+		       case
+		         when g7.HANDLE_SPEED is null then
+		          0
+		         else
+		          g7.HANDLE_SPEED
+		       end HANDLE_SPEED
+		  from (select MAPPING_TYPE, MAPPING_NAME, mi
+		          from (select to_char(SYSDATE - (1 / (24 * 60)) * rownum,
+		                               'yyyy-mm-dd hh24:mi') mi
+		                  from dual
+		                connect by rownum &lt; 61),
+		               (select distinct f.MAPPING_TYPE, f.MAPPING_NAME
+		                  from par_oper_type_def f)) p
+		  left join (select g6.MAPPING_TYPE,
+		                    case g6.DURATION
+		                      when 0 then
+		                       g6.TOTAL_RECORDS
+		                      else
+		                       ceil(g6.TOTAL_RECORDS / g6.DURATION)
+		                    end HANDLE_SPEED,
+		                    g6.END_TIME_MI
+		               from (select ff.MAPPING_TYPE,
+		                            sum(g5.DURATION) DURATION,
+		                            sum(g5.TOTAL_RECORDS) TOTAL_RECORDS,
+		                            max(g5.END_TIME_MI) END_TIME_MI
+		                       from (select g4.OPER_TYPE,
+		                                    sum(g4.DURATION) DURATION,
+		                                    sum(g4.TOTAL_RECORDS) TOTAL_RECORDS,
+		                                    to_char(g4.END_TIME, 'yyyy-mm-dd hh24:mi') END_TIME_MI
+		                               from (select g3.SOURCE_ID,
+		                                            g3.OPER_TYPE,
+		                                            sum(g3.TOTAL_RECORDS) TOTAL_RECORDS,
+		                                            sum(g3.DURATION) DURATION,
+		                                            max(g3.END_TIME) END_TIME
+		                                       from (select g2. SOURCE_ID,
+		                                                    g2.OPER_TYPE,
+		                                                    g2.NORMAL_RECORDS +
+		                                                    g2.INVALID_RECORDS +
+		                                                    g2.ABNORMAL_RECORDS +
+		                                                    g2.NOUSER_RECORDS TOTAL_RECORDS,
+		                                                    g2.DURATION,
+		                                                    g2.END_TIME
+		                                               from (select g.SOURCE_ID,
+		                                                            g.OPER_TYPE,
+		                                                            case g.PROCER_ID
+		                                                              when 'C' then
+		                                                               g.NORMAL_RECORDS
+		                                                              else
+		                                                               0
+		                                                            end NORMAL_RECORDS,
+		                                                            case g.PROCER_ID
+		                                                              when 'A' then
+		                                                               g.INVALID_RECORDS
+		                                                              else
+		                                                               0
+		                                                            end INVALID_RECORDS,
+		                                                            g.ABNORMAL_RECORDS,
+		                                                            case g.PROCER_ID
+		                                                              when 'C' then
+		                                                               g.NOUSER_RECORDS
+		                                                              else
+		                                                               0
+		                                                            end NOUSER_RECORDS,
+		                                                            (g.END_TIME -
+		                                                            g.BEGIN_TIME) * 24 * 60 * 60 DURATION,
+		                                                            g.END_TIME
+		                                                       from LOG_RATING g where g.END_TIME > (sysdate-1/24)
+		                                                      ) g2) g3
+		                                      group by g3.SOURCE_ID, g3.OPER_TYPE) g4
+		                              group by g4.OPER_TYPE,
+		                                       to_char(g4.END_TIME,
+		                                               'yyyy-mm-dd hh24:mi')) g5
+		                       left join par_oper_type_def ff
+		                         on g5.OPER_TYPE = ff.OPER_TYPE
+		                      group by ff.MAPPING_TYPE) g6) g7
+		    on g7.MAPPING_TYPE = p.MAPPING_TYPE
+		   and g7.END_TIME_MI = p.MI
+		    order by p.MAPPING_TYPE asc, p.MI asc
+	  </select>
+	  
+<!-- 	查询主机资源上报实时数据 -->
+  <select id="queryDcf_resource" parameterType="map" resultType="map">
+	 SELECT
+			RESOURCE_ID,
+			HOST,
+			CPU,
+			MEM_TOTAL,
+			MEM_USE,
+			DISK_TOTAL,
+			DISK_USE,
+			PROC_NUM,
+			DATE_FORMAT(REPORT_TIME,'%Y-%m-%d %H:%i:%s') REPORT_TIME,
+			DATE_FORMAT(REPORT_TIME,'%H:%i:%s') REPORT_TIME_ONLY
+		FROM
+			DCF_RESOURCE
+		where 1=1
+		<if test="HOST != null and HOST != '' ">
+		 and HOST like '%${HOST}%'
+		</if>
+      order by HOST asc,REPORT_TIME desc
+  </select>
+  <select id="queryHostDiskInfo" parameterType="map" resultType="map">
+	  SELECT
+			DISKINFO_ID,
+			HOST,
+			DISK_NAME,
+			DISK_TOTAL,
+			DISK_USED,
+			DISK_PERCENT,
+			REPORT_TIME
+		FROM
+			DCF_DISK_INFO 
+		WHERE HOST=#{HOST}
+			ORDER BY DISK_NAME
+  </select>
+  
+<!--   查询进程资源上报实时信息 -->
+  <select id="queryDcf_proc_info" parameterType="map" resultType="map">
+	SELECT
+			PROC_RCD_ID,
+			HOST,
+			PROC_NAME,
+			PID,
+			DATE_FORMAT(START_TIME,'%Y-%m-%d %H:%i:%s') START_TIME,
+			DATE_FORMAT(STOP_TIME,'%Y-%m-%d %H:%i:%s') STOP_TIME,
+			CPU,
+			MEM_USE,
+			DATE_FORMAT(REPORT_TIME,'%Y-%m-%d %H:%i:%s') REPORT_TIME
+		FROM
+			DCF_PROC_INFO
+		where 1=1
+		<if test="HOST != null and HOST != '' ">
+		 and HOST like '%${HOST}%'
+		</if>
+		<if test="PROC_NAME != null and PROC_NAME != '' ">
+		 and PROC_NAME like '%${PROC_NAME}%'
+		</if>	
+		order by REPORT_TIME desc
+  
+  </select>
+  
+  <!--   查询进程资源上报摘要信息 -->
+  <select id="queryProcAbstract" parameterType="map" resultType="map">
+  	  SELECT
+			o.HOST,
+			count(o.pid) PID_NUM,
+			sum(o.cpu) CPU_TOTAL,
+			sum(o.mem_use) MEM_USE_TOTAL,
+			sum(o.avtive_state) AVTIVE_STATE,
+			sum(o.stop_state) STOP_STATE,
+			count(1) PROC_TOAL
+		FROM
+			(
+				SELECT
+					HOST,
+					proc_name,
+					pid,
+					CASE
+				WHEN stop_time IS NULL THEN
+					1
+				ELSE
+					0
+				END avtive_state,
+				CASE
+			WHEN stop_time IS NULL THEN
+				0
+			ELSE
+				1
+			END stop_state,
+			CASE
+		WHEN stop_time IS NULL THEN
+			cpu
+		ELSE
+			0
+		END cpu,
+		 CASE
+		WHEN stop_time IS NULL THEN
+			mem_use
+		ELSE
+			0
+		END mem_use
+		FROM
+			DCF_PROC_INFO
+		where 1=1
+		<if test="HOST != null and HOST != '' ">
+		 and HOST like '%${HOST}%'
+		</if>	
+			) o
+		GROUP BY
+			o. HOST
+  </select>
+  
+<!--   流量无缝结转查询 -->
+	<select id="queryGroupInfo" parameterType="map" resultType="map">
+		select p.OFFER_ID,p.OFFER_NAME 
+		 from PRODUCT_OFFER p
+		  where p.OFFER_ID in (${GROUPID})
+	</select>
+	
+	<select id="queryBaseResourceInfo" parameterType="map" resultType="map">
+		select r.RATABLE_RESOURCE_ID, r.RATABLE_RESOURCE_NAME
+		  from RATABLE_RESOURCE r 
+		  where r.RATABLE_RESOURCE_ID in ( ${H_BASERESOURCEID})
+	</select>
+<!-- 	查询文件处理积压量 -->
+	<select id="queryOverstock" parameterType="map" resultType="map">
+	select count(1) NUM,to_char(sysdate,'yyyy-mm-dd hh24:mi') NOW_TIME
+	  from SOURCE_FILES s
+	 where s.SOURCE_STATE = 'M0C'
+	   and s.CREATED_TIME &lt; sysdate - 1 / (24 * 6)
+	</select>
+	
+<!-- 	业务类型 -->
+	<select id="queryOperType" parameterType="map" resultType="map">
+	select distinct f.MAPPING_TYPE, f.MAPPING_NAME
+  from par_oper_type_def f
+ order by f.MAPPING_TYPE
+	</select>
+	
+<!-- 	查询结果码 -->
+	<select id="queryResultCode" parameterType="map" resultType="map">
+	SELECT OCS_RESULT_CODE,
+	       OCP_RESULT_CODE,
+	       to_char(to_date(CREATE_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') CREATE_DATE,
+	       to_char(to_date(MODIFY_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') MODIFY_DATE,
+	       to_char(to_date(EFF_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') EFF_DATE,
+	       to_char(to_date(EXP_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') EXP_DATE,
+	       REMARKS,
+	       CODE_TYPE
+	  from sm_resultcode_map
+		WHERE 1=1
+		<if test="OCS_RESULT_CODE != null and OCS_RESULT_CODE!= ''">
+		 AND OCS_RESULT_CODE  like '%${OCS_RESULT_CODE}%'
+		</if>
+		<if test="OCP_RESULT_CODE != null and OCP_RESULT_CODE !=''">
+		 AND OCP_RESULT_CODE  like '%${OCP_RESULT_CODE}%'
+		</if>
+		<if test="REMARKS != null and REMARKS !=''">
+		 AND REMARKS  like '%${REMARKS}%'
+		</if>
+		order by OCS_RESULT_CODE , OCP_RESULT_CODE
+	</select>
+	
+	<select id="queryResultCodeById" parameterType="map" resultType="map">
+	SELECT OCS_RESULT_CODE,
+	       OCP_RESULT_CODE,
+	       to_char(to_date(CREATE_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') CREATE_DATE,
+	       to_char(to_date(MODIFY_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') MODIFY_DATE,
+	       to_char(to_date(EFF_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') EFF_DATE,
+	       to_char(to_date(EXP_DATE,'yyyymmddhh24miss'),'yyyy-mm-dd hh24:mi:ss') EXP_DATE,
+	       REMARKS,
+	       CODE_TYPE
+	  from sm_resultcode_map
+		WHERE OCS_RESULT_CODE = #{OCS_RESULT_CODE}
+			and OCP_RESULT_CODE=#{OCP_RESULT_CODE}
+	</select>
+	
+	
+<!-- 	更新结果码 -->
+	<update id="updateResultCode"  parameterType="map">
+		 update sm_resultcode_map 
+				 <set>
+				 MODIFY_DATE = to_number(to_char(sysdate,'yyyymmddhh24miss')),
+				 <if test="EFF_DATE != null and EFF_DATE != ''"> EFF_DATE = to_number(#{EFF_DATE}),</if>
+				 <if test="EXP_DATE != null and EXP_DATE != ''">EXP_DATE = to_number(#{EXP_DATE}),</if>
+				 <if test="REMARKS != null and REMARKS != ''">REMARKS = #{REMARKS},</if>
+				 <if test="CODE_TYPE != null and CODE_TYPE != ''"> CODE_TYPE = #{CODE_TYPE},</if>
+				 
+				  <if test="EFF_DATE  == ''"> EFF_DATE = null,</if>
+				 <if test="EXP_DATE == ''">EXP_DATE = null,</if>
+				 <if test="REMARKS == ''">REMARKS = null,</if>
+				 <if test="CODE_TYPE == ''"> CODE_TYPE = null,</if>
+				 </set>
+				 where  OCS_RESULT_CODE =#{OCS_RESULT_CODE}
+				 and OCP_RESULT_CODE =#{OCP_RESULT_CODE}
+	</update>
+	
+<!-- 	保存结果码 -->
+	<insert id="saveResultCode" parameterType="map" >
+	insert into sm_resultcode_map
+				  (OCS_RESULT_CODE,
+				   OCP_RESULT_CODE,
+				   CREATE_DATE,
+				   MODIFY_DATE,
+				   EFF_DATE,
+				   EXP_DATE,
+				   REMARKS,
+				   CODE_TYPE)
+				values
+				  (#{OCS_RESULT_CODE},
+				   #{OCP_RESULT_CODE},
+				   to_number(to_char(sysdate,'yyyymmddhh24miss')),
+				   to_number(to_char(sysdate,'yyyymmddhh24miss')),
+				   to_number(#{EFF_DATE}),
+				   to_number(#{EXP_DATE}),
+				   #{REMARKS},
+				   #{CODE_TYPE})
+
+	</insert>
+	
+<!-- 	删除结果码 -->
+	<delete id="deleteResultCode" parameterType="map">
+	delete from sm_resultcode_map where OCS_RESULT_CODE = #{OCS_RESULT_CODE} and OCP_RESULT_CODE = #{OCP_RESULT_CODE}
+	</delete>
+</mapper>
+
+
+
+
+
+
+
+
+

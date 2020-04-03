@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 集群配置表操作SQL -->
+<mapper namespace="forecastReport">
+	<!-- 添加预测报告 -->
+	<insert id="addForecastReport" parameterType="map">
+		<selectKey order="BEFORE" resultType="String" keyProperty="ID">
+			SELECT NEWID() FROM DUAL
+		</selectKey>
+		INSERT INTO DCF_FORECAST_REPORT(ID, TASK_PROGRAM_ID, STRATEGY_ID, OPERATOR_TYPE, 
+			CPU, MEM, DISK, BUSS_VOLUME, PREDICTION_TIME, RESULT_DESC, STATUS, CRT_DATE, PREDICTION_DATA)
+		VALUES(#{ID}, #{TASK_PROGRAM_ID}, #{STRATEGY_ID}, #{OPERATOR_TYPE}, 
+			#{CPU}, #{MEM}, #{DISK}, #{BUSS_VOLUME}, #{PREDICTION_TIME}, #{RESULT_DESC}, #{STATUS}, NOW(), #{PREDICTION_DATA})
+	</insert>
+
+	<!-- 查询策略配置 -->
+	<select id="queryforcastReportList" parameterType="map" resultType="map">
+		SELECT A.ID,A.BUSS_VOLUME,A.CPU,A.DISK,A.MEM,A.OPERATOR_TYPE, date_format(A.PREDICTION_TIME, '%Y-%m-%d %H:%i:%s') PREDICTION_TIME,
+       A.RESULT_DESC,date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE,A.TASK_PROGRAM_ID,A.`STATUS` ,A.PREDICTION_DATA
+       FROM DCF_FORECAST_REPORT A 
+		WHERE 1=1
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID}
+		</if>
+		<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+			AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+		</if>
+		ORDER BY A.CRT_DATE DESC
+	</select>
+	
+	<!-- 修改 -->
+	<update id="updateStatusByID" parameterType="map">
+		UPDATE DCF_FORECAST_REPORT SET  STATUS = #{STATUS}
+		WHERE ID = #{ID} 
+	</update>
+	
+	<!-- 查询构造数据，根据TASK_PROGRAM_ID、HOST_IP进行分组，只查询ROW_COUNT条记录-->
+	<select id="queryBusiValueList" parameterType="map" resultType="map">
+		SELECT A.TASK_PROGRAM_ID, A.BATCH_NO, A.HOST_IP,
+			IFNULL(A.BUS_VALUE,0) BUS_VALUE, 
+			IFNULL(A.CPU_VALUE,0) CPU_VALUE,
+			IFNULL(A.DISK_VALUE,0) DISK_VALUE,
+			IFNULL(A.MEM_VALUE,0) MEM_VALUE,
+			IFNULL(A.IO_IN_VALUE,0) IO_IN_VALUE,
+			IFNULL(A.IO_OUT_VALUE,0) IO_OUT_VALUE
+		FROM DCF_TASK_BUSI_DATA A
+		WHERE A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID}
+		  AND A.HOST_IP IN (${HOST_IPS})
+		  AND  ${ROW_COUNT} > (SELECT COUNT(*) FROM DCF_TASK_BUSI_DATA B 
+				WHERE A.TASK_PROGRAM_ID = B.TASK_PROGRAM_ID 
+				  AND A.HOST_IP = B.HOST_IP 
+				  AND A.BATCH_NO &lt; B.BATCH_NO)
+		ORDER BY A.TASK_PROGRAM_ID, A.HOST_IP, A.BATCH_NO DESC
+	</select>
+	
+	<!-- 保留ES查询数据 -->
+	<select id="queryBusiValueListWithES" parameterType="map" resultType="map">
+		SELECT A.TASK_PROGRAM_ID, A.BATCH_NO,
+			IFNULL(A.BUS_VALUE,0) BUS_VALUE
+		FROM DCF_TASK_BUSI_DATA A
+		WHERE A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID} 
+		ORDER BY A.BATCH_NO DESC
+	</select>
+	
+</mapper>

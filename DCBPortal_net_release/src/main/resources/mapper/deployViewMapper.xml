@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 部署图相关Sql -->
+<mapper namespace="deployView">
+
+	<!--查询程序部署主机-->
+	<select id="queryDeployViewHostCount" parameterType="map" resultType="map">
+		SELECT COUNT(1) CNT, A.CLUSTER_TYPE, A.CLUSTER_ID, A.CLUSTER_NAME, A.TYPE,
+			GROUP_CONCAT(E.HOST_IP ORDER BY INET_ATON(E.HOST_IP) ASC SEPARATOR '，') HOST_LIST
+		FROM DCF_SERVICE_TYPE A, DCF_BUS_MAIN_CLUSTER B, DCF_BUS_RELATION_CLUSTER_LIST C, DCF_HOST_DEPLOY D, DCF_HOST E
+		WHERE A.CLUSTER_ID = C.CLUSTER_ID
+		  AND B.BUS_CLUSTER_ID = C.BUS_CLUSTER_ID
+		  AND A.CLUSTER_ID = D.CLUSTER_ID
+		  AND D.HOST_ID = E.HOST_ID
+		  <if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			  AND B.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		  </if>
+		  <if test="TYPE != null and TYPE != ''">
+			  AND A.TYPE = #{TYPE}
+		  </if>
+		GROUP BY A.CLUSTER_ID,A.CLUSTER_TYPE, A.CLUSTER_NAME, A.TYPE
+		ORDER BY A.CLUSTER_TYPE ASC, A.CLUSTER_NAME ASC
+	</select>
+
+	<!--查询业务部署集群实例数据-->
+	<select id="queryBusDeployViewListByClusterId" parameterType="map" resultType="map">
+		SELECT A.ID, A.BUS_CLUSTER_ID, A.CLUSTER_ID, A.PROGRAM_CODE, A.PROGRAM_NAME, A.PROGRAM_TYPE, A.RUN_STATE,A.TASK_ID,
+ 			B.CLUSTER_CODE, B.CLUSTER_NAME, B.TYPE, B.CLUSTER_TYPE,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE,
+			C.VERSION, C.TASK_NAME,
+			D.HOST_IP, D.SSH_USER, CONCAT(D.HOST_IP,"(", D.SSH_USER, ")") HOST_INFO
+		FROM DCF_TASK_PROGRAM A JOIN DCF_SERVICE_TYPE B ON (A.CLUSTER_ID = B.CLUSTER_ID)
+		JOIN DCF_DEPLOY_TASK C ON (A.TASK_ID = C.TASK_ID)
+		LEFT JOIN DCF_HOST D ON (A.HOST_ID = D.HOST_ID)
+		WHERE A.RUN_STATE = '1'
+		AND B.TYPE = '3'
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+			AND A.PROGRAM_CODE = #{PROGRAM_CODE}
+		</if>
+		ORDER BY B.CLUSTER_TYPE ASC, C.VERSION DESC, B.CLUSTER_NAME ASC
+	</select>
+
+	<!--查询组件部署集群实例数据-->
+	<select id="queryComponentDeployViewListByClusterId" parameterType="map" resultType="map">
+		SELECT A.INST_ID, A.CLUSTER_ID,A.DEPLOY_FILE_TYPE, A.STATUS,A.HOST_ID,A.VERSION,
+			DATE_FORMAT(A.MODIFY_TIME,'%Y-%m-%d %H:%i:%s') AS MODIFY_TIME,
+			B.CLUSTER_CODE, B.CLUSTER_NAME, B.TYPE, B.CLUSTER_TYPE,
+			C.BUS_CLUSTER_ID,
+			D.HOST_IP, D.SSH_USER, CONCAT(D.HOST_IP,"(", D.SSH_USER, ")") HOST_INFO
+		FROM DCF_DEPLOY_INST_CONFIG A, DCF_SERVICE_TYPE B, DCF_BUS_RELATION_CLUSTER_LIST C, DCF_HOST D
+		WHERE A.CLUSTER_ID = B.CLUSTER_ID
+		AND B.CLUSTER_ID = C.CLUSTER_ID
+		AND A.HOST_ID = D.HOST_ID
+		AND A.STATUS = '1'
+		AND B.TYPE = '1'
+		  <if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			  AND C.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		  </if>
+		  <if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+		  	AND A.CLUSTER_ID = #{CLUSTER_ID}
+		  </if>
+		  <if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+			AND A.DEPLOY_FILE_TYPE = #{PROGRAM_CODE}
+		  </if>
+		ORDER BY B.CLUSTER_TYPE ASC, B.CLUSTER_NAME ASC
+	</select>
+
+
+	<!--查询主机列表-->
+	<select id="queryDeployViewHostInfoList" parameterType="map" resultType="map">
+		SELECT  A.CLUSTER_TYPE, A.CLUSTER_ID, A.CLUSTER_NAME, A.TYPE,
+			E.HOST_NAME, E.HOST_IP, E.HOST_ID, E.HOST_STATE, E.SSH_USER, E.SSH_PORT,
+			CONCAT(E.HOST_IP,":", E.SSH_PORT, "(", E.SSH_USER,")") HOST_INFO,
+			DATE_FORMAT(E.CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE
+		FROM DCF_SERVICE_TYPE A, DCF_HOST_DEPLOY D, DCF_HOST E
+		WHERE A.CLUSTER_ID = D.CLUSTER_ID
+		  AND D.HOST_ID = E.HOST_ID
+		  <if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+			  AND D.CLUSTER_ID = #{CLUSTER_ID}
+		  </if>
+		  ORDER BY INET_ATON(E.HOST_IP) ASC
+	</select>
+
+</mapper>

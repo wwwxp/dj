@@ -1,0 +1,355 @@
+XML数据节点和常用属性详解
+
+<chart >….</chart > 
+caption=‘标题‘ 
+subcaption=‘子标题‘ 
+clickURL=‘abc.jsp‘ 点击整个图表时跳转到abc.jsp 
+xAxisName=部门‘ 
+numberSuffix =‘￥’ 数据前缀单位 
+numberSuffix =‘个’ 数据后缀单位 
+Decimals=‘2’  保留两位小数，四舍五入 
+forceDecimals=‘2’  强制保留两位小数，对于5.1 转换为5.10 
+yAxisName=‘完成率’  如果使用汉字汉符需加属性：rotateYAxisName=‘1’ 
+showValues=‘1’ 
+yAxisMaxValue=‘100’  对于百分比的常用 
+bgColor='999999,FFFFFF‘  渐变 
+bgColor=‘999999 ’ 单色 
+useRoundEdges=‘1’  光线效果 
+baseFont=‘宋体‘ 
+baseFontSize='12' 
+baseFontColor='333333' 
+lineThickness='2'   线图的粗细
+labelDisplay="Rotate", 横坐标是否旋转
+useRoundEdges 为2D图的时候 样式的变化 1/0
+legendPosition:'RIGHT',	图列的显示位置 默认显示在下方。
+
+< categories >….. </categories > 
+属性名称 类型  说名 
+font  String  字体 
+fontSize  Number  尺寸 
+fontColor  Color  颜色 
+
+<category /> 
+属性 类型  说明  
+label  String  类别名称 
+showLabel  Boolean  是否显示名称 
+toolText  String  替称 
+
+
+< set> 
+属性 类型 说明  
+label  String  名称 
+value  Number  值 
+color  Color  颜色  
+link  String  链接调用JS方法：link=‘Javascript:method();’ 
+toolText  String  替称 
+showLabel  Boolean  是否显示名称0/1  
+showValue  Boolean  是否显示值0/1  
+dashed  Boolean  是否用虚线0/1  
+alpha  Number  透明度0-100 
+
+
+
+
+
+XML中的标签和属性有：    
+<graph> 所具有的属性    
+flash背景参数：    
+* bgColor=”HexColorCode” : 设置flash的背景颜色    
+* bgAlpha=”NumericalValue(0-100)” : 设置背景的透明度    
+* bgSWF=”Path of SWF File” : 设置一个外部的Flash 为flash的背景    
+图表背景参数：    
+* canvasBgColor=”HexColorCode” : 设置图表背景的颜色    
+* canvasBaseColor=”HexColorCode” : 设置图表基部的颜色    
+* canvasBaseDepth=”Numerical Value” : 设置图表基部的高度    
+* canvasBgDepth=”Numerical Value” : 设置图表背景的深度    
+* showCanvasBg=”1/0″ : 设置是否显示图表背景    
+* showCanvasBase=”1/0″ : 设置是否显示图表基部    
+图表和轴的标题    
+* caption=”String” : 图表上方的标题    
+* subCaption=”String” : 图表上方的副标题    
+* xAxisName= “String” : X轴的名字    
+* yAxisName= “String” : y轴的名字    
+图表数量值的限制    
+* yAxisMinValue=”value”: y轴最小值    
+* yAxisMaxValue=”value”: y舟最大值    
+通用参数    
+* shownames=”1/0″ : 设置是否在x轴下显示<set>里指定的name    
+* showValues=”1/0″ : 设置是否在柱型图或饼型图上显示数据的值    
+* showLimits=”1/0″ : 设置是否在图表的y轴坐标上显示最大最小的数据值    
+* rotateNames=”1/0″ : 设置x轴下的name 是水平显示还是垂直显示    
+* animation=”1/0″ : 设置柱型图的显示是否是动画显示    
+字体属性    
+* baseFont=”FontName” : 设置字体样式    
+* baseFontSize=”FontSize” : 设置字体大小    
+* baseFontColor=”HexColorCode” : 设置字体颜色    
+* outCnvBaseFont = “FontName” : 设置图表外侧的字体样式    
+* outCnvBaseFontSze=”FontSize” : 设置图表外侧的字体大小    
+* outCnvBaseFontColor=”HexColorCode”: 设置图表外侧的字体颜色    
+数字格式选项    
+* numberPrefix=”$” : 设置数据值的前缀    
+* numberSuffix=”p.a” : 设置数据值的后缀（如果是特殊字符，需要使用URL Encode重编码）    
+* formatNumber=”1/0″ : 设置是否格式化数据    
+* formatNumberScale=”1/0″ : 设置是否用“K”来代表千，“M”来代表百万    
+* decimalSeparator=”.” : 用指定的字符来代替小数点    
+* thousandSeparator=”,” : 用指定的字符来代替千位分隔符    
+* decimalPrecision=”2″ : 设置十进制的精度    
+* divLineDecimalPrecision=”2″: 设置y轴数值的小数位数    
+* limitsDecimalPrecision=”2″ : 设置y轴的最大最小值的小数位数    
+水平分隔线    
+* numdivlines=”NumericalValue” : 设置水平分隔线的数量    
+* divlinecolor=”HexColorCode” : 设置水平分隔线的颜色    
+* divLineThickness=”NumericalValue” : 设置水平分隔线的宽度    
+* divLineAlpha=”NumericalValue0-100″ : 设置水平分隔线的透明度    
+* showDivLineValue=”1/0″ : 设置是否显示水平分隔线的数值    
+鼠标旋停参数    
+* showhovercap=”1/0″ : 显示是否激活鼠标旋停效果    
+* hoverCapBgColor=”HexColorCode” : 设置鼠标旋停效果的背景颜色    
+* hoverCapBorderColor=”HexColorCode” : 设置鼠标旋停效果的边框颜色    
+* hoverCapSepChar=”Char” : 设置鼠标旋停后显示的文本中的分隔符号    
+图表边距的设置    
+* chartLeftMargin=”Numerical Value (in pixels)” : 设置图表左边距    
+* chartRightMargin=”Numerical Value (in pixels)” : 设置图表右边距    
+* chartTopMargin=”Numerical Value (in pixels)” : 设置图表上边距    
+* chartBottomMargin=”Numerical Value (in pixels)” : 设置图表下边距    
+Zero Plane    
+The zero plane is a 3D plane that signifies the 0 position on the chart. If there are no negative numbers on the chart, you won’t see a visible zero plane.    
+* zeroPlaneShowBorder=”1/0″ : Whether the border of a 3D zero plane would be plotted or not.    
+* zeroPlaneBorderColor=”Hex Code” : If the border is to be plotted, this attribute sets the border color for the plane.    
+* zeroPlaneColor=”Hex Code” : The intended color for the zero plane.    
+* zeroPlaneAlpha=”Numerical Value 0-100″ : The intended transparency for the zero plane.    
+  
+<set> 所具有的属性    
+* name=”string” : 设置在图表中体现出来的名字    
+Example: <set name=’Jan’ …>    
+* value=”NumericalValue” : 设置在图表中各个名字想对应的值    
+Example: <set name=’Jan’ value=’12345′ …>    
+* color=”HexCode” : 设置在图表中相对应的柱行图的颜色    
+Example: <set name=’Jan’ value=’12345′ color=’636363′ …>    
+* hoverText=”String value” : 设置鼠标旋停在相对应的柱行图 上出现的文本内容    
+Example: <set name=’Jan’ value=’12345′ color=’636363′ hoverText=’January’…>    
+* link=”URL” : 设置该柱行图的链接地址（需要URL Encode重编码）    
+Example: <set … link=’ShowDetails.asp%3FMonth=Jan’ …>    
+* alpha=”Numerical Value 0-100″ : 设置在图表中相对应的柱行图的透明度    
+Example: <set … alpha=’100′ …>    
+* showName=”1″ : 设置在是否显示图表中相对应的柱行图的name    
+Example : <set … showName=”1″ …>   
+  
+////////////////////////////////////////////////////////////////////////////////////////////   
+  
+ANCHORS 锚点 用于标识line或area的数值点   
+支持效果 Animation 动画、Shadow 阴影、Glow 发光、Bevel 倾斜、Blur 模糊   
+动画属性 _alpha、_x、_y、_xScale、_yScale   
+BACKGROUND 整个图表的背景   
+支持属性 Animation、Shadow、Glow、Bevel、Blur   
+动画属性 _alpha、_x、_y、_xScale、_yScale   
+CANVAS 区域图中的区域   
+支持属性 Animation、Shadow、Glow、Bevel、Blur   
+动画属性 _alpha、_x、_y、_xScale、_yScale   
+CAPTION 图表标题   
+SUBCAPTION 图表子标题   
+支持属性 Animation、Shadow、Glow、Bevel、Blur、Font 字体   
+动画属性 _alpha、_x、_y   
+DATALABELS 数据的x轴标签列表   
+支持属性 Animation、Shadow、Glow、Bevel、Blur、Font 字体   
+动画属性 _alpha、_x、_y   
+DATAPLOT 数据细节（如：2D图表中的列）   
+支持属性 Animation、Shadow、Glow、Bevel、Blur   
+动画属性 _alpha、_x、_y、_xScale、_yScale   
+DATAVALUES 图表数据   
+支持属性 Animation、Shadow、Glow、Bevel、Blur、Font 字体   
+动画属性 _alpha、_x、_y   
+DIVLINES 水平的列表区域(由div组成的线)   
+支持属性 Animation、Shadow、Glow、Bevel、Blur   
+动画属性 _alpha、_x、_y、_xScale   
+HGRID 水平的两个列表区域中交替的颜色   
+支持属性 Animation、Shadow、Glow、Bevel、Blur   
+动画属性 _alpha、_x、_y、_xScale、_yScale   
+VDIVLINES 垂直的列表区域   
+VGRID 垂直的两个列表区域中交替的颜色   
+VLINES 垂直分割线   
+XAXISNAME x轴名称   
+YAXISNAME y轴名称   
+YAXISVALUES y轴的值列表   
+  
+  
+TOOLTIP 在鼠标移动到数据点上的时候的提示   
+支持属性 Font   
+TRENDLINES 趋势线   
+TRENDVALUES   
+chart   
+Functional Attributes   
+animation bool 是否使用动画   
+palette number(1-5) 使用默认的调色板   
+connectNullData bool 是否呈现空值（？猜测）   
+showLabels bool 是否显示标签   
+labelDisplay string (WRAP,STAGGER,ROTATE or NONE ) 标签的呈现方式（超长屏蔽、折行、倾斜还是不显示）   
+rotateLabels bool   
+slantLabels bool x轴说明文字是否倾斜（1/0）   
+labelStep number (1 or above)   
+staggerLines number (2 or above) 多少个字符后折行（labelDisplay=stagger）   
+showValues bool 是否一直显示数据值在数据点上   
+rotateValues bool 是否滚动显示值 （showValues=1）   
+showYAxisValues bool 是否显示y轴数据   
+showLimits bool   
+showDivLineValues bool   
+yAxisValuesStep number (1 or above) y轴标记的显示间隔   
+adjustDiv bool 自动调整divlines   
+rotateYAxisName bool   
+yAxisNameWidth number (In Pixels)   
+clickURL String 图表的焦点链接地址   
+defaultAnimation bool 是否开启默认动画   
+yAxisMinValue number Y轴中最小值   
+yAxisMaxValue number Y轴中最大值   
+setAdaptiveYMin   
+Chart Titles and Axis Names   
+caption   
+subCaption   
+xAxisName   
+yAxisName   
+Chart Cosmetics   
+bgColor color 可以使用逗号分割多个颜色值 FF5904,FFFFFF   
+bgAlpha number (0-100) 透明度   
+bgRatio number (0-100) 多个颜色值所占的比率   
+bgAngle number (0-360) 角度   
+bgSWF string 背景flash，但必须在同一个域下   
+bgSWFAlpha number (0-100)   
+canvasBgColor Color 区域背景颜色   
+canvasBgAlpha   
+canvasBgRatio   
+canvasBgAngle   
+canvasBorderColor   
+canvasBorderThickness number (0-5) 边框厚度   
+canvasBorderAlpha   
+showBorder bool   
+borderColor   
+borderThickness number In Pixels   
+borderAlpha   
+Data Plot Cosmetics   
+showPlotBorder bool   
+plotBorderColor   
+plotBorderThickness (0-5)pixels   
+plotBorderAlpha   
+plotBorderDashed bool 是否使用虚线   
+plotBorderDashLen number in pixels   
+plotBorderDashGap number in pixels   
+plotFillAngle number 0-360  
+plotFillRatio number 0-100  
+plotFillAlpha   
+plotGradientColor color 渐变颜色   
+showShadow bool 是否显示阴影   
+plotFillColor   
+Anchors   
+drawAnchors bool   
+anchorSides Number 3-20 边数   
+anchorRadius number in pixels 半径   
+anchorBorderColor color hex code   
+anchorBorderThickness number in pixels   
+anchorBgColor   
+anchorAlpha   
+anchorBgAlpha   
+Divisional Lines & Grids   
+numDivLines number >0 水平区域线数量   
+divLineColor   
+divLineThickness number 1-5  
+divLineAlpha   
+divLineIsDashed bool 虚线   
+divLineDashLen   
+divLineDashGap   
+zeroPlaneColor   
+zeroPlaneThickness   
+zeroPlaneAlpha   
+showAlternateHGridColor   
+alternateHGridColor   
+alternateHGridAlpha   
+numVDivLines   
+vDivLineColor   
+vDivLineThickness   
+vDivLineAlpha   
+vDivLineIsDashed   
+vDivLineDashLen   
+vDivLineDashGap   
+showAlternateVGridColor   
+alternateVGridColor   
+alternateVGridAlpha   
+Number Formatting   
+formatNumber bool   
+formatNumberScale bool   
+defaultNumberScale string   
+numberScaleUnit string   
+numberScaleValue string   
+numberPrefix string   
+numberSuffix string   
+decimalSeparator string   
+thousandSeparator string   
+inDecimalSeparator string   
+inThousandSeparator string   
+decimals number 0-10  
+forceDecimals bool   
+yAxisValueDecimals number 0-10  
+Font Properties   
+baseFont   
+baseFontSize number 0-72  
+baseFontColor   
+outCnvBaseFont cnv canvas   
+outCnvBaseFontSize   
+outCnvBaseFontColor   
+Tool-tip   
+showToolTip bool   
+toolTipBgColor   
+toolTipBorderColor   
+toolTipSepChar   
+Chart Padding & Margins   
+captionPadding   
+xAxisNamePadding   
+yAxisNamePadding   
+yAxisValuesPadding   
+labelPadding   
+valuePadding   
+chartLeftMargin   
+chartRightMargin   
+chartTopMargin   
+chartBottomMargin   
+canvasPadding   
+set element   
+label string   
+value number   
+color color hex code   
+link string   
+toolText string   
+showLavel   
+showValue   
+dashed   
+alpha   
+anchorSides   
+anchorRadius   
+anchorBorderColor   
+anchorBorderThickness   
+anchorBgColor   
+anchorAlpha   
+anchorBgAlpha   
+Vertical data separator lines   
+   <set label=’Dec 2005′ value=’36556′ />   
+   <vLine color=’FF5904′ thickness=’2′ />   
+   <set label=’Jan 2006′ value=’45456′ />   
+color   
+thickness   
+alpha   
+dashed   
+dashLen   
+dashGap   
+Trend-lines   
+   <trendLines>   
+   <line startValue=’895′ color=’FF0000′ displayvalue=’Average’ />    
+   </trendLines>   
+startValue   
+endValue   
+displayValue   
+color   
+isTrendZone   
+showOnTop   
+thickness   
+alpha   
+dashed   
+dashLen  
+
