@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+
+    <!--==========================数据源公共部分配置========================-->
+    <bean id="abstractDataSource" init-method="init" destroy-method="close"
+          class="com.alibaba.druid.pool.DruidDataSource" abstract="true">
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${jdbc.maxWait}"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}"/>
+        <!-- 配置监控统计拦截的filters，去掉后监控界面sql无法统计 -->
+        <!--<property name="filters" value="stat" />-->
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxOpenPreparedStatements" value="20" />
+    </bean>
+    <!--========================== END ========================-->
+
+    <!--==========================数据源配置开始=============================-->
+    <!-- 数据源配置 -->
+    <bean id="defaultDataSource" init-method="init" destroy-method="close"
+          class="com.alibaba.druid.pool.DruidDataSource" parent="abstractDataSource">
+        <!-- 配置url、用户、密码 -->
+        <property name="url" value="${jdbc.url}"/>
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!-- end -->
+
+    <!-- default Datasource Mybaitis SessionFactory的注册 -->
+    <bean id="defaultSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:conf/mybaits-cfg.xml"></property>
+        <property name="mapperLocations" value="classpath*:mapper/*.xml"/>
+        <property name="dataSource" ref="defaultDataSource"/>
+    </bean>
+
+    <!-- default Datasource jdbcTemplate的配置 ，不使用可以屏蔽掉-->
+    <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="defaultDataSource"/>
+    </bean>
+    <!-- end -->
+
+    <!-- 动态切换SqlSessionFactory  -->
+    <bean id="sqlSessionDaoSupport" class="com.tydic.bp.core.utils.db.SqlSessionDaoSupport">
+        <property name="targetSqlSessionFactorys">
+            <map value-type="org.apache.ibatis.session.SqlSessionFactory">
+                <entry key="defaultDataSource" value-ref="defaultSqlSessionFactory"/>
+            </map>
+        </property>
+        <property name="defaultTargetSqlSessionFactory" ref="defaultSqlSessionFactory"/>
+    </bean>
+
+    <!-- 动态切换JdbcTempleate,如果不需要使用jdbcTemplate，则可以屏蔽掉 -->
+    <bean id="jdbcDaoSupport" class="com.tydic.bp.core.utils.db.JdbcDaoSupport">
+        <property name="targetJdbcFactorys">
+            <map value-type="org.springframework.jdbc.core.JdbcTemplate">
+                <entry key="defaultDataSource" value-ref="defaultJdbcTemplate"/>
+            </map>
+        </property>
+        <property name="defaultJdbcTemplate" ref="defaultJdbcTemplate"/>
+    </bean>
+
+    <!-- defaultDataSource 事务管理器 -->
+    <bean name="defaultTransactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="defaultDataSource"></property>
+    </bean>
+    <!-- end -->
+</beans>

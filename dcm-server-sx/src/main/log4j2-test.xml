@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <!--日志输出格式-->
+        <!--统一日志编码、日志序列、日期时间、应用标识、能力标识、模块名/服务名、平台组件关联信息、日志级别（为ERROR或FATAL）、错误码、日志类型（业务类日志为01）、进程名、进程标识、线程标识、文件名：行号、函数名、执行时长、操作员工、具体日志信息；-->
+        <Property name="LOG_PATTERN">11|%sequenceNumber|%d{HHmmss,SSS}|000|000|%p|%rEx|000|%processId|%t|%C|%L|%M|%r|000|%m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 输出到控制台 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <!-- 需要记录的级别 -->
+            <!-- <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" /> -->
+            <PatternLayout
+                    pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </console>
+
+        <!--调试日志，方便分析-->
+        <RollingFile name="DebugLog" fileName="../log/debug.log"
+                     filePattern="debug-%d{yyyy-MM-dd}-%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <!--<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>-->
+            <PatternLayout
+                    pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="SystemLog" fileName="../log/system.log"
+                     filePattern="system-%d{yyyy-MM-dd}-%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout
+                    pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <RollingFile name="ErrorFile" fileName="../log/error.log"
+                     filePattern="error-%d{yyyy-MM-dd}-%i.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout
+                    pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <!--开发模式-->
+    <Loggers>
+        <!--业务代码-->
+        <logger name="com.tydic" level="debug"/>
+        <!--数据库操作-->
+        <logger name="druid.sql.Statement" level="debug"/>
+
+        <Root level="info">
+            <!--调试输出-->
+            <AppenderRef ref="DebugLog"/>
+
+            <!--终端输出-->
+            <AppenderRef ref="Console"/>
+
+            <!--生产环境-->
+            <!--<appenderRef ref="SystemLog"/>-->
+            <!--<appenderRef ref="ErrorFile"/>-->
+        </Root>
+    </Loggers>
+</Configuration>
