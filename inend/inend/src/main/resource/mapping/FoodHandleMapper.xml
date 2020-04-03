@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"
+        >
+
+<mapper namespace="com.wxp.inend.mapper.FoodHandleMapper">
+
+    <select id="selectAll"
+            resultType="com.wxp.inend.entity.Food">
+
+        select * from food
+    </select>
+
+    <select id="selectFoodName"
+            resultType="java.lang.String">
+
+        select foodName from food
+    </select>
+
+    <update id="adminUpdateGood" parameterType="com.wxp.inend.entity.Food">
+          update food
+          set price=#{price},oldPrice=#{oldPrice},margin=#{margin},type=#{type},img=#{img}
+          where foodName=#{foodName}
+    </update>
+
+</mapper>

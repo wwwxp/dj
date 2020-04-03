@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"
+        >
+
+<mapper namespace="com.wxp.inend.mapper.FoodBuyMapper">
+    <select id="getFoodByFoodName" parameterType="string"
+            resultType="com.wxp.inend.entity.Food">
+
+        select * from food where foodName=#{foodName}
+    </select>
+
+    <update id="updateSaleNumberAndMarginByFoodName" parameterType="java.util.Map"
+           >
+
+        update food
+        set saleNumber=saleNumber+#{number},margin=margin-#{number}
+        where foodName=#{foodName}
+    </update>
+
+
+</mapper>
