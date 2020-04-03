@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="collectMapper">
+	<!-- 查询远程文件，根据path+name,只在一个月范围内判断文件是否重复 -->
+	<!--
+		SELECT /*["sqlId":"collectMapper.queryListByPathName","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DISTINCT
+			*
+		FROM
+			TEMP_REMOTE_FILE_LIST A
+		WHERE
+				A.SESSION_ID = #{SESSION_ID}
+			AND EXISTS (
+					SELECT
+						1
+					FROM
+						DC_COLL_LOG B
+					WHERE
+					 	    A.LINK_ID = B.LINK_ID
+						AND A.ORI_PATH = B.ORI_PATH
+						AND A.ORI_FILE_NAME = B.ORI_FILE_NAME
+						AND ADDDATE(
+									DATE_FORMAT(
+											B.DST_FILE_TIME,
+											'%Y-%m-%d %H:%i:%S'
+									),
+									INTERVAL ${COLL_COMPARISON_TIME} MONTH
+							) >= NOW()
+			)
+	-->
+	<select id="queryListByPathName" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryListByPathName","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DISTINCT
+			A.ID, A.LINK_ID, A.ORI_PATH, A.ORI_FILE_NAME, A.ORI_FILE_LENGTH, A.ORI_FILE_TIME, A.SESSION_ID
+		FROM
+			TEMP_REMOTE_FILE_LIST A, DC_COLL_LOG B
+		WHERE A.SESSION_ID = #{SESSION_ID}
+		  AND A.LINK_ID = B.LINK_ID
+		  AND A.ORI_PATH = B.ORI_PATH
+		  AND A.ORI_FILE_NAME = B.ORI_FILE_NAME
+		  AND ADDDATE(
+					DATE_FORMAT(B.DST_FILE_TIME, '%Y-%m-%d %H:%i:%S'),
+					INTERVAL ${COLL_COMPARISON_TIME} MONTH
+			) >= NOW()
+	</select>
+
+	<!-- 查询远程文件，根据path+name+time, 只在一个月范围内判断文件是否重复 -->
+	<!--
+		SELECT /*["sqlId":"collectMapper.queryListByPathNameTime","appName":"dcm-server-sx.jar","Mode":"生产"]*/  DISTINCT
+			*
+		FROM
+			TEMP_REMOTE_FILE_LIST A
+		WHERE
+				A.SESSION_ID = #{SESSION_ID}
+			AND EXISTS (
+					SELECT
+						1
+					FROM
+						DC_COLL_LOG B
+					WHERE
+					  		A.LINK_ID = B.LINK_ID
+						AND A.ORI_PATH = B.ORI_PATH
+						AND A.ORI_FILE_NAME = B.ORI_FILE_NAME
+						AND A.ORI_FILE_TIME = B.ORI_FILE_TIME
+						AND ADDDATE(
+									DATE_FORMAT(
+											B.DST_FILE_TIME,
+											'%Y-%m-%d %H:%i:%S'
+									),
+									INTERVAL ${COLL_COMPARISON_TIME} MONTH
+							) >= NOW()
+			)
+	-->
+	<select id="queryListByPathNameTime" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryListByPathNameTime","appName":"dcm-server-sx.jar","Mode":"生产"]*/  DISTINCT
+			A.ID, A.LINK_ID, A.ORI_PATH, A.ORI_FILE_NAME, A.ORI_FILE_LENGTH, A.ORI_FILE_TIME, A.SESSION_ID
+		FROM
+			TEMP_REMOTE_FILE_LIST A, DC_COLL_LOG B
+		WHERE A.SESSION_ID = #{SESSION_ID}
+		  AND A.LINK_ID = B.LINK_ID
+		  AND A.ORI_PATH = B.ORI_PATH
+		  AND A.ORI_FILE_NAME = B.ORI_FILE_NAME
+		  AND A.ORI_FILE_TIME = B.ORI_FILE_TIME
+		  AND ADDDATE(
+					DATE_FORMAT(B.DST_FILE_TIME, '%Y-%m-%d %H:%i:%S'),
+					INTERVAL ${COLL_COMPARISON_TIME} MONTH
+			) >= NOW()
+	</select>
+
+	<!-- 查询远程文件，根据name, 只在一个月范围内判断文件是否重复-->
+	<!--
+		SELECT /*["sqlId":"collectMapper.queryListByName","appName":"dcm-server-sx.jar","Mode":"生产"]*/  DISTINCT
+			*
+		FROM
+			TEMP_REMOTE_FILE_LIST A
+		WHERE
+			A.SESSION_ID = #{SESSION_ID}
+			AND EXISTS (
+					SELECT
+						1
+					FROM
+						DC_COLL_LOG B
+					WHERE
+							A.SESSION_ID = #{SESSION_ID}
+					  	AND A.LINK_ID = B.LINK_ID
+						AND A.ORI_FILE_NAME = B.ORI_FILE_NAME
+						AND ADDDATE(
+									DATE_FORMAT(
+											B.DST_FILE_TIME,
+											'%Y-%m-%d %H:%i:%S'
+									),
+									INTERVAL ${COLL_COMPARISON_TIME} MONTH
+							) >= NOW()
+			)
+	-->
+	<select id="queryListByName" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryListByName","appName":"dcm-server-sx.jar","Mode":"生产"]*/  DISTINCT
+			A.ID, A.LINK_ID, A.ORI_PATH, A.ORI_FILE_NAME, A.ORI_FILE_LENGTH, A.ORI_FILE_TIME, A.SESSION_ID
+		FROM
+			TEMP_REMOTE_FILE_LIST A, DC_COLL_LOG B
+		WHERE A.SESSION_ID = #{SESSION_ID}
+		  AND A.LINK_ID = B.LINK_ID
+		  AND A.ORI_FILE_NAME = B.ORI_FILE_NAME
+		  AND ADDDATE(
+					DATE_FORMAT(B.DST_FILE_TIME, '%Y-%m-%d %H:%i:%S'),
+					INTERVAL ${COLL_COMPARISON_TIME} MONTH
+			) >= NOW()
+	</select>
+
+	<!-- 执行添加sql -->
+	<insert id="addSqlToExecute" parameterType="map">
+ 		/*["sqlId":"collectMapper.addSqlToExecute","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		${EXEC_SQL}
+	</insert>
+
+	<!-- 查询刷新链路数据 -->
+	<select id="queryRefreshCollLinkList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryRefreshCollLinkList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.*, C.PARAMS_VALUE
+		FROM
+			(
+				SELECT
+					A.DEV_ID,
+					A.DEV_NAME,
+					A.ADDR_ID,
+					A. STATUS,
+					A.BEGIN_TIME,
+					A.END_TIME,
+					IFNULL(A.DATE_MODE, '1') DATE_MODE,
+					A.TIME_MODE,
+					DATE_FORMAT(
+							A.STATE_BEGIN_TIME,
+							'%Y-%m-%d %H:%i:%S'
+					) STATE_BEGIN_TIME,
+					DATE_FORMAT(
+							A.STATE_END_TIME,
+							'%Y-%m-%d %H:%i:%S'
+					) STATE_END_TIME,
+					A.CRON_DESC,
+					A.PRIORITY
+				FROM
+					DC_COLL_LINK A,
+					DC_ADDR B
+				WHERE
+					A.ADDR_ID = B.ADDR_ID
+					AND (
+						NOW() BETWEEN A.BEGIN_TIME
+						AND A.END_TIME
+					)
+					AND A.STATUS = '1'
+					AND B.VALID_FLAG = '1'
+					AND A.RUN_STATE = '1'
+					AND B.GROUP_ID = #{groupId}
+			) A
+			LEFT JOIN (
+						  SELECT
+							  DEV_ID,
+							  CONCAT(
+									  C.PARAM_NAME , '#' , C.PARAM_VALUE
+							  ) PARAMS_VALUE
+						  FROM
+							  DC_DEV_CFG C
+						  WHERE
+							  C.PARAM_NAME = 'warn_interval'
+						  GROUP BY
+							  DEV_ID
+					  ) C ON A.DEV_ID = C.DEV_ID
+		ORDER BY
+			A.PRIORITY DESC
+	</select>
+
+	<!-- 查询采集链路信息 -->
+	<select id="queryCollLinkInfoById" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryCollLinkInfoById","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.DEV_ID,
+			A.DEV_NAME,
+			A.ADDR_ID,
+			A.SUB_TYPE,
+			A.REMARK,
+			A. STATUS,
+			A.FMT_FLAG,
+			A.DATE_MODE,
+			A.TIME_MODE,
+			A.RLT_DIST_ID,
+			DATE_FORMAT(A.BEGIN_TIME, '%Y-%m-%d') BEGIN_TIME,
+			DATE_FORMAT(A.END_TIME, '%Y-%m-%d') END_TIME,
+			A.LATN_ID,
+			A.LINK_ERR,
+			DATE_FORMAT(
+				A.STATE_BEGIN_TIME,
+				'%Y-%m-%d %H:%i:%S'
+			) STATE_BEGIN_TIME,
+			DATE_FORMAT(
+				A.STATE_END_TIME,
+				'%Y-%m-%d %H:%i:%S'
+			) STATE_END_TIME,
+			A.RUN_STATE,
+			A.FILE_STORE_TYPE
+		FROM
+			DC_COLL_LINK A
+		WHERE
+			A.DEV_ID = #{devId}
+	</select>
+
+	<!-- 查询采集链路参数 -->
+	<select id="queryCollLinkParamsList" parameterType="map" resultType="map">
+		SELECT  /*["sqlId":"collectMapper.queryCollLinkParamsList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.DEV_ID,
+			A.PARAM_NAME,
+			A.PARAM_VALUE,
+			B.IS_REQUIRED
+		FROM
+			DC_DEV_CFG A,
+			DC_CFG_TYPE B
+		WHERE
+			A.PARAM_NAME IS NOT NULL
+		AND A.PARAM_NAME = B.PARAM_NAME
+	  	<if test="MODULE != null and MODULE != ''">
+			AND B.MODULE = #{MODULE}
+		</if>
+		AND B.CFG_TYPE = 'NOR_LINK'
+		AND A.DEV_ID = #{devId}
+	</select>
+
+	<!-- 修改链路告警级别 -->
+	<update id="updateCollLinkTipsLevel" parameterType="map" >
+		UPDATE  /*["sqlId":"collectMapper.updateCollLinkTipsLevel","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DC_COLL_LINK SET TIPS_LEVEL = #{TIPS_LEVEL}, LINK_ERR = #{LINK_ERR}, RUN_STATE_TIME=NOW()
+		<if test="RUN_STATE != null and RUN_STATE != ''">
+			,RUN_STATE = #{RUN_STATE}
+		</if>
+		WHERE DEV_ID = #{DEV_ID}
+	</update>
+
+	<!--清空临时表-->
+	<delete id="truncateTempTable">
+		DELETE  /*["sqlId":"collectMapper.truncateTempTable","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM
+			 temp_remote_file_list
+		WHERE
+				session_id = #{SESSION_ID}
+	</delete>
+
+	<!-- 添加临时表用来刷选已经采集过的文件 -->
+	<insert id="addTempTableData" parameterType="java.util.List">
+		INSERT  /*["sqlId":"collectMapper.addTempTableData","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO TEMP_REMOTE_FILE_LIST(LINK_ID, ORI_PATH, ORI_FILE_NAME, ORI_FILE_LENGTH, ORI_FILE_TIME,SESSION_ID)
+		<foreach collection="list" item="item" index="index" separator="," open="VALUE" close="">
+			(#{item.DEV_ID}, #{item.FILE_PATH}, #{item.FILE_NAME}, #{item.FILE_LENGTH}, #{item.FILE_TIME}, #{item.SESSION_ID})
+		</foreach>
+	</insert>
+
+	<!-- 添加采集告警 -->
+	<insert id="addDcTranWarn" parameterType="map">
+		INSERT /*["sqlId":"collectMapper.addDcTranWarn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_TRAN_WARN(WARN_CODE, DEV_ID, FILE_NAME, WARN_TIME, CONTENT,
+			STATE, HANDLE_TIME, HANDLE_USER_ID, HANDLE_REMARK)
+		VALUES(#{WARN_CODE}, #{DEV_ID}, #{FILE_NAME}, #{WARN_TIME}, #{CONTENT}, #{STATE}, '', 0, '')
+	</insert>
+
+	<!-- 添加采集日志 -->
+	<insert id="addDcCollLog" parameterType="map">
+		INSERT /*["sqlId":"collectMapper.addDcCollLog","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_COLL_LOG(LINK_ID, TRANSFER_METHOD, ORI_PATH,
+			ORI_FILE_NAME,ORI_FILE_LENGTH,ORI_FILE_TIME,
+       		DST_PATH,DST_FILE_NAME,DST_FILE_LENGTH,DST_FILE_TIME,
+       		AFTER_ACTION, ORI_FILE_RENAME, DEAL_TIME, MONTHNO, SOURCE_ID,START_DEAL_TIME)
+		VALUES(#{DEV_ID}, #{TRANSFER_METHOD}, #{ORI_PATH},
+			#{ORI_FILE_NAME}, #{ORI_FILE_LENGTH}, #{ORI_FILE_TIME},
+       		#{DST_PATH}, #{DST_FILE_NAME}, #{DST_FILE_LENGTH}, #{DST_FILE_TIME},
+       		#{AFTER_ACTION}, #{ORI_FILE_RENAME}, #{DEAL_TIME}, #{MONTHNO}, #{SOURCE_ID},#{START_DEAL_TIME})
+	</insert>
+
+	<!-- 添加分发任务表 -->
+	<insert id="addDcDistTask" parameterType="map">
+		INSERT /*["sqlId":"collectMapper.addDcDistTask","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_DIST_TASK(RECID,SOURCE_ID,DIST_DEV_ID, ORI_PATH, ORI_FILE_NAME, ORI_FILE_LENGTH, ORI_FILE_TIME,
+       		LATN_ID, COLL_DEV_ID, CREATE_TIME, STATUS)
+		VALUES(SEQ_RECID.NEXTVAL, #{SOURCE_ID}, #{DIST_DEV_ID}, #{ORI_PATH}, #{ORI_FILE_NAME}, #{ORI_FILE_LENGTH}, #{ORI_FILE_TIME},
+       		#{LATN_ID}, #{COLL_DEV_ID}, str_to_date (#{CREATE_TIME}, '%Y-%m-%d %H:%i:%S'), #{STATUS})
+	</insert>
+
+	<!-- 获取分发链路列表 -->
+	<select id="queryDistLinkList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryDistLinkList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A .DEV_ID,
+			A .PARENT_FLAG
+		FROM
+			DC_DIST_LINK A
+		WHERE
+			A.DEV_ID IN (${DIST_IDS})
+	</select>
+
+	<!-- 根据文件名称序列查询上一个文件序列是否存在 -->
+	<select id="queryFileSequenceList" parameterType="map" resultType="map">
+		<![CDATA[
+		SELECT /*["sqlId":"collectMapper.queryFileSequenceList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		 		ID,
+			   LAST_SEQ
+		FROM
+			(SELECT ID,
+				 CAST( SUBSTR( ORI_FILE_NAME,#{SUBSTR_START_POS},#{SUBSTR_LEN} ) AS SIGNED ) LAST_SEQ
+			FROM DC_COLL_LOG
+			WHERE LINK_ID = #{DEV_ID}) a
+		WHERE LAST_SEQ < #{FIRST_SEQ}
+		ORDER BY  LAST_SEQ DESC LIMIT 0, 1
+		]]>
+	</select>
+
+	<!-- 查询Sequence -->
+	<!--
+	select nextval(#{sequenceName}) as ID
+	-->
+	<select id="querySequenceByName" parameterType="map" resultType="map">
+        select ${sequenceName}.nextval as ID
+    </select>
+
+    <!-- 查询链路参数 -->
+    <select id="queryAllCollParamsList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryAllCollParamsList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.DEV_ID,
+            IFNULL(
+                A.PARAM_NAME,
+				''
+			) PARAM_NAME,
+            IFNULL(
+                A.PARAM_VALUE,
+                ''
+			) PARAM_VALUE,
+			D.IS_REQUIRED
+		FROM
+			DC_DEV_CFG A,
+			DC_COLL_LINK B,
+			DC_ADDR C,
+			DC_CFG_TYPE D
+		WHERE
+			A.PARAM_NAME IS NOT NULL
+		AND A.DEV_ID = B.DEV_ID
+		AND B.ADDR_ID = C.ADDR_ID
+		AND A.PARAM_NAME = D.PARAM_NAME
+		AND D.MODULE = (
+			CASE
+			WHEN B.FILE_STORE_TYPE = 'local' THEN
+				'COLL'
+			ELSE
+				'COLL_DFS'
+			END
+		)
+		AND D.CFG_TYPE = 'NOR_LINK'
+		AND C.GROUP_ID = #{groupId}
+    </select>
+
+    <!-- 查询所有采集链路属性-->
+	<select id="queryAllCollAttrsList" parameterType="map" resultType="map">
+        SELECT /*["sqlId":"collectMapper.queryAllCollAttrsList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+            A.DEV_ID,
+            A.DEV_NAME,
+            A.ADDR_ID,
+            A.SUB_TYPE,
+            A.REMARK,
+            A. STATUS,
+            A.FMT_FLAG,
+            A.DATE_MODE,
+            A.TIME_MODE,
+            A.RLT_DIST_ID,
+            DATE_FORMAT(A.BEGIN_TIME, '%Y-%m-%d') BEGIN_TIME,
+            DATE_FORMAT(A.END_TIME, '%Y-%m-%d') END_TIME,
+            A.LATN_ID,
+            A.LINK_ERR,
+            DATE_FORMAT(
+                    A.STATE_BEGIN_TIME,
+                    '%Y-%m-%d %H:%i:%S'
+            ) STATE_BEGIN_TIME,
+            DATE_FORMAT(
+                    A.STATE_END_TIME,
+                    '%Y-%m-%d %H:%i:%S'
+            ) STATE_END_TIME,
+            A.RUN_STATE,
+            A.FILE_STORE_TYPE
+        FROM
+            DC_COLL_LINK A,
+            DC_ADDR B
+        WHERE
+            A.ADDR_ID = B.ADDR_ID
+            AND B.GROUP_ID = #{groupId}
+	</select>
+
+	<!-- 查询SOURCE_FILES记录发送写入分发sql_jiekou-->
+	<select id="querySourceFileRecord" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.querySourceFileRecord","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A .COLLECT_ID,
+			A .LATN_ID,
+			A .OPER_LIST_ID,
+			A .SWITCH_ID,
+			A .OPER_TYPE,
+			A .SOURCE_ID,
+			A .SOURCE_NAME,
+			A .ORI_PATH,
+			A .EXCHANGE_ID,
+			A .PROC_LIST
+		FROM
+			SOURCE_FILES A
+		WHERE
+			A.SOURCE_ID = #{SOURCE_ID}
+	</select>
+
+	<!-- 新增采集实例 -->
+	<!--语法不支持，暂不使用-->
+    <insert id="addHost" parameterType="map">
+    	INSERT /*["sqlId":"collectMapper.addHost","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+    	INTO DC_HOST_DEP_INFO(HOST_ID, IP, HOST_NAME, PORT,GROUP_ID)
+    		VALUES((SELECT IFNULL(MAX(t.HOST_ID),0)+1 from DC_HOST_DEP_INFO t), #{IP}, #{HOST_NAME}, #{PORT},#{GROUP_ID})
+    </insert>
+	<!-- 查询主机ip，port是否有记录 -->
+	<select id="queryHostList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryHostList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		IP, PORT, GROUP_ID
+		  FROM DC_HOST_DEP_INFO
+		 WHERE IP = #{IP} AND PORT = #{PORT}
+	</select>
+	<!-- 查询groupID是否有记录 -->
+	<select id="queryHostGroupList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryHostGroupList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		IP, PORT, GROUP_ID
+		  FROM DC_HOST_DEP_INFO
+		 WHERE GROUP_ID = #{GROUP_ID}
+	</select>
+
+	<!-- 添加SOURCE_FILES记录到RocketMQ -->
+	<select id="queryLinkPathList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"collectMapper.queryLinkPathList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DISTINCT ORI_PATH
+		  FROM (SELECT DISTINCT ORI_PATH ORI_PATH
+		          FROM SOURCE_FILES
+		         WHERE LINK_ID = #{DEV_ID}
+		        UNION
+		        SELECT PARAM_VALUE ORI_PATH
+		          FROM DC_DEV_CFG
+		         WHERE PARAM_NAME = 'local_path'
+		           AND DEV_ID = #{DEV_ID}) A
+	</select>
+
+	<delete id="delInvalidCollLog" parameterType="map">
+		  delete /*["sqlId":"collectMapper.delInvalidCollLog","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		  from DC_COLL_LOG WHERE LINK_ID = #{DEV_ID} AND SOURCE_ID = #{SOURCE_ID}
+	</delete>
+
+	<delete id="delInvalidDistTask" parameterType="map">
+		  delete /*["sqlId":"collectMapper.delInvalidDistTask","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		  from DC_DIST_TASK WHERE SOURCE_ID = #{SOURCE_ID}
+	</delete>
+
+	<delete id="delInvalidSourceFiles" parameterType="map">
+		  delete /*["sqlId":"collectMapper.delInvalidSourceFiles","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		  from SOURCE_FILES WHERE LINK_ID = #{DEV_ID} AND SOURCE_ID = #{SOURCE_ID}
+	</delete>
+
+	<!--删除分发管理表记录-->
+	<delete id="delInvalidTaskManager" parameterType="map">
+		delete /*["sqlId":"collectMapper.delInvalidTaskManager","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		  from TASK_MANAGER WHERE LINK_ID = #{DEV_ID} AND SOURCE_ID = #{SOURCE_ID}
+	</delete>
+
+	<!--根据group_id查询所有的链路Id-->
+	<select id="queryLinkIdByGroupId" parameterType="map" resultType="map">
+	  	SELECT /*["sqlId":"collectMapper.queryLinkIdByGroupId","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+	  		DEV_ID
+	  	FROM DC_COLL_LINK
+		WHERE ADDR_ID IN
+		(SELECT ADDR_ID FROM DC_ADDR
+		 WHERE GROUP_ID = #{GROUP_ID})
+	</select>
+
+	<select id="queryNeedMoveCollLog" parameterType="map" resultType="map">
+		SELECT
+			LINK_ID,
+			ORI_PATH,
+			ORI_FILE_NAME,
+			ORI_FILE_TIME
+		FROM DC_COLL_LOG
+		WHERE
+			DEAL_TIME >= #{START_DATE}
+		<if test="LINK_IDS!=null and LINK_IDS!=''">
+			AND LINK_ID IN
+			<foreach collection="LINK_IDS" open="(" item="LINK_ID" separator="," close=")">
+				  #{LINK_ID}
+			</foreach>
+		</if>
+		limit #{START_MOVE_NUMBER},#{ONCE_MOVE_NUMBER}
+	</select>
+</mapper>

@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="distributeMapper">
+	<!-- 查询需要进行分发的链路 -->
+	<select id="queryRefreshDistLinkList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryRefreshDistLinkList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DISTINCT
+			A.DEV_ID,
+			A.DEV_NAME,
+			A.ADDR_ID
+		FROM
+			DC_DIST_LINK A,
+			(SELECT DISTINCT DIST_DEV_ID FROM DC_DIST_TASK) B,
+			DC_ADDR C
+		WHERE
+			A.DEV_ID = B.DIST_DEV_ID
+		AND A.ADDR_ID = C.ADDR_ID
+		AND (
+			NOW() BETWEEN A.BEGIN_TIME
+			AND A.END_TIME
+		)
+		AND A. STATUS = '1'
+		AND A.RUN_STATE = '1'
+		AND C.GROUP_ID = #{groupId}
+	</select>
+	
+	<!-- 查询文件分发本地网 -->
+	<select id="queryLatnOfFtpList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryLatnOfFtpList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.LOC_ID LOC_ID,
+			B.IP,
+			B. PORT,
+			B.USERNAME,
+			B. PASSWORD,
+			B.TYPE
+		FROM
+			TB_LATN A,
+			DC_FTP_INFO B
+		WHERE
+			A.IP_ID = B.ID
+	</select>
+	
+	<!-- 查询分发链路信息 -->
+	<select id="queryDistLinkInfoById" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistLinkInfoById","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.DEV_ID,
+			A.DEV_NAME,
+			A.ADDR_ID,
+			A.SUB_TYPE,
+			A.REMARK,
+			A. STATUS,
+			A.LATN_ID,
+			A.COLL_DEV_ID,
+			DATE_FORMAT(
+					A.BEGIN_TIME,
+					'%Y-%m-%d %H:%i:%S'
+			) BEGIN_TIME,
+			DATE_FORMAT(
+					A.END_TIME,
+					'%Y-%m-%d %H:%i:%S'
+			) END_TIME,
+			A.PARENT_FLAG,
+			A.RUN_STATE,
+			A.LINK_ERR,
+			DATE_FORMAT(
+					A.STATE_BEGIN_TIME,
+					'%Y-%m-%d %H:%i:%S'
+			) STATE_BEGIN_TIME,
+			A.TSK_TYPE,
+			A.FILE_STORE_TYPE
+		FROM
+			DC_DIST_LINK A
+		WHERE
+			DEV_ID = #{devId}
+	</select>
+	
+	<!-- 获取分发文件列表 -->
+	<select id="queryDistFileListWithLatn" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistFileListWithLatn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		*
+		FROM
+			(SELECT SOURCE_ID,
+				 RECID,
+				 ORI_PATH,
+				 ORI_FILE_NAME,
+				 ORI_FILE_LENGTH,
+				 ORI_FILE_TIME,
+				 COLL_DEV_ID,
+				 CREATE_TIME,
+				 LATN_ID,
+				 BATCH_ID,
+				 `LINES`
+			FROM DC_DIST_TASK
+			WHERE STATUS = '0'
+				AND DIST_DEV_ID = #{DIST_DEV_ID}
+				<if test="LATN_ID != null and LATN_ID != ''">
+					AND LATN_ID = #{LATN_ID}
+				</if>
+			ORDER BY  SOURCE_ID ASC ) A LIMIT 0,#{DIST_RECORD_ROW}
+	</select>
+	
+	<!-- 删除分发任务表数据 -->
+	<delete id="delDcDistTask" parameterType="map">
+		DELETE /*["sqlId":"distributeMapper.delDcDistTask","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM
+			DC_DIST_TASK
+		WHERE
+			 	SOURCE_ID = #{SOURCE_ID}
+			AND RECID = #{RECID}
+			AND DIST_DEV_ID = #{DEV_ID}
+	</delete>
+
+    <!-- 查询分发任务表数据 用于回滚事务 -->
+    <select id="queryDcDistTaskById" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDcDistTaskById","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+            RECID,
+            DIST_DEV_ID,
+            ORI_PATH,
+            ORI_FILE_NAME,
+            ORI_FILE_LENGTH,
+            ORI_FILE_TIME,
+            LATN_ID,
+            COLL_DEV_ID,
+            CREATE_TIME,
+            STATUS,
+            SOURCE_ID,
+            BATCH_ID
+		FROM
+			DC_DIST_TASK
+		WHERE
+			DIST_DEV_ID = #{DEV_ID}
+			<if test="RECID != null and RECID != ''">
+				AND RECID = #{RECID}
+			</if>
+			<if test="SOURCE_ID != null and SOURCE_ID != ''">
+				AND SOURCE_ID = #{SOURCE_ID}
+			</if>
+	</select>
+
+    <!-- 回滚分发任务表数据 用于回滚事务 -->
+    <insert id="addDcDistTaskForRollBack" parameterType="list">
+        INSERT /*["sqlId":"distributeMapper.addDcDistTaskForRollBack","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+        INTO DC_DIST_TASK (
+            RECID,
+            DIST_DEV_ID,
+            ORI_PATH,
+            ORI_FILE_NAME,
+            ORI_FILE_LENGTH,
+            ORI_FILE_TIME,
+            LATN_ID,
+            COLL_DEV_ID,
+            CREATE_TIME,
+            STATUS,
+            SOURCE_ID,
+            BATCH_ID
+        ) VALUE
+        (
+            #{RECID},
+            #{DIST_DEV_ID},
+            #{ORI_PATH},
+            #{ORI_FILE_NAME},
+            #{ORI_FILE_LENGTH},
+            #{ORI_FILE_TIME},
+            #{LATN_ID},
+            #{COLL_DEV_ID},
+            #{CREATE_TIME},
+            #{STATUS},
+            #{SOURCE_ID},
+            #{BATCH_ID}
+        )
+    </insert>
+
+
+
+	<!-- 查询将要删除的分发任务表数据 -->
+	<select id="countDcDistTask" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.countDcDistTask","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			COUNT(1) COUNTER
+		FROM
+			DC_DIST_TASK
+		WHERE
+			RECID = #{RECID}
+	</select>
+	
+	<!-- 添加分发日志表 -->
+	<insert id="addDcDistLog" parameterType="map">
+		INSERT /*["sqlId":"distributeMapper.addDcDistLog","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_DIST_LOG(LINK_ID, TRANSFER_METHOD, ORI_PATH,ORI_FILE_NAME,
+			ORI_FILE_LENGTH,ORI_FILE_TIME, DST_PATH, DST_FILE_NAME, DST_FILE_LENGTH,
+			DST_FILE_TIME, AFTER_ACTION, ORI_FILE_RENAME, DEAL_TIME, MONTHNO,
+			SOURCE_ID,ORG_SOURCE_ID,START_DEAL_TIME ) 
+		VALUES(#{DEV_ID}, #{METHOD}, #{ORI_PATH}, #{ORI_FILE_NAME},
+			#{ORI_FILE_LENGTH}, #{ORI_FILE_TIME}, #{DST_PATH}, #{DST_FILE_NAME}, #{DST_FILE_LENGTH},
+			#{DST_FILE_TIME}, #{AFTER_ACTION}, #{ORI_FILE_RENAME}, #{DEAL_TIME}, #{MONTHNO},
+			#{SOURCE_ID}, #{ORG_SOURCE_ID},#{START_DEAL_TIME})
+	</insert>
+	
+	<!-- 添加分发任务异常表 -->
+	<insert id="addDcDistTaskAbn" parameterType="map">
+		INSERT /*["sqlId":"distributeMapper.addDcDistTaskAbn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_DIST_TASK_ABN (
+			RECID,
+			SOURCE_ID,
+			DIST_DEV_ID,
+			ORI_PATH,
+			ORI_FILE_NAME,
+			ORI_FILE_LENGTH,
+			ORI_FILE_TIME,
+			LATN_ID,
+			COLL_DEV_ID,
+			CREATE_TIME,
+			STATUS,
+			EXCEPTIONDESC,
+			BATCH_ID,
+			`LINES`,
+			TSK_TYPE
+		) values(
+			#{RECID},
+			#{SOURCE_ID},
+			#{DIST_DEV_ID},
+			#{ORI_PATH},
+			#{ORI_FILE_NAME},
+			#{ORI_FILE_LENGTH},
+			#{ORI_FILE_TIME},
+			#{LATN_ID},
+			#{COLL_DEV_ID},
+			NOW(),
+			'0',
+			#{EXCEPTIONDESC},
+			#{BATCH_ID},
+			#{LINES},
+			#{TSK_TYPE}
+		)
+	</insert>
+	
+	<!-- 添加分发任务异常表,用来记录分发失败文件 -->
+	<insert id="addDcDistTaskAbnHistory" parameterType="map">
+		INSERT /*["sqlId":"distributeMapper.addDcDistTaskAbnHistory","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_DIST_TASK_ABN_HISTORY (
+			RECID,
+			SOURCE_ID,
+			DIST_DEV_ID,
+			ORI_PATH,
+			ORI_FILE_NAME,
+			ORI_FILE_LENGTH,
+			ORI_FILE_TIME,
+			LATN_ID,
+			COLL_DEV_ID,
+			CREATE_TIME,
+			STATUS,
+			EXCEPTIONDESC,
+			BATCH_ID
+		) values(
+			#{RECID},
+			#{SOURCE_ID},
+			#{DIST_DEV_ID},
+			#{ORI_PATH},
+			#{ORI_FILE_NAME},
+			#{ORI_FILE_LENGTH},
+			#{ORI_FILE_TIME},
+			#{LATN_ID},
+			#{COLL_DEV_ID},
+			NOW(),
+			'0',
+			#{EXCEPTIONDESC},
+			#{BATCH_ID}
+			)
+	</insert>
+
+	<!--修改分发异常历史表数据-->
+	<update id="updateDcDistTaskAbnHistory" parameterType="map">
+		UPDATE /*["sqlId":"distributeMapper.updateDcDistTaskAbnHistory","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DC_DIST_TASK_ABN_HISTORY SET CREATE_TIME = NOW() WHERE RECID = #{RECID} AND SOURCE_ID = #{SOURCE_ID} AND DIST_DEV_ID = #{DIST_DEV_ID}
+	</update>
+	
+	<!-- 修改链路告警级别 -->
+	<update id="updateDistLinkTipsLevel" parameterType="map">
+		UPDATE /*["sqlId":"distributeMapper.updateDistLinkTipsLevel","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DC_DIST_LINK SET TIPS_LEVEL = #{TIPS_LEVEL},LINK_ERR = #{LINK_ERR},STATE_BEGIN_TIME = NOW()
+			<if test="RUN_STATE != null and RUN_STATE != ''">
+				,RUN_STATE = #{RUN_STATE}
+			</if>
+		WHERE DEV_ID = #{DEV_ID}
+	</update>
+	
+	<!-- 查询分发日志表SourceID信息 -->
+	<select id="querySourceIdFromDcDistLog" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.querySourceIdFromDcDistLog","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.ID,
+			A.LINK_ID,
+			A.TRANSFER_METHOD,
+			A.ORI_PATH,
+			A.ORI_FILE_NAME,
+			A.ORI_FILE_LENGTH,
+			A.ORI_FILE_TIME,
+			A.DST_PATH,
+			A.DST_FILE_NAME,
+			A.DST_FILE_LENGTH,
+			A.DST_FILE_TIME,
+			A.AFTER_ACTION,
+			A.ORI_FILE_RENAME,
+			A.DEAL_TIME,
+			A.MONTHNO,
+			A.SOURCE_ID,
+			A.ORG_SOURCE_ID
+		FROM
+			DC_DIST_LOG A
+		WHERE
+			A.LINK_ID = #{DEV_ID}
+			AND A.ORI_PATH = #{ORI_PATH}
+			AND A.ORI_FILE_NAME = #{ORI_FILE_NAME}
+			AND A.ORI_FILE_LENGTH = #{ORI_FILE_LENGTH}
+	</select>
+	
+	<!-- 查询分发任务表SourceID信息 -->
+	<select id="querySourceIdFromDcDistTask" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.querySourceIdFromDcDistTask","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.RECID,
+			A.DIST_DEV_ID,
+			A.ORI_PATH,
+			A.ORI_FILE_NAME,
+			A.ORI_FILE_LENGTH,
+			A.ORI_FILE_TIME,
+			A.LATN_ID,
+			A.COLL_DEV_ID,
+			A.CREATE_TIME,
+			A. STATUS,
+			A.SOURCE_ID
+		FROM
+			DC_DIST_TASK A
+		WHERE
+			ORI_PATH = #{ORI_PATH}
+			AND ORI_FILE_NAME = #{ORI_FILE_NAME}
+			AND ORI_FILE_LENGTH = #{ORI_FILE_LENGTH}
+			AND DIST_DEV_ID = #{DEV_ID}
+	</select>
+	
+	<!-- 查询分发任务异常表SourceID信息 -->
+	<select id="querySourceIdFromDcDistTaskAbn" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.querySourceIdFromDcDistTaskAbn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.SOURCE_ID,
+			A.DIST_DEV_ID,
+			A.ORI_PATH,
+			A.ORI_FILE_NAME,
+			A.ORI_FILE_LENGTH,
+			A.ORI_FILE_TIME,
+			A.LATN_ID,
+			A.COLL_DEV_ID,
+			A.CREATE_TIME,
+			A. STATUS
+		FROM
+			DC_DIST_TASK_ABN A
+		WHERE
+			ORI_PATH = #{ORI_PATH}
+			AND ORI_FILE_NAME = #{ORI_FILE_NAME}
+			AND ORI_FILE_LENGTH = #{ORI_FILE_LENGTH}
+			AND DIST_DEV_ID = #{DEV_ID}
+	</select>
+	
+	<!-- 查询分发日志表数据(用来分发排重) -->
+	<select id="queryDistLogById" parameterType="map" resultType="map">
+		SELECT  /*["sqlId":"distributeMapper.queryDistLogById","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		A.ID,
+			A.LINK_ID,
+			A.TRANSFER_METHOD,
+			A.ORI_PATH,
+			A.ORI_FILE_NAME,
+			A.ORI_FILE_LENGTH,
+			A.ORI_FILE_TIME,
+			A.DST_PATH,
+			A.DST_FILE_NAME,
+			A.DST_FILE_LENGTH,
+			A.DST_FILE_TIME,
+			A.AFTER_ACTION,
+			A.ORI_FILE_RENAME,
+			A.DEAL_TIME,
+			A.MONTHNO,
+			A.SOURCE_ID,
+			A.ORG_SOURCE_ID
+		FROM
+			DC_DIST_LOG A
+		WHERE
+			A.LINK_ID = #{DEV_ID}
+		<if test="beginTime != null and beginTime != ''">
+			AND A.ORI_FILE_TIME &gt;= #{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND A.ORI_FILE_TIME &lt;= #{endTime}
+		</if>
+	</select>
+
+	<!--查询分发异常表-->
+	<select id="queryDcDistTaskFromAbn" parameterType="map" resultType="list">
+		SELECT /*["sqlId":"distributeMapper.queryDcDistTaskFromAbn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			   A.SOURCE_ID,
+			   A.DIST_DEV_ID,
+			   A.ORI_PATH,
+			   A.ORI_FILE_NAME,
+			   A.ORI_FILE_LENGTH,
+			   A.ORI_FILE_TIME,
+			   A.LATN_ID,
+			   A.COLL_DEV_ID,
+			   A.CREATE_TIME,
+			   A.RECID,
+			   A.STATUS
+		FROM
+			 DC_DIST_TASK_ABN A
+		WHERE
+				A.DIST_DEV_ID IN (${DEV_IDS})
+	</select>
+	<!-- 添加分发任务表数据(数据来源于分发任务异常表) -->
+	<insert id="addDcDistTaskFromAbn" parameterType="list">
+		INSERT /*["sqlId":"distributeMapper.addDcDistTaskFromAbn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_DIST_TASK (
+			SOURCE_ID,
+			DIST_DEV_ID,
+			ORI_PATH,
+			ORI_FILE_NAME,
+			ORI_FILE_LENGTH,
+			ORI_FILE_TIME,
+			LATN_ID,
+			COLL_DEV_ID,
+			CREATE_TIME,
+			RECID,
+			STATUS
+		) VALUE
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.SOURCE_ID},
+				#{item.DIST_DEV_ID},
+				#{item.ORI_PATH},
+				#{item.ORI_FILE_NAME},
+				#{item.ORI_FILE_LENGTH},
+				#{item.ORI_FILE_TIME},
+				#{item.LATN_ID},
+				#{item.COLL_DEV_ID},
+				#{item.CREATE_TIME},
+				#{item.RECID},
+				#{item.STATUS}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 删除分发异常表数据 -->
+	<delete id="delDcDistTaskAbnByIds" parameterType="map">
+		DELETE /*["sqlId":"distributeMapper.delDcDistTaskAbnByIds","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM
+			DC_DIST_TASK_ABN
+		WHERE
+			DIST_DEV_ID IN (${DEV_IDS})
+	</delete>
+
+	<!--删除分发异常表数据-->
+	<delete id="delDcDistTaskAbn" parameterType="map">
+		DELETE /*["sqlId":"distributeMapper.delDcDistTaskAbn","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM
+			DC_DIST_TASK_ABN
+		WHERE DIST_DEV_ID = #{DEV_ID}
+		  AND SOURCE_ID = #{SOURCE_ID}
+		  <if test="REC_ID != null and REC_ID != ''">
+			  AND RECID = #{REC_ID}
+		  </if>
+		  <if test="ORI_FILE_NAME != null and ORI_FILE_NAME != ''">
+			AND ORI_FILE_NAME = #{ORI_FILE_NAME}
+		  </if>
+	</delete>
+
+	<!--删除分发异常历史表数据-->
+	<delete id="delDcDistTaskAbnHistory" parameterType="map">
+		DELETE /*["sqlId":"distributeMapper.delDcDistTaskAbnHistory","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM
+		DC_DIST_TASK_ABN_HISTORY
+		WHERE DIST_DEV_ID = #{DEV_ID}
+		  AND SOURCE_ID = #{SOURCE_ID}
+		  <if test="REC_ID != null and REC_ID != ''">
+			  AND RECID = #{REC_ID}
+		  </if>
+		  <if test="ORI_FILE_NAME != null and ORI_FILE_NAME != ''">
+			  AND ORI_FILE_NAME = #{ORI_FILE_NAME}
+		  </if>
+	</delete>
+
+	<!-- 查询链路参数 -->
+    <select id="queryDistAllParamsList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistAllParamsList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.DEV_ID,
+			IFNULL(
+					A.PARAM_NAME,
+					''
+			) PARAM_NAME,
+			IFNULL(
+					A.PARAM_VALUE,
+					''
+			) PARAM_VALUE
+		FROM
+			DC_DEV_CFG A,
+			DC_DIST_LINK B,
+			DC_ADDR C
+		WHERE
+			A.DEV_ID = B.DEV_ID
+			AND B.ADDR_ID = C.ADDR_ID
+			AND C.GROUP_ID = #{groupId}
+    </select>
+    
+    <!-- 查询所有分发链路属性-->
+	<select id="queryDistAllAttrsList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistAllAttrsList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			A.DEV_ID,
+			A.DEV_NAME,
+			A.ADDR_ID,
+			A.SUB_TYPE,
+			A.REMARK,
+			A. STATUS,
+			A.LATN_ID,
+			A.COLL_DEV_ID,
+			DATE_FORMAT (
+					A.BEGIN_TIME,
+					'%Y-%m-%d %H:%i:%S'
+			) BEGIN_TIME,
+			DATE_FORMAT (
+					A.END_TIME,
+					'%Y-%m-%d %H:%i:%S'
+			) END_TIME,
+			A.PARENT_FLAG,
+			A.RUN_STATE,
+			A.LINK_ERR,
+			A.TSK_TYPE,
+			A.FILE_STORE_TYPE,
+			DATE_FORMAT (
+					A.STATE_BEGIN_TIME,
+					'%Y-%m-%d %H:%i:%S'
+			) STATE_BEGIN_TIME
+		FROM
+			DC_DIST_LINK A,
+			DC_ADDR B
+		WHERE
+			A.ADDR_ID = B.ADDR_ID
+			AND B.GROUP_ID = #{groupId}
+	</select>
+	
+	<!-- 查询分发链路序列 -->
+	<select id="queryLastSequence" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryLastSequence","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			*
+		FROM
+			(
+				SELECT
+					ID,
+					LINK_ID,
+					DST_FILE_NAME LAST_SEQUENCE
+				FROM
+					DC_DIST_LOG A
+				WHERE
+					A.LINK_ID = #{DEV_ID}
+				ORDER BY
+					A.DST_FILE_NAME DESC
+			) NEW_TABLE
+		LIMIT 0,1
+	</select>
+	
+	<!-- 查询分发任务表,判断文件是否能删除或者重命名 -->
+	<select id="queryDistTaskForCanDel" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistTaskForCanDel","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			ORI_PATH,
+			ORI_FILE_NAME,
+			ORI_FILE_LENGTH
+		FROM
+			DC_DIST_TASK
+		WHERE
+			ORI_PATH = #{ORI_PATH}
+			AND ORI_FILE_NAME = #{ORI_FILE_NAME}
+			AND ORI_FILE_LENGTH = #{ORI_FILE_LENGTH}
+	</select>
+	
+	<!-- 添加SOURCE_FILES记录到RocketMQ -->
+	<select id="queryLinkPathList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryLinkPathList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DISTINCT LINK_ID, ORI_PATH
+		  FROM (SELECT DISTINCT LINK_ID, ORI_PATH
+		          FROM SOURCE_FILES
+		         WHERE LINK_ID IN
+		               (SELECT DEV_ID
+		                  FROM DC_COLL_LINK
+		                 WHERE CONCAT('#', CONCAT(RLT_DIST_ID, '#')) LIKE
+		                       CONCAT('%#', CONCAT(#{DIST_DEV_ID}, '#%')))
+		        UNION
+		        SELECT DEV_ID LINK_ID, PARAM_VALUE ORI_PATH
+		          FROM DC_DEV_CFG
+		         WHERE PARAM_NAME = 'local_path'
+		           AND DEV_ID IN
+		               (SELECT DEV_ID
+		                  FROM DC_COLL_LINK
+		                 WHERE CONCAT('#', CONCAT(RLT_DIST_ID, '#')) LIKE
+		                       CONCAT('%#', CONCAT(#{DIST_DEV_ID}, '#%')))) A
+	</select>
+
+	<!-- 获取分发链路的local_path -->
+	<select id="queryLinkLocalPathList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryLinkLocalPathList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DISTINCT DEV_ID LINK_ID, PARAM_VALUE ORI_PATH
+		FROM DC_DEV_CFG
+		WHERE PARAM_NAME = 'local_path'
+		  AND DEV_ID = #{DIST_DEV_ID}
+	</select>
+	
+	<!-- 修改链路告警级别 -->
+	<update id="updateDistributeLinkTipsLevel" parameterType="map" >
+		UPDATE /*["sqlId":"distributeMapper.updateDistributeLinkTipsLevel","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		DC_DIST_LINK SET TIPS_LEVEL = #{TIPS_LEVEL},LINK_ERR = #{LINK_ERR},STATE_BEGIN_TIME=NOW()
+		<if test="RUN_STATE != null and RUN_STATE != ''">
+			,RUN_STATE = #{RUN_STATE}
+		</if>
+		WHERE DEV_ID = #{DEV_ID}
+	</update>
+
+	<delete id="delInvalidDistLog" parameterType="map">
+		  delete /*["sqlId":"distributeMapper.delInvalidDistLog","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		  from DC_DIST_LOG WHERE LINK_ID = #{DEV_ID} AND SOURCE_ID = #{SOURCE_ID}
+	</delete>
+
+	<delete id="delInvalidSourceFiles" parameterType="map">
+		  delete /*["sqlId":"distributeMapper.delInvalidSourceFiles","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		  from SOURCE_FILES WHERE LINK_ID = #{DEV_ID} AND SOURCE_ID = #{SOURCE_ID}
+	</delete>
+
+
+	<!--分发异常回收数据查询-->
+	<select id="queryDistTaskAbnListCallbackList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistTaskAbnListCallbackList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		A.SOURCE_ID, A.DIST_DEV_ID, A.ORI_PATH, A.ORI_FILE_NAME, A.ORI_FILE_LENGTH, A.ORI_FILE_TIME, A.LATN_ID,
+			A.COLL_DEV_ID, A.CREATE_TIME, A.`STATUS`, A.BATCH_ID, A.RECID, A.`LINES`, A.TSK_TYPE,
+			B.ADDR_ID, C.GROUP_ID
+		FROM DC_DIST_TASK_ABN A JOIN DC_DIST_LINK B ON (A.DIST_DEV_ID = B.DEV_ID)
+								JOIN DC_ADDR C ON (B.ADDR_ID = C.ADDR_ID)
+		WHERE C.GROUP_ID = #{GROUP_ID}
+			AND B.`STATUS` = '1'
+			AND B.RUN_STATE = '1'
+		ORDER BY A.CREATE_TIME ASC
+		LIMIT 0, ${CALLBACK_ROWS}
+	</select>
+
+	<!--批量回收分发异常数据-->
+	<insert id="addBatchDistTaskCallbackList" parameterType="java.util.List">
+		INSERT /*["sqlId":"distributeMapper.addBatchDistTaskCallbackList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		INTO DC_DIST_TASK(RECID, DIST_DEV_ID, ORI_PATH, ORI_FILE_NAME, ORI_FILE_LENGTH,
+				ORI_FILE_TIME, LATN_ID, COLL_DEV_ID, CREATE_TIME, `STATUS`, SOURCE_ID,
+				BATCH_ID, `LINES`, TSK_TYPE) VALUES
+		<foreach collection="list" item="item" index="index" separator="," close="">
+			(#{item.RECID}, #{item.DIST_DEV_ID}, #{item.ORI_PATH}, #{item.ORI_FILE_NAME}, #{item.ORI_FILE_LENGTH},
+				#{item.ORI_FILE_TIME}, #{item.LATN_ID}, #{item.COLL_DEV_ID}, #{item.CREATE_TIME}, #{item.STATUS}, #{item.SOURCE_ID},
+				#{item.BATCH_ID}, #{item.LINES}, #{item.TSK_TYPE})
+		</foreach>
+	</insert>
+
+	<!--分发异常表回写成功后删除异常表数据-->
+	<delete id="delBatchDistTaskAbnCallbackList" parameterType="java.util.List">
+		DELETE /*["sqlId":"distributeMapper.delBatchDistTaskAbnCallbackList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM DC_DIST_TASK_ABN WHERE (DIST_DEV_ID, SOURCE_ID, RECID) IN
+		<foreach item="item" index="index" collection="list" separator="," open="(" close=")">
+			(#{item.DIST_DEV_ID}, #{item.SOURCE_ID},#{item.RECID})
+		</foreach>
+	</delete>
+
+	<!--查询分发任务数存在重复的数据-->
+	<select id="queryDistTaskAbnDuplicateList" parameterType="map" resultType="map">
+		SELECT /*["sqlId":"distributeMapper.queryDistTaskAbnDuplicateList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			T.* FROM (
+				SELECT A.* FROM DC_DIST_TASK_ABN A, DC_DIST_TASK B
+				WHERE A.RECID = B.RECID
+				  AND A.SOURCE_ID = B.SOURCE_ID
+				  AND A.DIST_DEV_ID = B.DIST_DEV_ID
+		  ) T, DC_DIST_LINK C, DC_ADDR D
+		  WHERE T.DIST_DEV_ID = C.DEV_ID
+		  AND C.ADDR_ID = D.ADDR_ID
+		  AND D.GROUP_ID = #{GROUP_ID}
+	</select>
+
+	<!--分发成功后删除分发任务表数据-->
+	<delete id="delBatchDistTaskkList" parameterType="java.util.List">
+		DELETE /*["sqlId":"distributeMapper.delBatchDistTaskkList","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+		FROM DC_DIST_TASK WHERE (DIST_DEV_ID, SOURCE_ID, RECID) IN
+		<foreach item="item" index="index" collection="list" separator="," open="(" close=")">
+			(#{item.DIST_DEV_ID}, #{item.SOURCE_ID}, #{item.RECID})
+		</foreach>
+	</delete>
+
+	<!--根据SourceId，查询出parent_source_id-->
+	<select id="queryParentSourceId" parameterType="map" resultType="map">
+		SELECT/*["sqlId":"distributeMapper.queryParentSourceId","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+			PARENT_SOURCE_ID
+		FROM SOURCE_FILES
+		WHERE
+			SOURCE_ID = #{SOURCE_ID}
+	</select>
+
+	<!-- 根据采集链路Id查询数据源 -->
+	<select id="queryDatasourceByCollDevId" parameterType="map" resultType="map">
+	  	SELECT/*["sqlId":"distributeMapper.queryDatasourceByCollDevId","appName":"dcm-server-sx.jar","Mode":"生产"]*/
+	  		PARAM_VALUE DATASOURCE
+	  	FROM DC_DEV_CFG
+ 		WHERE
+ 			DEV_ID = #{COLL_DEV_ID} AND PARAM_NAME = 'datasource';
+	</select>
+</mapper>

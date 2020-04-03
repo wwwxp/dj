@@ -1,0 +1,1645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" readonly="true" id="b8530224-853b-4f83-9273-429a1b16dca5" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/dcm-server-sx.iml" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="spring-config.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-config.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" selection-start-line="11" selection-end-line="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mybaits-cfg.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/mybaits-cfg.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" selection-start-line="11" selection-end-line="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spring-datasource.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2737">
+              <caret line="161" column="40" selection-start-line="161" selection-start-column="40" selection-end-line="161" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spring-datasource-double.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-double.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2295">
+              <caret line="135" selection-start-line="135" selection-end-line="135" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spring-datasource-single.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-single.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1088">
+              <caret line="64" column="11" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fastdfs_client.properties" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/fastdfs_client.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="19" column="18" selection-start-line="19" selection-end-line="19" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spring-distribute-component.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-distribute-component.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="11" column="29" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="335">
+              <caret line="268" column="48" selection-start-line="268" selection-start-column="48" selection-end-line="268" selection-end-column="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spring-datasource-three.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-three.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2703">
+              <caret line="159" column="11" selection-start-line="159" selection-start-column="11" selection-end-line="159" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DCFileServiceImpl.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/com/tydic/dcfile/DCFileSDK-java/1.3.6/DCFileSDK-java-1.3.6.jar!/com/tydic/dcfile/service/impl/DCFileServiceImpl.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="102">
+              <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>queryDatasourceByCollDevId</find>
+      <find>log4j</find>
+      <find>LZ4</find>
+      <find>dfs_mount_point</find>
+      <find>dfsMountPoint</find>
+      <find>tracker_server</find>
+      <find>LZ4Factory</find>
+      <find>enable_compression</find>
+      <find>spring-distribute-component</find>
+      <find>fastdfs_client.properties</find>
+      <find>placeholder</find>
+      <find>.setLenient</find>
+    </findStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/main/resources/mapper/distributeMapper.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="G:\soft\maven\apache-maven-3.5.2-bin\localRepo" />
+        <option name="userSettingsFile" value="G:\soft\maven\apache-maven-3.5.2-bin\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="Profiles" type="6783ec58:MavenProjectsStructure$ProfilesNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="dcm-server-sx" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+        </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="dcm-server-sx" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+          <item name="Lifecycle" type="58874e2:MavenProjectsStructure$LifecycleNode" />
+        </path>
+      </expand>
+      <select />
+    </treeState>
+  </component>
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths />
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="5" />
+    <option name="width" value="1350" />
+    <option name="height" value="725" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="AndroidView" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="dfs-lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="fastdfs-lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="hadoop-lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="hadoop-lib" type="462c0819:PsiDirectoryNode" />
+              <item name="ref-lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="tydic" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="tydic" type="462c0819:PsiDirectoryNode" />
+              <item name="dcm" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="conf" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="dcm-server-sx" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="mapper" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="dcm-server-sx" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../dcm2/dcm_fileupload" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.20344828" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="DcmSystem" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.tydic.dcm.DcmSystem" />
+      <module name="dcm-server-sx" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.tydic.dcm.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <properties />
+      <listeners />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.DcmSystem" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\hp\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="G:\work\svn\dcm\dcm\dcm-server-sx" />
+          <option name="myCopyRoot" value="G:\work\svn\dcm\dcm\dcm-server-sx" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="G:\work\svn\dcm\dcm\dcm-server-sx" />
+          <option name="myCopyRoot" value="G:\work\svn\dcm\dcm\dcm-server-sx" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b8530224-853b-4f83-9273-429a1b16dca5" name="Default" comment="" />
+      <created>1577102503682</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1577102503682</updated>
+      <workItem from="1577102508559" duration="255000" />
+      <workItem from="1577103200425" duration="4754000" />
+      <workItem from="1577187160161" duration="381000" />
+      <workItem from="1579089547772" duration="5691000" />
+      <workItem from="1579173763233" duration="56000" />
+      <workItem from="1579316957149" duration="3318000" />
+      <workItem from="1579497236610" duration="84000" />
+      <workItem from="1579498903791" duration="1199000" />
+      <workItem from="1579504976269" duration="17000" />
+      <workItem from="1584244663925" duration="599000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="16354000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <layout>
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info id="Image Layers" order="2" />
+      <window_info anchor="right" id="Capture Analysis" order="3" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info active="true" anchor="right" id="Maven Projects" order="3" visible="true" weight="0.19504021" />
+      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.30508474" />
+      <window_info anchor="bottom" id="Spring" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Designer" order="2" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26407507" />
+      <window_info anchor="right" id="Database" order="3" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info id="UI Designer" order="2" />
+      <window_info anchor="right" id="Theme Preview" order="3" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Messages" order="7" visible="true" weight="0.32909605" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2737">
+          <caret line="161" column="40" selection-start-line="161" selection-start-column="40" selection-end-line="161" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-double.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2295">
+          <caret line="135" selection-start-line="135" selection-end-line="135" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-single.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1088">
+          <caret line="64" column="11" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/fastdfs_client.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="18" selection-start-line="19" selection-end-line="19" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-three.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2703">
+          <caret line="159" column="11" selection-start-line="159" selection-start-column="11" selection-end-line="159" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/tydic/dcfile/DCFileSDK-java/1.3.6/DCFileSDK-java-1.3.6.jar!/com/tydic/dcfile/service/impl/DCFileServiceImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-distribute-component.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="29" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/DcmSystem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5304">
+          <caret line="335" column="19" selection-start-line="335" selection-start-column="19" selection-end-line="335" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-config.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/mybaits-cfg.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2737">
+          <caret line="161" column="40" lean-forward="true" selection-start-line="161" selection-start-column="40" selection-end-line="161" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-double.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2295">
+          <caret line="135" lean-forward="true" selection-start-line="135" selection-end-line="135" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-single.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1088">
+          <caret line="64" column="11" lean-forward="true" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/fastdfs_client.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="18" selection-start-line="19" selection-end-line="19" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-three.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2703">
+          <caret line="159" column="11" lean-forward="true" selection-start-line="159" selection-start-column="11" selection-end-line="159" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/tydic/dcfile/DCFileSDK-java/1.3.6/DCFileSDK-java-1.3.6.jar!/com/tydic/dcfile/service/impl/DCFileServiceImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-distribute-component.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/client/DcmClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="57" column="37" selection-start-line="57" selection-start-column="37" selection-end-line="57" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/device/DeviceControl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1020">
+          <caret line="60" column="16" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/ftran/DistLink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39287">
+          <caret line="2311" column="89" selection-start-line="2311" selection-start-column="89" selection-end-line="2311" selection-end-column="89" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/DcmSystem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="33" selection-start-line="33" selection-end-line="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/service/impl/HdfsDFSServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="29" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/mapper/distributeMapper.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="11815">
+          <caret line="695" column="81" selection-start-line="695" selection-start-column="81" selection-end-line="695" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/client/DcmClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="57" column="37" selection-start-line="57" selection-start-column="37" selection-end-line="57" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/device/DeviceControl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="60" column="16" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/ftran/DistLink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39287">
+          <caret line="2311" column="89" selection-start-line="2311" selection-start-column="89" selection-end-line="2311" selection-end-column="89" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/DcmSystem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="33" selection-start-line="33" selection-end-line="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/service/impl/HdfsDFSServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="29" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/mapper/distributeMapper.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="11815">
+          <caret line="695" column="81" selection-start-line="695" selection-start-column="81" selection-end-line="695" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/mapper/distributeMapper.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="695" column="81" selection-start-line="695" selection-start-column="81" selection-end-line="695" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/client/DcmClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="57" column="37" selection-start-line="57" selection-start-column="37" selection-end-line="57" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/device/DeviceControl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="60" column="16" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/jpountz/lz4/lz4/1.3.0/lz4-1.3.0.jar!/net/jpountz/lz4/LZ4Factory.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="15" column="19" lean-forward="true" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://MAVEN/com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>MAVEN</ID>
+          <OriginalElement>com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT</OriginalElement>
+          <nodes>
+            <node x="3709.125" y="635.0">com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT</node>
+            <node x="1387.0" y="394.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61</node>
+            <node x="412.5" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71</node>
+            <node x="549.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/com.tydic.framework.osgi.commons:ehcache:jar:1.0.1</node>
+            <node x="135.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/org.slf4j:slf4j-api:jar:1.7.7</node>
+            <node x="649.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/joda-time:joda-time:jar:2.9.1</node>
+            <node x="399.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-codec:commons-codec:jar:1.9</node>
+            <node x="630.25" y="81.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-collections:commons-collections:jar:3.2.2</node>
+            <node x="232.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-beanutils:commons-beanutils:jar:1.9.3</node>
+            <node x="2093.25" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.springframework:spring-aop:jar:4.3.16.RELEASE</node>
+            <node x="1107.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.aspectj:aspectjweaver:jar:1.8.5</node>
+            <node x="872.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.mybatis:mybatis-spring:jar:1.2.2</node>
+            <node x="1789.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.mybatis:mybatis:jar:3.2.2</node>
+            <node x="1697.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/ojdbc6:ojdbc6:jar:11.2.0.2.0</node>
+            <node x="1242.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-dbcp:commons-dbcp:jar:1.4</node>
+            <node x="1243.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-dbcp:commons-dbcp:jar:1.4/commons-pool:commons-pool:jar:1.5.4</node>
+            <node x="1011.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/net.sf.flexjson:flexjson:jar:3.3</node>
+            <node x="1886.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/cglib:cglib:jar:2.2.2</node>
+            <node x="753.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.github.pagehelper:pagehelper:jar:4.1.6</node>
+            <node x="758.5" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.github.pagehelper:pagehelper:jar:4.1.6/com.github.jsqlparser:jsqlparser:jar:0.9.5</node>
+            <node x="1532.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1</node>
+            <node x="1574.0" y="182.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1/commons-digester:commons-digester:jar:1.8.1</node>
+            <node x="1499.940641821944" y="0.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1/commons-logging:commons-logging:jar:1.2</node>
+            <node x="1386.0" y="273.0">com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.apache.commons:commons-lang3:jar:3.1</node>
+            <node x="4478.125" y="394.0">org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0</node>
+            <node x="4251.565641821944" y="182.0">org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0/org.apache.logging.log4j:log4j-api:jar:2.11.0</node>
+            <node x="5893.579547167808" y="394.0">org.slf4j:jcl-over-slf4j:jar:1.7.25</node>
+            <node x="5906.579547167808" y="273.0">org.slf4j:jcl-over-slf4j:jar:1.7.25/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="5670.579547167808" y="394.0">org.slf4j:jul-to-slf4j:jar:1.7.25</node>
+            <node x="5677.579547167808" y="273.0">org.slf4j:jul-to-slf4j:jar:1.7.25/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="5084.25" y="394.0">org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="3938.125" y="394.0">org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0</node>
+            <node x="3959.125" y="273.0">org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="4243.625" y="273.0">org.apache.logging.log4j:log4j-core:jar:2.11.0</node>
+            <node x="5559.523655040608" y="394.0">org.projectlombok:lombok:jar:1.16.20</node>
+            <node x="6016.579547167808" y="394.0">com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7</node>
+            <node x="6027.079547167808" y="273.0">com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7/org.quartz-scheduler:quartz:jar:2.2.1</node>
+            <node x="6022.579547167808" y="182.0">com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7/org.quartz-scheduler:quartz:jar:2.2.1/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="2257.5" y="273.0">org.springframework:spring-context:jar:4.3.16.RELEASE</node>
+            <node x="2458.5656418219437" y="81.0">org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE</node>
+            <node x="2209.25" y="182.0">org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-expression:jar:4.3.16.RELEASE</node>
+            <node x="2764.125" y="394.0">org.springframework:spring-jdbc:jar:4.3.16.RELEASE</node>
+            <node x="2771.625" y="273.0">org.springframework:spring-jdbc:jar:4.3.16.RELEASE/org.springframework:spring-tx:jar:4.3.16.RELEASE</node>
+            <node x="2570.5656418219437" y="182.0">org.springframework:spring-beans:jar:4.3.16.RELEASE</node>
+            <node x="1966.0" y="273.0">com.alibaba:druid:jar:1.0.12</node>
+            <node x="1912.25" y="182.0">com.alibaba:druid:jar:1.0.12/com.alibaba:jconsole:jar:1.8.0</node>
+            <node x="2012.25" y="182.0">com.alibaba:druid:jar:1.0.12/com.alibaba:tools:jar:1.8.0</node>
+            <node x="4300.125" y="394.0">mysql:mysql-connector-java:jar:5.1.36</node>
+            <node x="2304.125" y="394.0">org.springframework:spring-context-support:jar:4.3.16.RELEASE</node>
+            <node x="4741.486094654136" y="394.0">com.jcraft:jsch:jar:0.1.54</node>
+            <node x="2631.125" y="394.0">commons-net:commons-net:jar:3.6</node>
+            <node x="5181.25" y="394.0">commons-lang:commons-lang:jar:2.6</node>
+            <node x="2101.0656418219437" y="394.0">commons-io:commons-io:jar:2.6</node>
+            <node x="39.5" y="182.0">com.alibaba:fastjson:jar:1.2.29</node>
+            <node x="3116.125" y="182.0">org.springframework:spring-test:jar:4.3.16.RELEASE</node>
+            <node x="3204.125" y="394.0">junit:junit:jar:4.12</node>
+            <node x="3174.625" y="273.0">junit:junit:jar:4.12/org.hamcrest:hamcrest-core:jar:1.3</node>
+            <node x="2493.125" y="394.0">com.ctg:ctdfs-common:jar:2.4.0</node>
+            <node x="5781.579547167808" y="394.0">com.ctg:ctdfs-core:jar:2.4.0</node>
+            <node x="3656.1906418219437" y="182.0">io.prometheus:simpleclient:jar:0.5.0</node>
+            <node x="3771.125" y="394.0">io.prometheus:simpleclient_servlet:jar:0.5.0</node>
+            <node x="3699.375" y="273.0">io.prometheus:simpleclient_servlet:jar:0.5.0/io.prometheus:simpleclient_common:jar:0.5.0</node>
+            <node x="3421.125" y="394.0">io.prometheus:simpleclient_pushgateway:jar:0.5.0</node>
+            <node x="3626.125" y="394.0">javax.servlet:javax.servlet-api:jar:3.1.0</node>
+            <node x="2966.3156418219437" y="394.0">org.apache.curator:curator-client:jar:2.12.0</node>
+            <node x="2973.625" y="273.0">org.apache.curator:curator-client:jar:2.12.0/org.apache.zookeeper:zookeeper:jar:3.3.3</node>
+            <node x="3087.625" y="273.0">org.apache.curator:curator-client:jar:2.12.0/com.google.guava:guava:jar:16.0.1</node>
+            <node x="2876.625" y="273.0">org.apache.curator:curator-client:jar:2.12.0/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="5336.523655040608" y="394.0">org.apache.zookeeper:zookeeper:jar:3.4.6</node>
+            <node x="5372.0" y="273.0">org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="5511.375" y="273.0">org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-log4j12:jar:1.7.7</node>
+            <node x="5524.875" y="182.0">org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-log4j12:jar:1.7.7/org.slf4j:slf4j-api:jar:1.7.25</node>
+            <node x="5296.0" y="273.0">org.apache.zookeeper:zookeeper:jar:3.4.6/jline:jline:jar:0.9.94</node>
+            <node x="5295.5" y="182.0">org.apache.zookeeper:zookeeper:jar:3.4.6/jline:jline:jar:0.9.94/junit:junit:jar:4.11</node>
+            <node x="5210.125" y="273.0">org.apache.zookeeper:zookeeper:jar:3.4.6/io.netty:netty:jar:3.7.0.Final</node>
+            <node x="4171.125" y="394.0">cn.vivame.project:fastdfs_client:jar:1.27</node>
+            <node x="3281.125" y="394.0">com.tydic.dcfile:DCFileSDK-java:jar:1.3.6</node>
+            <node x="0.0" y="394.0">net.jpountz.lz4:lz4:jar:1.3.0</node>
+            <node x="4077.125" y="394.0">org.zeromq:jeromq:jar:0.3.5</node>
+            <node x="5450.523655040608" y="394.0">com.tydic.dca:dca-client:jar:3.1</node>
+            <node x="4920.625" y="394.0">org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908</node>
+            <node x="4927.125" y="273.0">org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.servlet:jar:3.0.0.v201112011016</node>
+            <node x="4715.125" y="273.0">org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.security.auth.message:jar:1.0.0.v201108011116</node>
+            <node x="5051.125" y="273.0">org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.mail.glassfish:jar:1.4.1.v201005082020</node>
+            <node x="5020.625" y="182.0">org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.activation:jar:1.1.0.v201105071233</node>
+            <node x="4568.125" y="273.0">org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.annotation:jar:1.1.0.v201108011116</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="org.springframework:spring-test:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="0.0" y="-15.5" />
+              <point x="3164.125" y="132.0" />
+              <point x="2552.3156418219437" y="132.0" />
+              <point x="43.75" y="15.5" />
+            </edge>
+            <edge source="org.apache.zookeeper:zookeeper:jar:3.4.6/jline:jline:jar:0.9.94" target="org.apache.zookeeper:zookeeper:jar:3.4.6/jline:jline:jar:0.9.94/junit:junit:jar:4.11">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.jcraft:jsch:jar:0.1.54">
+              <point x="23.958333333333485" y="-15.5" />
+              <point x="3790.5833333333335" y="515.0" />
+              <point x="4768.486094654136" y="515.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0" target="org.apache.logging.log4j:log4j-core:jar:2.11.0">
+              <point x="-26.5" y="-15.5" />
+              <point x="4504.625" y="374.0" />
+              <point x="4320.291666666667" y="374.0" />
+              <point x="30.66666666666697" y="15.5" />
+            </edge>
+            <edge source="com.alibaba:druid:jar:1.0.12" target="com.alibaba:druid:jar:1.0.12/com.alibaba:tools:jar:1.8.0">
+              <point x="15.75" y="-15.5" />
+              <point x="2013.25" y="253.0" />
+              <point x="2042.75" y="253.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="io.prometheus:simpleclient_servlet:jar:0.5.0" target="io.prometheus:simpleclient_servlet:jar:0.5.0/io.prometheus:simpleclient_common:jar:0.5.0">
+              <point x="-36.75" y="-15.5" />
+              <point x="3807.875" y="374.0" />
+              <point x="3819.375" y="374.0" />
+              <point x="40.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/net.sf.flexjson:flexjson:jar:3.3">
+              <point x="-28.615384615384528" y="-15.5" />
+              <point x="1420.3846153846155" y="344.0" />
+              <point x="1049.0" y="344.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.slf4j:jcl-over-slf4j:jar:1.7.25">
+              <point x="52.708333333333485" y="-15.5" />
+              <point x="3819.3333333333335" y="605.0" />
+              <point x="5945.079547167808" y="605.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0" target="org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0/org.apache.logging.log4j:log4j-api:jar:2.11.0">
+              <point x="26.5" y="-15.5" />
+              <point x="4557.625" y="253.0" />
+              <point x="4321.565641821944" y="253.0" />
+              <point x="28.0" y="15.5" />
+            </edge>
+            <edge source="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.servlet:jar:3.0.0.v201112011016">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.alibaba:druid:jar:1.0.12">
+              <point x="47.69230769230762" y="-15.5" />
+              <point x="1496.6923076923076" y="364.0" />
+              <point x="1981.75" y="364.0" />
+              <point x="-15.75" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0">
+              <point x="4.791666666666515" y="-15.5" />
+              <point x="3771.4166666666665" y="455.0" />
+              <point x="3997.625" y="455.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="30.34722222222217" y="-15.5" />
+              <point x="3796.972222222222" y="535.0" />
+              <point x="5122.75" y="535.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7/org.quartz-scheduler:quartz:jar:2.2.1" target="com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7/org.quartz-scheduler:quartz:jar:2.2.1/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-jdbc:jar:4.3.16.RELEASE/org.springframework:spring-tx:jar:4.3.16.RELEASE" target="org.springframework:spring-beans:jar:4.3.16.RELEASE">
+              <point x="-21.0" y="-15.5" />
+              <point x="2792.625" y="243.0" />
+              <point x="2667.7656418219435" y="243.0" />
+              <point x="43.19999999999999" y="15.5" />
+            </edge>
+            <edge source="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.security.auth.message:jar:1.0.0.v201108011116">
+              <point x="-23.199999999999818" y="-15.5" />
+              <point x="4955.425" y="364.0" />
+              <point x="4811.125" y="364.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="14.75" y="-15.5" />
+              <point x="2331.25" y="253.0" />
+              <point x="2355.75" y="253.0" />
+              <point x="2355.75" y="152.0" />
+              <point x="2489.8156418219437" y="152.0" />
+              <point x="-18.75" y="15.5" />
+            </edge>
+            <edge source="org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-log4j12:jar:1.7.7" target="org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-log4j12:jar:1.7.7/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="io.prometheus:simpleclient_servlet:jar:0.5.0">
+              <point x="1.5972222222221717" y="-15.5" />
+              <point x="3768.222222222222" y="445.0" />
+              <point x="3844.625" y="445.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.springframework:spring-beans:jar:4.3.16.RELEASE">
+              <point x="-30.34722222222217" y="-15.5" />
+              <point x="3736.277777777778" y="535.0" />
+              <point x="2620.625" y="535.0" />
+              <point x="2620.625" y="253.0" />
+              <point x="2624.5656418219437" y="253.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="commons-net:commons-net:jar:3.6">
+              <point x="-27.15277777777783" y="-15.5" />
+              <point x="3739.472222222222" y="525.0" />
+              <point x="2687.625" y="525.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-codec:commons-codec:jar:1.9">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-beanutils:commons-beanutils:jar:1.9.3" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1/commons-logging:commons-logging:jar:1.2">
+              <point x="-36.75" y="-15.5" />
+              <point x="269.25" y="56.0" />
+              <point x="1523.1073084886107" y="56.0" />
+              <point x="-46.33333333333326" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.tydic.dca:dca-client:jar:3.1">
+              <point x="39.93055555555566" y="-15.5" />
+              <point x="3806.5555555555557" y="565.0" />
+              <point x="5495.023655040608" y="565.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.mail.glassfish:jar:1.4.1.v201005082020" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.activation:jar:1.1.0.v201105071233">
+              <point x="0.0" y="-15.5" />
+              <point x="5120.625" y="253.0" />
+              <point x="5110.625" y="253.0" />
+              <point x="30.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.springframework:spring-aop:jar:4.3.16.RELEASE">
+              <point x="57.23076923076928" y="-15.5" />
+              <point x="1506.2307692307693" y="374.0" />
+              <point x="2117.25" y="374.0" />
+              <point x="-24.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.mybatis:mybatis:jar:3.2.2">
+              <point x="28.615384615384528" y="-15.5" />
+              <point x="1477.6153846153845" y="344.0" />
+              <point x="1827.5" y="344.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="junit:junit:jar:4.12">
+              <point x="-14.375" y="-15.5" />
+              <point x="3752.25" y="485.0" />
+              <point x="3232.625" y="485.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="io.prometheus:simpleclient_pushgateway:jar:0.5.0" target="io.prometheus:simpleclient_servlet:jar:0.5.0/io.prometheus:simpleclient_common:jar:0.5.0">
+              <point x="46.0" y="-15.5" />
+              <point x="3559.125" y="374.0" />
+              <point x="3739.375" y="374.0" />
+              <point x="-40.0" y="15.5" />
+            </edge>
+            <edge source="io.prometheus:simpleclient_pushgateway:jar:0.5.0" target="io.prometheus:simpleclient:jar:0.5.0">
+              <point x="-46.0" y="-15.5" />
+              <point x="3467.125" y="243.0" />
+              <point x="3668.9406418219437" y="243.0" />
+              <point x="-38.25" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-jdbc:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="33.0" y="-15.5" />
+              <point x="2846.625" y="374.0" />
+              <point x="2866.125" y="374.0" />
+              <point x="2866.125" y="142.0" />
+              <point x="2539.8156418219437" y="142.0" />
+              <point x="31.25" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7" target="com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7/org.quartz-scheduler:quartz:jar:2.2.1">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0" target="org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-dbcp:commons-dbcp:jar:1.4">
+              <point x="-9.538461538461434" y="-15.5" />
+              <point x="1439.4615384615386" y="324.0" />
+              <point x="1304.0" y="324.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.curator:curator-client:jar:2.12.0" target="org.apache.curator:curator-client:jar:2.12.0/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="-37.0" y="-15.5" />
+              <point x="2984.8156418219437" y="374.0" />
+              <point x="2915.125" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.slf4j:jcl-over-slf4j:jar:1.7.25" target="org.slf4j:jcl-over-slf4j:jar:1.7.25/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.alibaba:fastjson:jar:1.2.29">
+              <point x="-52.708333333333485" y="-15.5" />
+              <point x="3713.9166666666665" y="605.0" />
+              <point x="58.5" y="605.0" />
+              <point x="-19.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.16.RELEASE" target="org.springframework:spring-beans:jar:4.3.16.RELEASE">
+              <point x="44.25" y="-15.5" />
+              <point x="2360.75" y="243.0" />
+              <point x="2581.365641821944" y="243.0" />
+              <point x="-43.19999999999999" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-expression:jar:4.3.16.RELEASE">
+              <point x="-14.75" y="-15.5" />
+              <point x="2301.75" y="253.0" />
+              <point x="2277.25" y="253.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-beans:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="0.0" y="-15.5" />
+              <point x="2624.5656418219437" y="162.0" />
+              <point x="2514.8156418219437" y="162.0" />
+              <point x="6.25" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/com.tydic.framework.osgi.commons:ehcache:jar:1.0.1">
+              <point x="14.85714285714289" y="-15.5" />
+              <point x="479.3571428571431" y="233.0" />
+              <point x="589.5" y="233.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.annotation:jar:1.1.0.v201108011116">
+              <point x="-46.40000000000009" y="-15.5" />
+              <point x="4932.225" y="374.0" />
+              <point x="4631.625" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0" target="org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0/org.apache.logging.log4j:log4j-api:jar:2.11.0">
+              <point x="-39.666666666666515" y="-15.5" />
+              <point x="3957.9583333333335" y="374.0" />
+              <point x="3909.0" y="374.0" />
+              <point x="3909.0" y="253.0" />
+              <point x="4265.565641821944" y="253.0" />
+              <point x="-28.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="mysql:mysql-connector-java:jar:5.1.36">
+              <point x="17.569444444444343" y="-15.5" />
+              <point x="3784.1944444444443" y="495.0" />
+              <point x="4379.125" y="495.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.springframework:spring-context:jar:4.3.16.RELEASE">
+              <point x="-39.93055555555566" y="-15.5" />
+              <point x="3726.6944444444443" y="565.0" />
+              <point x="2287.0" y="565.0" />
+              <point x="-29.5" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="io.prometheus:simpleclient:jar:0.5.0">
+              <point x="-4.791666666666515" y="-15.5" />
+              <point x="3761.8333333333335" y="455.0" />
+              <point x="3615.625" y="455.0" />
+              <point x="3615.625" y="253.0" />
+              <point x="3694.4406418219437" y="253.0" />
+              <point x="-12.75" y="15.5" />
+            </edge>
+            <edge source="org.apache.zookeeper:zookeeper:jar:3.4.6" target="org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-log4j12:jar:1.7.7">
+              <point x="35.25" y="-15.5" />
+              <point x="5418.773655040608" y="374.0" />
+              <point x="5563.375" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="commons-lang:commons-lang:jar:2.6">
+              <point x="33.541666666666515" y="-15.5" />
+              <point x="3800.1666666666665" y="545.0" />
+              <point x="5240.75" y="545.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61">
+              <point x="-49.51388888888869" y="-15.5" />
+              <point x="3717.1111111111113" y="595.0" />
+              <point x="1449.0" y="595.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.curator:curator-client:jar:2.12.0" target="org.apache.curator:curator-client:jar:2.12.0/com.google.guava:guava:jar:16.0.1">
+              <point x="37.0" y="-15.5" />
+              <point x="3058.8156418219437" y="374.0" />
+              <point x="3120.625" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="cn.vivame.project:fastdfs_client:jar:1.27">
+              <point x="11.180555555555657" y="-15.5" />
+              <point x="3777.8055555555557" y="475.0" />
+              <point x="4225.125" y="475.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.zookeeper:zookeeper:jar:3.4.6" target="org.apache.zookeeper:zookeeper:jar:3.4.6/jline:jline:jar:0.9.94">
+              <point x="-11.75" y="-15.5" />
+              <point x="5371.773655040608" y="364.0" />
+              <point x="5324.0" y="364.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.apache.zookeeper:zookeeper:jar:3.4.6">
+              <point x="36.73611111111131" y="-15.5" />
+              <point x="3803.3611111111113" y="555.0" />
+              <point x="5383.523655040608" y="555.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/ojdbc6:ojdbc6:jar:11.2.0.2.0">
+              <point x="19.076923076923094" y="-15.5" />
+              <point x="1468.076923076923" y="334.0" />
+              <point x="1733.0" y="334.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context-support:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="0.0" y="-15.5" />
+              <point x="2388.625" y="374.0" />
+              <point x="2408.8712138344754" y="374.0" />
+              <point x="2408.8712138344754" y="162.0" />
+              <point x="2502.3156418219437" y="162.0" />
+              <point x="-6.25" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1/commons-logging:commons-logging:jar:1.2">
+              <point x="0.0" y="-15.5" />
+              <point x="2508.5656418219437" y="56.0" />
+              <point x="1615.7739751552772" y="56.0" />
+              <point x="46.33333333333326" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.github.pagehelper:pagehelper:jar:4.1.6" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.github.pagehelper:pagehelper:jar:4.1.6/com.github.jsqlparser:jsqlparser:jar:0.9.5">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.projectlombok:lombok:jar:1.16.20">
+              <point x="43.125" y="-15.5" />
+              <point x="3809.75" y="575.0" />
+              <point x="5597.523655040608" y="575.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.0" target="org.apache.logging.log4j:log4j-core:jar:2.11.0">
+              <point x="39.66666666666697" y="-15.5" />
+              <point x="4037.291666666667" y="374.0" />
+              <point x="4258.958333333333" y="374.0" />
+              <point x="-30.66666666666697" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.github.pagehelper:pagehelper:jar:4.1.6">
+              <point x="-47.69230769230762" y="-15.5" />
+              <point x="1401.3076923076924" y="364.0" />
+              <point x="802.5" y="364.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-beanutils:commons-beanutils:jar:1.9.3">
+              <point x="-14.85714285714289" y="-15.5" />
+              <point x="449.6428571428569" y="233.0" />
+              <point x="306.0" y="233.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="junit:junit:jar:4.12" target="junit:junit:jar:4.12/org.hamcrest:hamcrest-core:jar:1.3">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.apache.curator:curator-client:jar:2.12.0">
+              <point x="-20.763888888888687" y="-15.5" />
+              <point x="3745.8611111111113" y="505.0" />
+              <point x="3021.8156418219437" y="505.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1/commons-logging:commons-logging:jar:1.2">
+              <point x="-36.25" y="-15.5" />
+              <point x="1568.25" y="253.0" />
+              <point x="1563.5" y="253.0" />
+              <point x="1563.5" y="56.0" />
+              <point x="1569.440641821944" y="56.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-jdbc:jar:4.3.16.RELEASE" target="org.springframework:spring-jdbc:jar:4.3.16.RELEASE/org.springframework:spring-tx:jar:4.3.16.RELEASE">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="io.prometheus:simpleclient_servlet:jar:0.5.0" target="io.prometheus:simpleclient:jar:0.5.0">
+              <point x="36.75" y="-15.5" />
+              <point x="3881.375" y="374.0" />
+              <point x="3869.875" y="374.0" />
+              <point x="3869.875" y="243.0" />
+              <point x="3745.4406418219437" y="243.0" />
+              <point x="38.25" y="15.5" />
+            </edge>
+            <edge source="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.mail.glassfish:jar:1.4.1.v201005082020">
+              <point x="46.40000000000009" y="-15.5" />
+              <point x="5025.025" y="374.0" />
+              <point x="5120.625" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1">
+              <point x="9.538461538461434" y="-15.5" />
+              <point x="1458.5384615384614" y="324.0" />
+              <point x="1604.5" y="324.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.springframework:spring-test:jar:4.3.16.RELEASE">
+              <point x="-17.569444444444343" y="-15.5" />
+              <point x="3749.0555555555557" y="495.0" />
+              <point x="3164.125" y="495.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="io.prometheus:simpleclient_pushgateway:jar:0.5.0">
+              <point x="-7.986111111111313" y="-15.5" />
+              <point x="3758.6388888888887" y="465.0" />
+              <point x="3513.125" y="465.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="net.jpountz.lz4:lz4:jar:1.3.0">
+              <point x="-55.90277777777783" y="-15.5" />
+              <point x="3710.722222222222" y="615.0" />
+              <point x="24.0" y="615.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.ctg:ctdfs-core:jar:2.4.0">
+              <point x="49.51388888888869" y="-15.5" />
+              <point x="3816.1388888888887" y="595.0" />
+              <point x="5827.579547167808" y="595.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context-support:jar:4.3.16.RELEASE" target="org.springframework:spring-beans:jar:4.3.16.RELEASE">
+              <point x="56.33333333333326" y="-15.5" />
+              <point x="2444.958333333333" y="374.0" />
+              <point x="2452.298655040608" y="374.0" />
+              <point x="2452.298655040608" y="253.0" />
+              <point x="2602.965641821944" y="253.0" />
+              <point x="-21.600000000000023" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-expression:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="0.0" y="-15.5" />
+              <point x="2277.25" y="142.0" />
+              <point x="2477.3156418219437" y="142.0" />
+              <point x="-31.25" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.slf4j:jul-to-slf4j:jar:1.7.25">
+              <point x="46.31944444444434" y="-15.5" />
+              <point x="3812.9444444444443" y="585.0" />
+              <point x="5716.079547167808" y="585.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/org.slf4j:slf4j-api:jar:1.7.7">
+              <point x="-29.714285714285666" y="-15.5" />
+              <point x="434.7857142857142" y="243.0" />
+              <point x="174.0" y="243.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-validator:commons-validator:jar:1.4.1/commons-digester:commons-digester:jar:1.8.1">
+              <point x="36.25" y="-15.5" />
+              <point x="1640.75" y="253.0" />
+              <point x="1645.5" y="253.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0">
+              <point x="20.763888888888687" y="-15.5" />
+              <point x="3787.3888888888887" y="505.0" />
+              <point x="4531.125" y="505.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-jdbc:jar:4.3.16.RELEASE" target="org.springframework:spring-beans:jar:4.3.16.RELEASE">
+              <point x="-33.0" y="-15.5" />
+              <point x="2780.625" y="374.0" />
+              <point x="2718.5919867813354" y="374.0" />
+              <point x="2718.5919867813354" y="253.0" />
+              <point x="2646.1656418219436" y="253.0" />
+              <point x="21.600000000000023" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/cglib:cglib:jar:2.2.2">
+              <point x="38.15384615384619" y="-15.5" />
+              <point x="1487.1538461538462" y="354.0" />
+              <point x="1916.0" y="354.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.tydic.dcfile:DCFileSDK-java:jar:1.3.6">
+              <point x="-11.180555555555657" y="-15.5" />
+              <point x="3755.4444444444443" y="475.0" />
+              <point x="3341.125" y="475.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-beanutils:commons-beanutils:jar:1.9.3" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-collections:commons-collections:jar:3.2.2">
+              <point x="36.75" y="-15.5" />
+              <point x="342.75" y="162.0" />
+              <point x="669.5" y="162.0" />
+              <point x="-39.25" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.zeromq:jeromq:jar:0.3.5">
+              <point x="7.986111111111313" y="-15.5" />
+              <point x="3774.6111111111113" y="465.0" />
+              <point x="4114.125" y="465.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.springframework:spring-aop:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="0.0" y="-15.5" />
+              <point x="2141.25" y="132.0" />
+              <point x="2464.8156418219437" y="132.0" />
+              <point x="-43.75" y="15.5" />
+            </edge>
+            <edge source="org.apache.logging.log4j:log4j-core:jar:2.11.0" target="org.apache.logging.log4j:log4j-1.2-api:jar:2.11.0/org.apache.logging.log4j:log4j-api:jar:2.11.0">
+              <point x="0.0" y="-15.5" />
+              <point x="4289.625" y="253.0" />
+              <point x="4293.565641821944" y="253.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908">
+              <point x="27.15277777777783" y="-15.5" />
+              <point x="3793.777777777778" y="525.0" />
+              <point x="4978.625" y="525.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.zookeeper:zookeeper:jar:3.4.6" target="org.apache.zookeeper:zookeeper:jar:3.4.6/io.netty:netty:jar:3.7.0.Final">
+              <point x="-35.25" y="-15.5" />
+              <point x="5348.273655040608" y="374.0" />
+              <point x="5241.125" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/joda-time:joda-time:jar:2.9.1">
+              <point x="29.714285714285666" y="-15.5" />
+              <point x="494.2142857142858" y="243.0" />
+              <point x="693.5" y="243.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71">
+              <point x="-57.23076923076928" y="-15.5" />
+              <point x="1391.7692307692307" y="374.0" />
+              <point x="464.5" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="javax.servlet:javax.servlet-api:jar:3.1.0">
+              <point x="-1.5972222222221717" y="-15.5" />
+              <point x="3765.027777777778" y="445.0" />
+              <point x="3688.625" y="445.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.aspectj:aspectjweaver:jar:1.8.5">
+              <point x="-19.076923076923094" y="-15.5" />
+              <point x="1429.923076923077" y="334.0" />
+              <point x="1164.5" y="334.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.ctg:ctdfs-common:jar:2.4.0">
+              <point x="-33.541666666666515" y="-15.5" />
+              <point x="3733.0833333333335" y="545.0" />
+              <point x="2551.625" y="545.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71/commons-collections:commons-collections:jar:3.2.2">
+              <point x="44.57142857142844" y="-15.5" />
+              <point x="509.07142857142844" y="253.0" />
+              <point x="748.0" y="253.0" />
+              <point x="39.25" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/com.tydic.bp:bp-common:jar:1.0-20191108.084542-71" target="com.alibaba:fastjson:jar:1.2.29">
+              <point x="-44.571428571428555" y="-15.5" />
+              <point x="419.92857142857156" y="253.0" />
+              <point x="96.5" y="253.0" />
+              <point x="19.0" y="15.5" />
+            </edge>
+            <edge source="io.prometheus:simpleclient_servlet:jar:0.5.0/io.prometheus:simpleclient_common:jar:0.5.0" target="io.prometheus:simpleclient:jar:0.5.0">
+              <point x="0.0" y="-15.5" />
+              <point x="3779.375" y="253.0" />
+              <point x="3719.9406418219437" y="253.0" />
+              <point x="12.75" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-jdbc:jar:4.3.16.RELEASE/org.springframework:spring-tx:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE/org.springframework:spring-core:jar:4.3.16.RELEASE">
+              <point x="21.0" y="-15.5" />
+              <point x="2834.625" y="152.0" />
+              <point x="2527.3156418219437" y="152.0" />
+              <point x="18.75" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.apache.logging.log4j:log4j-core:jar:2.11.0">
+              <point x="14.375" y="-15.5" />
+              <point x="3781.0" y="485.0" />
+              <point x="4289.625" y="485.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.16.RELEASE" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.springframework:spring-aop:jar:4.3.16.RELEASE">
+              <point x="-44.25" y="-15.5" />
+              <point x="2272.25" y="253.0" />
+              <point x="2165.25" y="253.0" />
+              <point x="24.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="commons-io:commons-io:jar:2.6">
+              <point x="-43.125" y="-15.5" />
+              <point x="3723.5" y="575.0" />
+              <point x="2153.5656418219437" y="575.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.mybatis:mybatis-spring:jar:1.2.2">
+              <point x="-38.15384615384619" y="-15.5" />
+              <point x="1410.8461538461538" y="354.0" />
+              <point x="931.5" y="354.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.springframework:spring-context-support:jar:4.3.16.RELEASE">
+              <point x="-36.73611111111086" y="-15.5" />
+              <point x="3729.888888888889" y="555.0" />
+              <point x="2388.625" y="555.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.slf4j:jul-to-slf4j:jar:1.7.25" target="org.slf4j:jul-to-slf4j:jar:1.7.25/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.alibaba:druid:jar:1.0.12">
+              <point x="-46.31944444444434" y="-15.5" />
+              <point x="3720.3055555555557" y="585.0" />
+              <point x="2042.348655040608" y="585.0" />
+              <point x="2042.348655040608" y="364.0" />
+              <point x="2013.25" y="364.0" />
+              <point x="15.75" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-dbcp:commons-dbcp:jar:1.4" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/commons-dbcp:commons-dbcp:jar:1.4/commons-pool:commons-pool:jar:1.5.4">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908" target="org.eclipse.jetty.aggregate:jetty-all-server:jar:8.2.0.v20160908/org.eclipse.jetty.orbit:javax.activation:jar:1.1.0.v201105071233">
+              <point x="23.199999999999818" y="-15.5" />
+              <point x="5001.825" y="364.0" />
+              <point x="5040.625" y="364.0" />
+              <point x="5040.625" y="253.0" />
+              <point x="5050.625" y="253.0" />
+              <point x="-30.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61" target="com.tydic.bp:bp-core-service:jar:1.0-20190418.064859-61/org.apache.commons:commons-lang3:jar:3.1">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="org.springframework:spring-jdbc:jar:4.3.16.RELEASE">
+              <point x="-23.958333333333485" y="-15.5" />
+              <point x="3742.6666666666665" y="515.0" />
+              <point x="2813.625" y="515.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.apache.zookeeper:zookeeper:jar:3.4.6" target="org.apache.zookeeper:zookeeper:jar:3.4.6/org.slf4j:slf4j-api:jar:1.7.25">
+              <point x="11.75" y="-15.5" />
+              <point x="5395.273655040608" y="374.0" />
+              <point x="5410.5" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="org.springframework:spring-context-support:jar:4.3.16.RELEASE" target="org.springframework:spring-context:jar:4.3.16.RELEASE">
+              <point x="-56.33333333333334" y="-15.5" />
+              <point x="2332.2916666666665" y="374.0" />
+              <point x="2346.0" y="374.0" />
+              <point x="29.5" y="15.5" />
+            </edge>
+            <edge source="org.apache.curator:curator-client:jar:2.12.0" target="org.apache.curator:curator-client:jar:2.12.0/org.apache.zookeeper:zookeeper:jar:3.3.3">
+              <point x="0.0" y="-15.5" />
+              <point x="3021.8156418219437" y="374.0" />
+              <point x="3020.625" y="374.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT" target="com.tydic.bp:bp-quartz:jar:1.0-20180921.061829-7">
+              <point x="55.90277777777783" y="-15.5" />
+              <point x="3822.527777777778" y="615.0" />
+              <point x="6061.079547167808" y="615.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="com.alibaba:druid:jar:1.0.12" target="com.alibaba:druid:jar:1.0.12/com.alibaba:jconsole:jar:1.8.0">
+              <point x="-15.75" y="-15.5" />
+              <point x="1981.75" y="253.0" />
+              <point x="1952.25" y="253.0" />
+              <point x="0.0" y="15.5" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="1.06398891966759" x="206.0" y="388.0" />
+          <SelectedNodes>
+            <node>net.jpountz.lz4:lz4:jar:1.3.0</node>
+            <node>com.tydic.bp:dcm-server-sx:1.0-SNAPSHOT</node>
+          </SelectedNodes>
+          <Categories />
+          <SCOPE>All</SCOPE>
+          <VISIBILITY>All</VISIBILITY>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/config.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="95" column="15" selection-start-line="95" selection-end-line="95" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/service/impl/HdfsDFSServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="34" column="80" selection-start-line="34" selection-start-column="80" selection-end-line="34" selection-end-column="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/ftran/DistLink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="522">
+          <caret line="3033" column="40" selection-start-line="3033" selection-start-column="27" selection-end-line="3033" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/ftran/CollLink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="202">
+          <caret line="264" lean-forward="true" selection-start-line="264" selection-end-line="264" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tydic/dcm/DcmSystem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5304">
+          <caret line="335" column="19" selection-start-line="335" selection-start-column="19" selection-end-line="335" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/com/tydic/dcfile/DCFileSDK-java/1.3.6/DCFileSDK-java-1.3.6.jar!/com/tydic/dcfile/service/impl/DCFileServiceImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/fastdfs_client.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="18" selection-start-line="19" selection-end-line="19" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/mybaits-cfg.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-config.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2737">
+          <caret line="161" column="40" selection-start-line="161" selection-start-column="40" selection-end-line="161" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-double.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2295">
+          <caret line="135" selection-start-line="135" selection-end-line="135" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-single.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1088">
+          <caret line="64" column="11" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-datasource-three.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2703">
+          <caret line="159" column="11" selection-start-line="159" selection-start-column="11" selection-end-line="159" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/conf/spring-distribute-component.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="29" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="335">
+          <caret line="268" column="48" selection-start-line="268" selection-start-column="48" selection-end-line="268" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>scala-sdk-2.11.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.20344828" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.20344828" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.20344828" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

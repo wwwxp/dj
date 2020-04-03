@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <!-- FastDFS分布式文件系统SDK配置信息  START-->
+    <bean name="fastDfsUtil" class="com.tydic.dcfile.util.FastDfsUtil" init-method="init" destroy-method="close" lazy-init="true">
+        <property name="minPoolSize" value="${min_pool_size}"/>
+        <property name="maxPoolSize" value="${max_pool_size}"/>
+        <property name="waitTimes" value="${wait_times}"/>
+        <!--<property name="uploadGroups" value="${upload_groups}"/>-->
+        <property name="enableCompression" value="${enable_compression}"/>
+    </bean>
+
+    <bean name="redisUtil" class="com.tydic.dcfile.util.RedisUtil" init-method="init" destroy-method="close" lazy-init="true">
+        <property name="redisCluster" value="${redis_cluster}"/>
+        <property name="redisMaxIdle" value="${redis_max_idle}"/>
+        <property name="redisMaxTotal" value="${redis_max_total}"/>
+        <property name="redisMaxWaitMillis" value="${redis_max_wait_millis}"/>
+        <property name="redisMaxRedirections" value="${redis_max_redirections}"/>
+        <property name="redisPassWord" value="${redis_password}"/>
+    </bean>
+
+    <bean name="authUtil" class="com.tydic.dcfile.util.AuthUtil" scope="prototype" init-method="init" lazy-init="true">
+        <property name="authUser" value="${auth_user}"/>
+        <property name="authPassword" value="${auth_password}"/>
+        <property name="authRelogin" value="${auth_relogin}"/>
+    </bean>
+
+    <bean id="dcFileService" class="com.tydic.dcfile.service.impl.DCFileServiceImpl" init-method="init" lazy-init="true">
+    </bean>
+    <!--FastDFS分布式文件系统 END-->
+
+
+    <!--集团分布式文件系统接口-->
+    <bean id="dfsService" class="com.tydic.dcm.service.impl.HdfsDFSServiceImpl" init-method="init" lazy-init="true" destroy-method="destory"/>
+</beans>

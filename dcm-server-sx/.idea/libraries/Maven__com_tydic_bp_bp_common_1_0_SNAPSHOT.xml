@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.tydic.bp:bp-common:1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/tydic/bp/bp-common/1.0-SNAPSHOT/bp-common-1.0-20191108.084542-71.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/tydic/bp/bp-common/1.0-SNAPSHOT/bp-common-1.0-20191108.084542-71-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/tydic/bp/bp-common/1.0-SNAPSHOT/bp-common-1.0-20191108.084542-71-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
