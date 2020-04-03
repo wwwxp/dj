@@ -1,0 +1,85 @@
+<configuration>
+<property>
+<name>hbase.hconnection.threads.max</name>
+<value>50</value>
+</property>
+
+<property>
+<name>hbase.hconnection.threads.core</name>
+<value>50</value>
+</property>
+
+<property>
+<name>fs.hdfs.impl.disable.cache</name>
+<value>true</value>
+</property>
+
+<property>
+<name>dfs.zookeeper.quorum</name>
+<value>192.168.161.8:2181,192.168.161.9:2181,192.168.161.11:2181</value>
+</property>
+
+<property>
+<name>dfs.filerel.expiretime</name>
+<value>1440</value>
+</property>
+
+<property>
+ <name>dfs.query.page.size</name>
+  <value>5000</value>
+  </property>
+
+<property>
+ <name>fs.dfs.impl</name>
+  <value>org.apache.hadoop.fs.DFSFileSystem</value>
+  </property>
+
+<property>
+ <name>dfs.scheme</name>
+  <value>dfs</value>
+  </property>
+
+<property>
+ <name>fs.mixfs.impl</name>
+  <value>org.apache.hadoop.fs.DFSFileSystem</value>
+  </property>
+
+<property>
+ <name>dfs.zookeeper.znode.root</name>
+  <value>/dfs</value>
+  </property>
+
+<property>
+ <name>dfs.superuser</name>
+  <value>dfs</value>
+  </property>
+
+<property>
+ <name>dfs.supergroup</name>
+  <value>dfs</value>
+  </property>
+  <property>
+   <name>hbase.client.scanner.timeout.period</name>
+    <value>900000</value>
+    </property>
+    <property>
+     <name>hbase.rpc.timeout</name>
+      <value>900000</value>
+      </property>
+
+<property>
+ <name>dfs.superuser.kerberos.principal</name>
+ <value>dfs/dic9f8@HADOOP.COM</value>
+</property>
+	<!-- appengine keytab -->
+	<property>
+	        <name>dfsftp.kerberos.keytab</name>
+	        <value>/etc/security/keytabs/dfs.app.keytab</value>
+	</property>
+	 <property>
+	         <name>dfsftp.kerberos.principal</name>
+	        <value>dfs/h3a1.ecloud.com</value>
+	 </property>
+
+
+</configuration>

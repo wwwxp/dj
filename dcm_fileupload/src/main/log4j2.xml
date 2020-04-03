@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" monitorInterval="60">
+    <Properties>
+        <!--日志输出格式-->
+        <!--统一日志编码、日志序列、日期时间、应用标识、能力标识、模块名/服务名、平台组件关联信息、日志级别（为ERROR或FATAL）、错误码、日志类型（业务类日志为01）、进程名、进程标识、线程标识、文件名：行号、函数名、执行时长、操作员工、具体日志信息；-->
+        <Property name="LOG_PATTERN">11|%sequenceNumber|%d{HHmmss,SSS}|000|000|%p|%rEx|000|%processId|%t|%C|%L|%M|%r|000|%m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 输出到控制台 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <!-- 需要记录的级别 -->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="%d{HH:mm:ss.SSS}[%t][%-5level][%C:%L] - %msg%n"/>
+        </console>
+
+        <!--调试日志，方便分析-->
+        <RollingFile name="DebugLog" fileName="../log/debug.log"
+                     filePattern="../log/logBak-%d{yyyyMMdd}/debug-%d{yyyyMMdd-HH}.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS}[%t][%-5level][%C:%L] - %msg%n"/>
+            <Policies>
+                <!--TimeBasedTriggeringPolicy:日志文件按照时间备份 -->
+                <!--interval:每1天生成一个新文件，时间单位需要结合filePattern时间%d{yyyy-MM-dd} -->
+                <!--同理，如果要每1小时生成一个新文件，则改成%d{yyyy-MM-ddHH} -->
+                <!--modulate:对备份日志的生成时间纠偏，纠偏以0为基准进行，"0+interval"决定启动后第一次备份时间 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--<SizeBasedTriggeringPolicy size="100 MB"/>-->
+            </Policies>
+            <!--DefaultRolloverStrategy:翻转策略决定如何执行备份 -->
+            <!--max:最多保存max参数对应值个备份文件，结合时间使用后，在每个时间段内最多有max个备份，多出来的会被覆盖 -->
+            <!--compressionLevel:配置日志压缩级别，范围0-9，0不压缩，1压缩速度最快，9压缩率最好，目前只对于zip压缩文件类型有效 -->
+            <DefaultRolloverStrategy max="240" compressionLevel="0">
+                <Delete basePath="../log/" maxDepth="2">
+                    <!--IfFileName:匹配文件名称 -->
+                    <!--glob:匹配2级目录深度下的以.log.gz结尾的备份文件 -->
+                    <IfFileName glob="*/*.log" />
+                    <!--IfLastModified:匹配文件修改时间 -->
+                    <!--age:匹配超过180天的文件，单位D、H、M、S分别表示天、小时、分钟、秒-->
+                    <IfLastModified age="10D" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="SystemLog" fileName="../log/system.log"
+                     filePattern="../log/logBak-%d{yyyyMMdd}/system-%d{yyyyMMdd-HH}.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout
+                    pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--<SizeBasedTriggeringPolicy size="100 MB"/>-->
+            </Policies>
+            <DefaultRolloverStrategy max="48"/>
+        </RollingFile>
+
+        <RollingFile name="ErrorFile" fileName="../log/error.log"
+                     filePattern="../log/logBak-%d{yyyyMMdd}/error-%d{yyyyMMddHH}.log">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout
+                    pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--<SizeBasedTriggeringPolicy size="100 MB"/>-->
+            </Policies>
+            <DefaultRolloverStrategy max="240"/>
+        </RollingFile>
+
+    </Appenders>
+
+    <!--开发模式-->
+    <Loggers>
+
+        <!--业务代码-->
+        <logger name="com.tydic" level="debug"/>
+        <!--框架代码-->
+        <logger name="org.apache.hadoop" level="warn"/>
+
+        <Root level="info">
+            <!--调试输出-->
+            <AppenderRef ref="DebugLog"/>
+
+            <!--终端输出-->
+            <!--<AppenderRef ref="Console"/>-->
+
+            <!--生产环境-->
+            <appenderRef ref="SystemLog"/>
+            <appenderRef ref="ErrorFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
