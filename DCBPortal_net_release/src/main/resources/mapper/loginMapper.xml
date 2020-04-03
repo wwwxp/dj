@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="login">
+
+    <!-- 登录用户验证 --> 
+    <select id="userLogin" parameterType="map" resultType="hashMap">
+       SELECT 
+          EMPEE_ID,EMPEE_LEVEL,EMPEE_NAME,
+          EMPEE_CODE,LATN_ID,EMPEE_ACCT,
+          EMPEE_PWD,USER_TYPE
+        FROM tb_bp_sys_empee  
+        WHERE STATE='G01' and EMPEE_ACCT=#{userName}
+        AND EMPEE_PWD=#{passWord}
+         
+    </select>	  
+
+    <!-- 查询登陆用户拥有权限菜单-->
+    <!-- 字段别名as为小写，主要是为了前台进行展示 -->
+    <select id="queryEmpPrivilege" parameterType="map" resultType="hashMap">
+          SELECT t.*,length(path) - length(REPLACE(path, '|', '')) - 1 MENU_LEVEL
+	     FROM
+			(
+				SELECT
+					getParentList (privilege_id) PATH,
+					a.*
+				FROM
+					tb_bp_sys_privilege a
+			) t
+		where t.STATE = '1'
+		 <if test="SUPER != 1">
+            and t.privilege_code in 
+            (select privilege_code from tb_bp_sys_role_privilege b
+            where b.role_id in 
+            (select role_id from tb_bp_sys_empee_role c where c.EMPEE_ID =#{EMPEE_ID}))
+        </if>
+ 	  order by t.privilege_id
+    </select>
+<!--     查询登录失败次数 -->
+    <select id="queryLoginFail" parameterType="map" resultType="hashMap">
+	    SELECT
+				e.EMPEE_ACCT,
+				CASE
+			WHEN e.fail_num IS NULL THEN
+				0
+			ELSE
+				e.fail_num
+			END FAIL_NUM,
+			 date_format(
+				e.FAIL_TIME,
+				'%Y-%m-%d %H:%i:%s'
+			) FAIL_TIME,
+			 date_format(now(), '%Y-%m-%d %H:%i:%s') NOW_TIME
+			FROM
+				tb_bp_sys_empee e
+			WHERE
+				e.EMPEE_ACCT = #{userName}	
+    </select>
+    
+<!--     登录失败更新失败次数 -->
+	<update id="updateLoginFail" parameterType="map">
+		UPDATE tb_bp_sys_empee e
+				SET e.fail_num = CASE
+				WHEN e.fail_num IS NULL THEN
+					1
+				ELSE
+					e.fail_num + 1
+				END,
+				 e.fail_time = now()
+				WHERE
+					e.EMPEE_ACCT = #{userName}	
+	</update>
+	
+<!-- 	重置登录失败记录信息 -->
+	<update id="resetLogin">
+	UPDATE tb_bp_sys_empee e
+				SET e.fail_num = 0,
+				 e.fail_time = now()
+				WHERE
+					e.EMPEE_ACCT = #{userName}	
+	
+	</update>
+</mapper>

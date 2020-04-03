@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="environments">
+    <!--查询环境变量列表 --> 
+    <select id="queryEnvList" parameterType="map" resultType="hashMap">
+        SELECT A.ID,
+       		A.ENV_NAME,
+       		A.ENV_VALUE,
+       		A.STATE,
+			IFNULL(A.BUS_CLUSTER_ID,"") BUS_CLUSTER_ID,
+			IFNULL(B.BUS_CLUSTER_NAME,"公用，所有集群拥有") BUS_CLUSTER_NAME,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+       FROM DCF_ENVIRONMENTS A LEFT JOIN DCF_BUS_MAIN_CLUSTER B ON A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+       WHERE 1=1 
+       <if test="ENV_NAME != null and ENV_NAME != ''">
+        	AND A.ENV_NAME like  CONCAT('%', #{ENV_NAME}, '%')
+       </if> 
+       <choose>
+	       <when test="IS_ALL == 'ALL'">
+	        	<choose>
+		        	<when test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+		        		AND (A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID} OR A.BUS_CLUSTER_ID IS NULL OR A.BUS_CLUSTER_ID = '')
+		            </when>
+		            <otherwise>
+		            	OR A.BUS_CLUSTER_ID IS NULL OR A.BUS_CLUSTER_ID = ''
+		            </otherwise>
+	       		</choose>
+	       </when>
+	       <otherwise>
+		        <if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+		        	AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		       </if> 
+	       </otherwise>  
+       </choose>
+    </select>
+    
+    <!--查询挡圈Topology运行变量列表 --> 
+    <select id="queryRunTopologyEnvList" parameterType="map" resultType="hashMap">
+        SELECT A.ID,
+       		A.ENV_NAME,
+       		A.ENV_VALUE,
+       		A.STATE,
+			IFNULL(A.BUS_CLUSTER_ID,"") BUS_CLUSTER_ID,
+			IFNULL(B.BUS_CLUSTER_NAME,"公用，所有集群拥有") BUS_CLUSTER_NAME,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+       FROM DCF_ENVIRONMENTS A LEFT JOIN DCF_BUS_MAIN_CLUSTER B ON A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+       WHERE A.STATE = '1'
+       <if test="ENV_NAME != null and ENV_NAME != ''">
+        	AND A.ENV_NAME like  CONCAT('%', #{ENV_NAME}, '%')
+       </if> 
+       <choose>
+       		<when test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+       			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID} OR A.BUS_CLUSTER_ID IS NULL OR A.BUS_CLUSTER_ID = ''
+       		</when>
+       		<otherwise>
+       			AND (A.BUS_CLUSTER_ID IS NULL OR A.BUS_CLUSTER_ID = '')
+       		</otherwise>
+       </choose>
+    </select>
+    
+    <!-- 新增环境变量 -->
+    <insert id="insertEnv" parameterType="hashMap">
+    	INSERT INTO DCF_ENVIRONMENTS(ID,ENV_NAME,ENV_VALUE,
+    		BUS_CLUSTER_ID, STATE,CRT_DATE)
+    	VALUES(NEWID(),#{ENV_NAME},#{ENV_VALUE},
+    	<choose>
+            <when test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+                #{BUS_CLUSTER_ID},
+            </when>
+            <otherwise>
+                NULL,
+            </otherwise>
+        </choose>
+    	#{STATE}, CURRENT_TIMESTAMP)
+    </insert>
+    
+    <!-- 更新环境变量 -->
+    <update id="updateEnv" parameterType="hashMap">
+    	UPDATE DCF_ENVIRONMENTS
+	   	SET ENV_NAME=#{ENV_NAME},
+	   		ENV_VALUE =#{ENV_VALUE},
+	   		STATE=#{STATE},
+	   		<if test="ENV_NAME != null and ENV_NAME != ''">
+        		BUS_CLUSTER_ID=#{BUS_CLUSTER_ID},
+            </if>
+	   		CRT_DATE = CURRENT_TIMESTAMP
+	 	WHERE ID=#{ID}
+    </update>
+    
+    <!-- 删除环境变量 -->
+    <delete id="delEnv" parameterType="hashMap">
+    	DELETE FROM DCF_ENVIRONMENTS WHERE ID=#{ID}
+    </delete>
+    
+    <!-- 删除业务主集群关联配置 -->
+    <delete id="delEnvByBusClusterId" parameterType="map">
+    	DELETE FROM DCF_ENVIRONMENTS WHERE BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+    </delete>
+    
+    <!-- 根据业务主集群查询关联的M2DB集群 -->
+    <select id="queryM2dbListByBusClusterId" parameterType="map" resultType="map">
+    	SELECT A.BUS_CLUSTER_ID, A.BUS_CLUSTER_NAME, A.BUS_CLUSTER_CODE,
+			   B.CLUSTER_ID,B.CLUSTER_TYPE,
+			   C.CLUSTER_CODE, C.CLUSTER_DEPLOY_PATH
+		FROM DCF_BUS_MAIN_CLUSTER A JOIN DCF_BUS_RELATION_CLUSTER_LIST B ON (A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID)
+			 JOIN DCF_SERVICE_TYPE C ON (B.CLUSTER_ID = C.CLUSTER_ID)
+		 AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		 AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+    </select>
+    
+    <!-- 查询M2DB最新的启动实例版本 -->
+    <select id="queryM2dbLastVersionList" parameterType="map" resultType="map">
+    	SELECT COUNT(A.HOST_ID), A.DEPLOY_TYPE ,A.STATUS, A.VERSION
+		FROM DCF_DEPLOY_INST_CONFIG A
+		WHERE A.CLUSTER_ID = #{M2DB_CLUSTER_ID}
+		  AND A.STATUS = '1'
+		GROUP BY A.DEPLOY_TYPE,A.STATUS, A.VERSION
+		ORDER BY A.VERSION DESC
+    </select>
+    
+</mapper>

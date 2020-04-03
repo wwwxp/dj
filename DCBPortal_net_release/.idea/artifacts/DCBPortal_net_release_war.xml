@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="DCBPortal_net_release:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="DCBPortal_net_release.war">
+      <element id="artifact" artifact-name="DCBPortal_net_release:war exploded" />
+    </root>
+  </artifact>
+</component>

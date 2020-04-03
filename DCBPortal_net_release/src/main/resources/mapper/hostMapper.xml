@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="host">
+    <!-- 查询主机列表 --> 
+    <select id="queryHostList" parameterType="map" resultType="hashMap">
+      SELECT    D.HOST_ID,D.HOST_NAME,D.HOST_IP,D.HOST_NET_CARD,
+				D.SSH_PORT,D.SSH_USER,D.SSH_PASSWD, D.HOST_STATE,
+				CONCAT(D.HOST_IP,'(',D.SSH_USER,')') HOST_TEXT,
+				CASE D.HOST_STATE WHEN  1 THEN '启用' WHEN 0 THEN '失效'  END HOST_STATE_DESC,
+				CORE_COUNT,MEM_SIZE,STORE_SIZE,
+				date_format(D.CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+       FROM DCF_HOST D
+       <where>
+           <if test="searchHostName != null and searchHostName != ''">
+              AND D.HOST_NAME LIKE  CONCAT('%', #{searchHostName}, '%')
+           </if>
+		   <if test="searchHostIP != null and searchHostIP != ''">
+			   AND D.HOST_IP LIKE  CONCAT('%', #{searchHostIP}, '%')
+		   </if>
+		   <if test="searchUser != null and searchUser != ''">
+               AND D.SSH_USER = #{searchUser}
+           </if>
+		   <if test="HOST_STATE != null and HOST_STATE != ''">
+			   AND D.HOST_STATE = #{HOST_STATE}
+		   </if>
+            <if test="HOST_ID != null and HOST_ID != ''">  
+               AND D.HOST_ID = #{HOST_ID}
+           </if>
+            <if test="HOST_IP != null and HOST_IP != ''">  
+               AND D.HOST_IP = #{HOST_IP}
+           </if>
+           <if test="HOST_IDS != null and HOST_IDS != ''">
+           		AND D.HOST_ID IN (${HOST_IDS})
+           </if>
+       </where>
+       ORDER BY INET_ATON(D.HOST_IP) ASC, D.SSH_USER ASC
+    </select>
+    
+    <!-- 查询route“主”主机列表 -->
+    <select id="queryRouteHostByCluster" parameterType="map" resultType="hashMap">
+    	SELECT H.HOST_IP,
+    		H.HOST_ID,
+			H.HOST_NET_CARD,
+    		H.SSH_USER,
+    		H.SSH_PASSWD,
+    		H.SSH_PORT,
+    		T.CLUSTER_DEPLOY_PATH
+    	FROM DCF_HOST_DEPLOY D LEFT JOIN DCF_HOST H ON D.HOST_ID=H.HOST_ID
+    		LEFT JOIN DCF_SERVICE_TYPE T ON (D.CLUSTER_ID = T.CLUSTER_ID)
+    	WHERE D.STATE=1
+    		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+    			AND D.CLUSTER_TYPE IN (${CLUSTER_TYPE})
+    		</if>
+    		<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+    			AND D.CLUSTER_ID = #{CLUSTER_ID}
+    		</if>
+    </select> 
+    
+    <!-- 集群摘要,查询ZK运行主机信息 -->
+    <select id="queryZkHostList" parameterType="map" resultType="hashMap">
+    	SELECT DISTINCT B.HOST_IP,A.STATUS RUN_STATE
+    	 FROM DCF_DEPLOY_INST_CONFIG A,DCF_HOST B, DCF_SERVICE_TYPE C
+		 WHERE A.HOST_ID=B.HOST_ID
+		 AND A.DEPLOY_TYPE = C.CLUSTER_TYPE
+		 AND C.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		 AND B.HOST_IP IN 
+		<foreach collection="HOST_LIST" index="index" item="hostIp" open="(" separator="," close=")">
+    		#{hostIp}
+  		</foreach>
+		 ORDER BY A.STATUS DESC
+    </select>
+
+   <!-- 新增主机-->
+    <insert id="insertHost" parameterType="hashMap">
+       INSERT INTO DCF_HOST(HOST_ID,
+	      	<if test="HOST_NAME != null and HOST_NAME != ''">  
+	              HOST_NAME,
+	        </if>
+	        HOST_IP,
+			<if test="HOST_NET_CARD != null and HOST_NET_CARD != ''">
+				HOST_NET_CARD,
+			</if>
+	      	<if test="SSH_PORT != null and SSH_PORT != ''">  
+	              SSH_PORT,
+	        </if>
+			SSH_USER,SSH_PASSWD,HOST_STATE,
+            CORE_COUNT,
+            MEM_SIZE,
+            STORE_SIZE,
+			CRT_DATE)
+		VALUES(NEWID(),
+			   <if test="HOST_NAME != null and HOST_NAME != ''">  
+	             #{HOST_NAME},
+	           </if>
+	           #{HOST_IP},
+				<if test="HOST_NET_CARD != null and HOST_NET_CARD != ''">
+					#{HOST_NET_CARD},
+				</if>
+			   <if test="SSH_PORT != null and SSH_PORT != ''">  
+	             #{SSH_PORT,jdbcType=INTEGER},
+	           </if>
+		       #{SSH_USER},
+		       #{SSH_PASSWD},1,
+               #{CORE_COUNT},
+	           #{MEM_SIZE},
+	           #{STORE_SIZE},
+		      CURRENT_TIMESTAMP)
+    </insert>
+
+	<!--根据excel文件批量插入-->
+	<insert id="insertHostList" parameterType="list" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO DCF_HOST(
+			HOST_ID,
+			HOST_NAME,
+			HOST_IP,
+			HOST_NET_CARD,
+			SSH_PORT,
+			SSH_USER,SSH_PASSWD,HOST_STATE,
+			CORE_COUNT,
+			MEM_SIZE,
+			STORE_SIZE,
+			CRT_DATE)VALUES
+		<foreach item="item" collection="list" index="index" separator=",">
+			(NEWID(),
+			#{item.HOST_NAME},
+			#{item.HOST_IP},
+			#{item.HOST_NET_CARD},
+			#{item.SSH_PORT,jdbcType=INTEGER},
+			#{item.SSH_USER},
+			#{item.SSH_PASSWD},1,
+			#{item.CORE_COUNT},
+			#{item.MEM_SIZE},
+			#{item.STORE_SIZE},
+			CURRENT_TIMESTAMP)
+		</foreach>
+	</insert>
+    
+     <!-- 更新 主机 -->
+    <update id="updateHost" parameterType="hashMap">
+       UPDATE DCF_HOST
+	   SET 
+		   <if test="HOST_NAME != null and HOST_NAME != ''">  
+             HOST_NAME=#{HOST_NAME},
+           </if>
+	   		HOST_IP=#{HOST_IP},
+			HOST_NET_CARD = #{HOST_NET_CARD},
+	       <if test="SSH_PORT != null and SSH_PORT != ''">  
+             SSH_PORT=#{SSH_PORT},
+           </if>
+	       SSH_USER=#{SSH_USER},SSH_PASSWD=#{SSH_PASSWD},
+	        <if test="CORE_COUNT != null and CORE_COUNT != ''">  
+	          	  CORE_COUNT = #{CORE_COUNT},
+	        </if>
+	        <if test="MEM_SIZE != null and MEM_SIZE != ''">  
+	            MEM_SIZE = #{MEM_SIZE},
+	        </if>
+	        STORE_SIZE = #{STORE_SIZE}
+	 WHERE HOST_ID=#{HOST_ID}
+    </update>
+
+	<!--批量修改主机密码-->
+	<update id="updateHostPasswdBatch" parameterType="map">
+		UPDATE DCF_HOST SET SSH_PASSWD = #{SSH_PASSWD}
+		WHERE HOST_ID IN (${HOST_ID})
+	</update>
+
+    <!-- 删除 主机 -->
+    <delete id="delHost" parameterType="hashMap">
+    	DELETE from DCF_HOST where HOST_ID=#{HOST_ID}
+    </delete>
+    
+    <!--判断主机代码是否重复-->
+    <select id="queryMuitlCode" parameterType="map" resultType="hashMap">
+         SELECT COUNT(1) SUM FROM DCF_HOST
+         WHERE HOST_IP = #{HOST_IP} AND SSH_USER=#{SSH_USER}
+         <if test="FLAG == 'update'">  
+             AND HOST_ID != #{HOST_ID}
+         </if> 
+    </select>
+    
+    <!-- 查询单个主机信息 -->
+    <select id="queryHostById" resultType="hashMap">
+       SELECT D.HOST_ID,D.HOST_NAME,D.HOST_IP,D.HOST_NET_CARD,
+			D.SSH_PORT,D.SSH_USER,D.SSH_PASSWD 
+       FROM DCF_HOST D 
+       WHERE D.HOST_ID = #{HOST_ID}
+    </select>
+
+    <!-- 查询主机信息,用于删除业务版本时,删除各远程主机上的包 -->
+    <select id="queryHostInfoForServiceDelete" resultType="hashMap">
+		SELECT
+			A.HOST_IP,
+			A.SSH_USER,
+			A.SSH_PASSWD,
+			B.PACKAGE_TYPE,
+			B.CLUSTER_ID,
+			B.CLUSTER_TYPE,
+			C.CLUSTER_DEPLOY_PATH
+		FROM
+			DCF_HOST A,
+			DCF_BUSINESS_DEPLOY_LIST B,
+			DCF_SERVICE_TYPE C
+		WHERE A.HOST_ID = B.HOST_ID
+		  AND B.CLUSTER_ID = C.CLUSTER_ID
+		  AND B.VERSION = #{VERSION}
+		  AND B.PACKAGE_TYPE = #{PACKAGE_TYPE}
+    </select>
+    
+     <!-- 查询主机信息,用于删除业务版本时,删除各远程主机上的包 -->
+    <select id="queryHostInfoForAddBillingAndRent" resultType="hashMap">
+    	SELECT A.HOST_ID, A.HOST_IP, A.SSH_USER, A.HOST_NAME
+		FROM DCF_HOST A RIGHT JOIN DCF_HOST_DEPLOY B ON (A.HOST_ID = B.HOST_ID)
+		WHERE B.CLUSTER_ID IN (
+				SELECT CLUSTER_ID FROM DCF_BUS_RELATION_CLUSTER_LIST T 
+					WHERE T.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+					  AND T.CLUSTER_TYPE = 'jstorm'
+			)
+		  AND A.HOST_ID NOT IN (SELECT HOST_ID FROM DCF_HOST_DEPLOY 
+		  						 WHERE CLUSTER_ID = #{CLUSTER_ID})
+		  ORDER BY INET_ATON(A.HOST_IP) ASC
+    </select>
+    
+    
+     <!-- 查询某台主机是否下挂应用 -->	
+	<select id="queryCountByHostIds" parameterType="map" resultType="hashMap">
+		SELECT COUNT(1) AS SUM FROM DCF_HOST_DEPLOY
+		WHERE HOST_ID IN
+		<foreach collection="ids" item="item" separator="," open="(" close=")">
+	       	#{item.HOST_ID}
+	    </foreach>
+	</select>
+	
+	<!-- 根据主机ID查询主机列表，终端操作 -->
+    <select id="queryHostForTermial" parameterType="map" resultType="map">
+    	SELECT A.HOST_ID, A.HOST_NAME, A.HOST_IP, A.SSH_PORT, A.SSH_USER, A.SSH_PASSWD,A.HOST_NET_CARD
+		FROM DCF_HOST A
+		WHERE HOST_ID IN (${HOST_IDS}) 
+    </select>
+
+	<!-- 根据主机ＩＰ查询主机列表 -->
+	<select id="queryHostListByIp" parameterType="map" resultType="map">
+		SELECT A.HOST_ID, A.HOST_NAME, A.HOST_IP, A.SSH_PORT, A.SSH_USER, A.SSH_PASSWD,A.HOST_NET_CARD
+		FROM DCF_HOST A
+		WHERE HOST_IP IN (${HOST_IPS})
+	</select>
+</mapper>

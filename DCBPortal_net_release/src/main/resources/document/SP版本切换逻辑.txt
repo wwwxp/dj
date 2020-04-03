@@ -1,0 +1,23 @@
+1、网元列表获取方式，读取ocs_jtopo.xml文件
+2、号段获取方式，解析包类型下的sp_switch.xml文件，获取号段配置
+3、灰度升级按钮处理逻辑：
+	3.1、根据topologyGroup属性获取切换Topology节点
+	3.2、删除节点下的所有子节点，然后将前台传入的网元或者号段配置添加到节点下，将子节点的Current设置为父节点的next属性值
+	3.3、修改节点upgradestate=0
+	3.4、将修改后的配置文件同步到版本发布服务器对应包目录以及关联的业务集群目录
+	3.5、将DCF_MASTER_STANDBY表中TOPOLOGY_GROUP字段值和topologyGroup属性值对应的数据列ACTION_FLAG = 0
+4、灰度升级配置修改按钮处理逻辑：
+	4.1、根据topologyGroup属性获取切换Topology节点
+	4.2、删除节点下的所有子节点，然后将前台传入的网元或者号段配置添加到节点下，将子节点的Current设置为父节点的next属性值
+	4.3、将修改后的配置文件同步到版本发布服务器对应包目录以及关联的业务集群目录
+5、正式发布按钮处理逻辑：
+	5.1、根据topologyGroup属性获取切换Topology节点
+	5.2、将节点current和next属性值对调，并且将upgradestate=1
+	5.3、将修改后的配置文件同步到版本发布服务器对应包目录以及关联的业务集群目录
+	5.4、将DCF_MASTER_STANDBY表中TOPOLOGY_GROUP字段值和topologyGroup属性值对应的数据列ACTION_FLAG = 1
+6、回退按钮处理逻辑：
+	6.1、根据topologyGroup属性获取切换Topology节点
+	6.2、将节点upgradestate=1
+	6.3、当ACTION_FLAG=1回退时将节点current和next属性值对调
+	6.4、将修改后的配置文件同步到版本发布服务器对应包目录以及关联的业务集群目录
+	6.5、将DCF_MASTER_STANDBY表中TOPOLOGY_GROUP字段值和topologyGroup属性值对应的数据列ACTION_FLAG = 2

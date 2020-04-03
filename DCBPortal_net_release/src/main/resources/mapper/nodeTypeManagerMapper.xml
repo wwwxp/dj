@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nodeTypeManagerMapper">
+
+    <!--查询出版本发布服务的信息-->
+    <select id="queryVersionPublishInfo" parameterType="map" resultType="map">
+        SELECT
+            CONFIG_NAME,
+            CONFIG_VALUE
+        FROM DCF_GROUP_CONFIG
+        WHERE
+            CONFIG_NAME=#{FTP_IP}
+            OR CONFIG_NAME=#{FTP_USERNAME}
+            OR CONFIG_NAME=#{FTP_PASSWD}
+            OR CONFIG_NAME=#{FTP_ROOT_PATH}
+    </select>
+
+    <!--查询程序类型是否在NODE_CONFIG表中有关联-->
+    <select id="queryNodeByNodeTypeId" parameterType="map" resultType="map">
+        SELECT
+            COUNT(0) NODE_COUNT
+        FROM DCF_NODE_CONFIG
+        WHERE
+            NODE_TYPE_ID=#{ID}
+    </select>
+
+    <!--查询程序类型是否在程序类型版本表中有关联-->
+    <select id="queryTypeVersionByNodeTypeId" parameterType="map" resultType="map">
+        SELECT
+            COUNT(0) TYPE_VERSION_COUNT
+        FROM DCF_NODE_TYPE_VERSION_LIST
+        WHERE
+            NODE_TYPE_ID=#{ID}
+    </select>
+
+    <select id="queryDeployTableByNodeTypeId" parameterType="map" resultType="map">
+          SELECT
+              COUNT(0) NODE_TYPE_COUNT
+          FROM DCF_NODE_DEPLOY_LIST
+          WHERE
+            NODE_TYPE_ID=#{ID}
+    </select>
+
+    <!--程序类型配置信息的更新-->
+    <update id="nodeTypeUpdate" parameterType="map">
+      update DCF_NODE_TYPE_CONFIG
+      set
+        `NAME`=#{NAME},
+        CODE=#{CODE},
+        DIFF_CFG=#{DIFF_CFG},
+        RUN_WEB=#{RUN_WEB},
+        <choose>
+            <when test="BUS_GROUP!=null and BUS_GROUP!=''">
+                BUS_GROUP_ID=#{BUS_GROUP},
+            </when>
+            <otherwise>
+                BUS_GROUP_ID=NULL,
+            </otherwise>
+        </choose>
+        START_VERSION=#{START_VERSION},
+        DEFAULT_PATH=#{DEFAULT_PATH},
+        UPDATE_DATE=now(),
+        UPDATE_USER=#{USER_NAME},
+        `DESC`=#{DESC}
+      where
+        ID=#{ID}
+    </update>
+
+    <!--程序类型信息的插入-->
+    <insert id="nodeTypeInsert" parameterType="map">
+        INSERT INTO DCF_NODE_TYPE_CONFIG(`NAME`,CODE,DIFF_CFG,RUN_WEB,BUS_GROUP_ID,START_VERSION,CURR_VERSION,
+        DEFAULT_PATH,CREATED_DATE,CREATED_USER,`DESC`)
+        VALUES(
+            #{NAME},
+            #{CODE},
+            #{DIFF_CFG},
+            #{RUN_WEB},
+            <choose>
+                <when test="BUS_GROUP!=null and BUS_GROUP!=''">
+                    #{BUS_GROUP},
+                </when>
+                <otherwise>
+                    NULL,
+                </otherwise>
+            </choose>
+            #{START_VERSION},
+            NULL,
+            #{DEFAULT_PATH},
+            NOW(),
+            #{USER_NAME},
+            #{DESC});
+    </insert>
+
+    <select id="queryBusGroupOnNodeType" parameterType="map" resultType="map">
+          SELECT
+              DISTINCT
+              B.GROUP_NAME BUS_GROUP,
+              A.BUS_GROUP_ID
+          FROM DCF_NODE_TYPE_CONFIG A
+          INNER JOIN DCF_NODE_BUS_GROUP_CONFIG B ON A.BUS_GROUP_ID=B.ID
+          ORDER BY BUS_GROUP ASC
+    </select>
+
+    <select id="queryCodeCount" parameterType="map" resultType="map">
+        SELECT
+          COUNT(0) CODE_COUNT
+        FROM DCF_NODE_TYPE_CONFIG
+        WHERE
+          CODE=#{CODE}
+         <if test="ID!=null and ID!=''">
+             AND ID != #{ID}
+         </if>
+
+    </select>
+    
+    <select id="queryBusGroupOnBusGroupTable" parameterType="map" resultType="map">
+        SELECT
+            GROUP_NAME,
+            ID BUS_GROUP_ID
+        FROM
+            DCF_NODE_BUS_GROUP_CONFIG
+        ORDER BY GROUP_NAME ASC
+    </select>
+
+    <!--查询程序类型表信息-->
+    <select id="queryNodeType" parameterType="map" resultType="map">
+          SELECT
+              A.ID,
+              A.NAME,
+              A.CODE,
+              B.GROUP_NAME,
+              B.GROUP_NAME BUS_GROUP,
+              A.BUS_GROUP_ID,
+              A.DIFF_CFG,
+              A.RUN_WEB,
+              CASE A.DIFF_CFG
+                  WHEN 0 THEN '否'
+                  WHEN 1 THEN '是'
+                  ELSE ''
+              END DIFF_CFG_VALUE,
+              CASE A.RUN_WEB
+                  WHEN 0 THEN '否'
+                  WHEN 1 THEN '是'
+                  ELSE ''
+              END RUN_WEB_VALUE,
+              A.DEFAULT_PATH,
+              A.START_VERSION,
+              A.CURR_VERSION,
+              A.`DESC`
+          FROM DCF_NODE_TYPE_CONFIG A
+          LEFT JOIN DCF_NODE_BUS_GROUP_CONFIG B ON A.BUS_GROUP_ID=B.ID
+          <where>
+              <if test="ID!=null and ID!=''">
+                  AND A.ID=#{ID}
+              </if>
+              <if test="NAME!=null and NAME!=''">
+                  AND A.NAME like '%${NAME}%'
+              </if>
+              <if test="CODE!=null and CODE!=''">
+                  AND A.CODE=#{CODE}
+              </if>
+              <if test="BUS_GROUP_ID!=null and BUS_GROUP_ID!=''">
+                  AND A.BUS_GROUP_ID=#{BUS_GROUP_ID}
+              </if>
+          </where>
+          ORDER BY A.NAME,A.CODE
+    </select>
+
+    <delete id="delNodeType" parameterType="map">
+        DELETE FROM DCF_NODE_TYPE_CONFIG
+        WHERE ID=#{ID}
+    </delete>
+
+    <delete id="delNodeTypeOnNodeTable" parameterType="map">
+        DELETE FROM DCF_NODE_CONFIG
+        WHERE NODE_TYPE_ID=#{ID}
+    </delete>
+
+    <delete id="delNodeTypeOnVersionTable" parameterType="map">
+        DELETE FROM DCF_NODE_TYPE_VERSION_LIST
+        WHERE NODE_TYPE_ID=#{ID}
+    </delete>
+
+    <delete id="delNodeTypeOnDeployTable" parameterType="map">
+        DELETE FROM DCF_NODE_DEPLOY_LIST
+        WHERE NODE_TYPE_ID=#{ID}
+    </delete>
+
+    <delete id="delNodeTypeOnStartTable" parameterType="map">
+        DELETE FROM DCF_NODE_START_LIST
+        WHERE NODE_TYPE_ID=#{ID}
+    </delete>
+
+    <!--通过NODE_TYPE_ID，获取删除一行记录的所需信息-->
+    <!--      1）dcf_node_config表的“NODE_NAME、NODE_HOST_ID、NODE_PATH”字段-->
+    <!--      2）dcf_host表的“HOST_IP、SSH_USER、SSH_PASSWD”字段-->
+    <select id="queryDelInfoOfNodeHost" parameterType="map" resultType="map">
+        SELECT
+            A.ID NODE_TYPE_ID,
+            A.NAME NODE_TYPE_NAME,
+            A.CODE NODE_TYPE_CODE,
+            B.NODE_NAME,
+            B.NODE_HOST_ID,
+            B.NODE_PATH,
+            C.HOST_IP,
+            C.SSH_USER,
+            C.SSH_PASSWD
+        FROM DCF_NODE_TYPE_CONFIG A
+            INNER JOIN DCF_NODE_CONFIG B ON A.ID=B.NODE_TYPE_ID
+            INNER JOIN DCF_HOST C ON B.NODE_HOST_ID = C.HOST_ID
+        WHERE A.ID IN
+        <foreach collection="NODE_TYPE_IDS" item="NODE_TYPE_ID" open="(" separator="," close=")" >
+            #{NODE_TYPE_ID}
+        </foreach>
+    </select>
+
+    <!--获得删除该NODE_TYE要删除的版本目录-->
+    <select id="queryDelInfoOfVersion" parameterType="map" resultType="map">
+        SELECT
+            A.ID NODE_TYPE_ID,
+            B.FILE_PATH,
+            B.VERSION
+        FROM DCF_NODE_TYPE_CONFIG A
+             INNER JOIN DCF_NODE_TYPE_VERSION_LIST B ON A.ID=B.NODE_TYPE_ID
+        WHERE A.ID IN
+        <foreach collection="NODE_TYPE_IDS" item="NODE_TYPE_ID" open="(" separator="," close=")" >
+            #{NODE_TYPE_ID}
+        </foreach>
+
+    </select>
+
+    <!-- 操作日志表的记录 -->
+    <insert id="insertNodeHandleInfo">
+        INSERT INTO DCF_NODE_OPERATOR_LOG(OPERATOR_MODULE,OPERATOR_NAME,CREATED_DATE,CREATED_USER,LOG_CONTENT)
+        VALUES(
+        #{OPERATOR_MODULE},
+        #{OPERATOR_NAME},
+        NOW(),
+        #{CREATED_USER},
+        #{LOG_CONTENT}
+        )
+    </insert>
+
+    <!--判断当前程序类型是否在运行-->
+    <select id="queryRunningNumberByNodeTypeId" parameterType="map" resultType="map">
+        SELECT
+            COUNT(0) NODE_TYPE_RUN_COUNT
+        FROM DCF_NODE_START_LIST
+        WHERE NODE_TYPE_ID = #{ID} AND STATE=1
+    </select>
+</mapper>

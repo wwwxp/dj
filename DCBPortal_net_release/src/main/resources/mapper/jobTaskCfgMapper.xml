@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jobtaskcfg">
+	<!--查询常规任务列表 -->
+	<select id="queryTaskList" parameterType="map" resultType="hashMap">
+		SELECT ID,TASK_NAME,TASK_TYPE,
+		CRON_EXP,
+		CRON_DESC,
+		DATE_FORMAT(CRON_START_TIME,'%Y-%m-%d %H:%i:%s') CRON_START_TIME,
+		DATE_FORMAT(CRON_END_TIME,'%Y-%m-%d %H:%i:%s') CRON_END_TIME,
+		CRON_STATUS,
+		DATE_FORMAT(CRT_DATE,'%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM DCF_JOB_TASK_CONFIG
+		<where>
+			<if test="ID != null and ID != ''">
+				AND ID LIKE #{ID}
+			</if>
+			<if test="TASK_NAME != null and TASK_NAME != ''">
+				AND TASK_NAME LIKE concat('%',#{TASK_NAME},'%')
+			</if>
+		</where>
+		ORDER BY CRT_DATE DESC
+	</select>
+
+	<!-- 新增常规任务 -->
+	<insert id="insertTask" parameterType="hashMap">
+		<selectKey order="BEFORE" resultType="String" keyProperty="TASK_ID">
+			SELECT NEWID() FROM DUAL
+		</selectKey>
+		INSERT INTO
+		DCF_JOB_TASK_CONFIG(ID,TASK_NAME,TASK_TYPE,CRON_EXP,CRON_DESC,
+		CRON_START_TIME,CRON_END_TIME,CRON_STATUS,CRT_DATE)
+		VALUES(#{TASK_ID},#{TASK_NAME},#{TASK_TYPE},#{CRON_EXP},#{CRON_DESC},
+		<choose>
+			<when test="CRON_START_TIME != null and CRON_START_TIME != ''">
+				#{CRON_START_TIME},
+			</when>
+			<otherwise>
+				NULL,
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="CRON_END_TIME != null and CRON_END_TIME != ''">
+				#{CRON_END_TIME},
+			</when>
+			<otherwise>
+				NULL,
+			</otherwise>
+		</choose>
+		#{CRON_STATUS},NOW())
+	</insert>
+
+	<!-- 更新常规任务 -->
+	<update id="updateTask" parameterType="hashMap">
+		UPDATE DCF_JOB_TASK_CONFIG
+		SET ID=#{ID},
+		    TASK_NAME=#{TASK_NAME},
+		    TASK_TYPE=#{TASK_TYPE},
+		    CRON_EXP=#{CRON_EXP},
+		    CRON_DESC=#{CRON_DESC},
+		<if test="CRON_START_TIME != null and CRON_START_TIME != ''">
+			CRON_START_TIME=#{CRON_START_TIME},
+		</if>
+		<if test="CRON_END_TIME != null and CRON_END_TIME != ''">
+			CRON_END_TIME=#{CRON_END_TIME},
+		</if>
+		CRON_STATUS=#{CRON_STATUS},
+		CRT_DATE=NOW()
+		WHERE ID=#{ID}
+	</update>
+	<!-- 更新常规任务 -->
+	<update id="updateTaskStatusById" parameterType="hashMap">
+		UPDATE DCF_JOB_TASK_CONFIG
+		SET STATUS=#{STATUS}
+		WHERE ID=#{ID}
+	</update>
+
+	<!-- 删除常规任务 -->
+	<delete id="delTask" parameterType="hashMap">
+		DELETE FROM DCF_JOB_TASK_CONFIG WHERE ID=#{ID}
+	</delete>
+
+	<!--查询常规任务列表 -->
+	<select id="queryCmdList" parameterType="map" resultType="hashMap">
+		SELECT A.ID,A.CMD_NAME,CMD_CONTENT FROM DCF_COMMAND_CONFIG A
+
+		ORDER BY A.CRT_DATE DESC
+	</select>
+	<!--查询常规任务列表 -->
+	<select id="queryDatasourceList" parameterType="map" resultType="hashMap">
+		SELECT A.DATASOURCE_ID,A.DATASOURCE_NAME FROM DCF_DATASOURCE_CONFIG A
+		ORDER BY A.CRT_DATE DESC
+	</select>
+
+	<!--查询任务，判断是否有名称重复 -->
+	<select id="queryTaskByTaskNameAndId" parameterType="map"
+		resultType="hashMap">
+		SELECT COUNT(0) AS `COUNT` FROM DCF_JOB_TASK_CONFIG WHERE 1=1
+		<if test="ID != null and ID != ''">
+			AND ID != #{ID}
+		</if>
+		AND TASK_NAME = #{TASK_NAME}
+	</select>
+
+	<!--执行sql -->
+	<select id="execSqlByjob" parameterType="map" resultType="hashMap">
+		${EXEC_SQL}
+	</select>
+
+	<!--执行sql -->
+	<select id="execSqlByjobUpdate" parameterType="map">
+		${EXEC_SQL}
+	</select>
+
+	<!--执行sql -->
+	<select id="execSqlByjobInsert" parameterType="map">
+		${EXEC_SQL}
+	</select>
+
+	<!--执行sql -->
+	<select id="execSqlByjobDelete" parameterType="map">
+		${EXEC_SQL}
+	</select>
+	
+	
+	 <!--查询任务日志列表 --> 
+    <select id="queryExpandStrategyLogList" parameterType="map" resultType="hashMap">
+          SELECT date_format(L.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE,L.EXEC_MESSAGE,L.EXEC_RESULT,
+    L.HOST_ID_LIST,L.HOST_IP_LIST,L.STRATEGY_ID,L.TRIGGER_RESULT,L.ID,L.RULE_MSG,L.HOST_NORM_MSG from DCF_EXPAND_STRATEGY_LOG L
+    		WHERE 1=1
+    		 <if test="STRATEGY_ID != null and STRATEGY_ID != ''">
+   		       and L.STRATEGY_ID=#{STRATEGY_ID}
+             </if>
+             order by l.CRT_DATE desc
+    </select>
+	
+	<!-- 删除定时任务配置的时候，查询是否有定时任务关联的数据 -->
+	    <select id="queryJobTaskBusRelation" parameterType="map" resultType="hashMap">
+       		SELECT ID,TASK_ID,BUS_TYPE,BUS_ID 
+       		FROM 
+       		DCF_JOB_TASK_BUS 
+       		WHERE TASK_ID = #{ID}
+    	</select>
+</mapper>

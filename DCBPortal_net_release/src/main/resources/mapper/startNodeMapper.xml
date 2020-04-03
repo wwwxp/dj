@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="startNodeMapper">
+
+    <select id="queryDeployedNodes" parameterType="map" resultType="map">
+        SELECT
+            A.ID DEPLOY_ID,
+            B.ID NODE_ID,
+            C.ID START_ID,
+            IFNULL(C.STATE,0) STATE,
+            B.NODE_NAME,
+            (SELECT CONCAT(`NAME`,'(',CODE,')') FROM DCF_NODE_TYPE_CONFIG
+            WHERE ID=A.NODE_TYPE_ID) NODE_TYPE,
+            A.VERSION,
+            CONCAT(D.HOST_IP,'(',D.SSH_USER,')') IP_USER,
+            B.NODE_PATH,
+            CASE C.STATE
+                WHEN 1 THEN '运行中'
+                WHEN 0 THEN '停止'
+                ELSE '停止'
+            END STATE_NAME,
+            DATE_FORMAT(C.CREATED_DATE,'%Y-%m-%d %H:%i:%s') START_DATE,
+            DATE_FORMAT(C.UPDATE_DATE,'%Y-%m-%d %H:%i:%s') STOP_DATE
+        FROM
+            DCF_NODE_DEPLOY_LIST A
+            LEFT JOIN DCF_NODE_CONFIG B ON A.NODE_ID = B.ID
+            LEFT JOIN DCF_NODE_START_LIST C ON A.NODE_ID= C.NODE_ID AND A.VERSION=C.VERSION
+            LEFT JOIN DCF_HOST D ON B.NODE_HOST_ID = D.HOST_ID
+        <where>
+            <if test="NODE_TYPE_ID!=null and NODE_TYPE_ID!=''">
+                AND A.NODE_TYPE_ID=#{NODE_TYPE_ID}
+            </if>
+            <if test="NODE_HOST_ID!=null and NODE_HOST_ID!=''">
+                AND B.NODE_HOST_ID=#{NODE_HOST_ID}
+            </if>
+            <if test="VERSION!=null and VERSION!=''">
+                AND A.VERSION=#{VERSION}
+            </if>
+            <if test="STATE!=null and STATE!=''">
+                <choose>
+                    <when test="STATE == 1">
+                        AND C.STATE=1
+                    </when>
+                    <otherwise>
+                        AND (C.STATE=0 or C.STATE is null)
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY NODE_TYPE,A.VERSION,IP_USER
+    </select>
+
+    <!--获得表中所有的程序类型名称、程序类型ID-->
+    <select id="queryNodeTypeOnDeploy" parameterType="map" resultType="map">
+        SELECT
+            DISTINCT
+            CONCAT(B.NAME,'(',B.CODE,')') NODE_TYPE_NAME,
+            A.NODE_TYPE_ID
+        FROM DCF_NODE_DEPLOY_LIST A
+          INNER JOIN DCF_NODE_TYPE_CONFIG B ON A.NODE_TYPE_ID=B.ID
+    </select>
+
+    <!--获得表中所有的主机IP、主机IP的ID-->
+    <select id="queryHostIpOnDeploy" parameterType="map" resultType="map">
+        SELECT
+            DISTINCT
+            CONCAT(C.HOST_IP,CONCAT('(',C.SSH_USER,')')) HOST_IP_USER,
+            B.NODE_HOST_ID
+        FROM DCF_NODE_DEPLOY_LIST A
+          INNER JOIN DCF_NODE_CONFIG B ON A.NODE_ID=B.ID
+          INNER JOIN DCF_HOST C ON B.NODE_HOST_ID=C.HOST_ID
+        <where>
+          <if test="NODE_TYPE_ID!='' and NODE_TYPE_ID!=null">
+            AND A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+          </if>
+        </where>
+    </select>
+
+    <!--获得表中所有的版本-->
+    <select id="queryVersionOnDeploy" parameterType="map" resultType="map">
+        SELECT
+            DISTINCT
+            A.VERSION
+        FROM
+            DCF_NODE_DEPLOY_LIST A
+            INNER JOIN DCF_NODE_CONFIG B ON A.NODE_ID=B.ID
+        <where>
+            <if test="NODE_TYPE_ID!='' and NODE_TYPE_ID!=null">
+                AND A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+            </if>
+            <if test="NODE_HOST_ID!='' and NODE_HOST_ID!=null">
+                AND B.NODE_HOST_ID = #{NODE_HOST_ID}
+            </if>
+        </where>
+        ORDER BY A.VERSION DESC
+    </select>
+
+    <!--根据多个NODE_ID，从程序配置表中获取其信息-->
+    <select id="queryStartInfoByNodeIds" parameterType="map" resultType="map">
+        SELECT
+            A.NODE_TYPE_ID,
+            A.ID NODE_ID,
+            A.NODE_NAME,
+            A.NODE_PATH,
+            A.START_CMD,
+            B.HOST_IP,
+            B.SSH_USER,
+            B.SSH_PASSWD
+        FROM
+            DCF_NODE_CONFIG A
+            INNER JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+        WHERE ID IN (${NODE_IDS})
+    </select>
+
+    <!--根据NODE_ID获取node信息-->
+    <select id="queryNodeByNodeId" parameterType="map" resultType="map">
+        SELECT
+            ID NODE_ID,
+            NODE_TYPE_ID,
+            START_CMD,
+            CHECK_CMD,
+            STOP_CMD
+        FROM
+            DCF_NODE_CONFIG
+        WHERE
+            ID=#{NODE_ID}
+    </select>
+
+
+    <!--启停节点的插入-->
+    <insert id="insertStartNode">
+        INSERT INTO DCF_NODE_START_LIST(NODE_ID,NODE_TYPE_ID,VERSION,START_CMD,CHECK_CMD,STOP_CMD,STATE,CREATED_DATE,CREATED_USER)
+        VALUES(#{NODE_ID},#{NODE_TYPE_ID},#{VERSION},#{START_CMD},#{CHECK_CMD},#{STOP_CMD},#{STATE},NOW(),#{CREATED_USER})
+    </insert>
+
+    <!--更新节点的运行状态-->
+    <update id="updateRunState">
+          UPDATE DCF_NODE_START_LIST
+          SET STATE=#{STATE},CREATED_DATE=NOW(),CREATED_USER=#{CREATED_USER}
+          WHERE NODE_ID=#{NODE_ID} AND VERSION=#{VERSION}
+    </update>
+
+    <!--更新节点的运行状态为停止状态，并更新时间-->
+    <update id="updateStopState">
+          UPDATE DCF_NODE_START_LIST
+          SET STATE='0',UPDATE_DATE=NOW(),UPDATE_USER=#{UPDATE_USER}
+          WHERE NODE_ID=#{NODE_ID} AND VERSION=#{VERSION}
+    </update>
+
+    <!--查询启停表中的运行中的程序信息-->
+    <select id="queryNeedStopNode" parameterType="map" resultType="map">
+          SELECT
+              NODE_ID,
+              B.NODE_NAME,
+              B.STOP_CMD,
+              A.VERSION
+          FROM
+              DCF_NODE_DEPLOY_LIST A
+              INNER JOIN DCF_NODE_CONFIG B ON A.NODE_ID = B.ID
+          WHERE
+              A.ID in (${DEPLOY_IDS})
+    </select>
+
+    <!--根据一个NODE_ID，从程序配置表中获取shell信息-->
+    <select id="queryShellInfoByNodeIds" parameterType="map" resultType="map">
+        SELECT
+            A.NODE_TYPE_ID,
+            A.NODE_NAME,
+            A.NODE_PATH,
+            B.HOST_IP,
+            B.SSH_USER,
+            B.SSH_PASSWD,
+            C.RUN_WEB,
+            C.CONTEXT_CFG
+        FROM
+            DCF_NODE_CONFIG A
+            INNER JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+            INNER JOIN DCF_NODE_TYPE_CONFIG C ON C.ID = A.NODE_TYPE_ID
+        WHERE A.ID=#{NODE_ID}
+    </select>
+
+    <!--根据多个NODE_ID，从程序配置表中获取shell信息-->
+    <select id="queryShellInfoByIds" parameterType="map" resultType="map">
+        SELECT
+        A.NODE_TYPE_ID,
+        A.ID NODE_ID,
+        A.NODE_NAME,
+        A.NODE_PATH,
+        B.HOST_IP,
+        B.SSH_USER,
+        B.SSH_PASSWD
+        FROM
+        DCF_NODE_CONFIG A
+        INNER JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+        WHERE A.ID IN
+        <foreach collection="NODE_IDS" item="NODE_ID" open="(" separator="," close=")">
+            #{NODE_ID}
+        </foreach>
+    </select>
+
+    <!--根据DEPLOY_ID获得version、check_cmd-->
+    <select id="queryCheckInfoById" parameterType="map" resultType="map">
+        SELECT
+            A.ID DEPLOY_ID,
+            A.VERSION,
+            B.CHECK_CMD,
+            IF(C.STATE IS NULL OR C.STATE='',0,C.STATE) STATE
+        FROM
+            DCF_NODE_DEPLOY_LIST A
+            INNER JOIN DCF_NODE_CONFIG B ON A.NODE_ID = B.ID
+            LEFT JOIN DCF_NODE_START_LIST C ON A.NODE_ID= C.NODE_ID AND A.VERSION=C.VERSION
+        WHERE
+            A.ID IN
+            <foreach collection="DEPLOY_IDS" item="DEPLOY_ID" open="(" separator="," close=")">
+                #{DEPLOY_ID}
+            </foreach>
+    </select>
+
+    <!--启停表的节点删除-->
+    <delete id="delNodeOnStart" parameterType="map">
+        DELETE FROM DCF_NODE_START_LIST
+        WHERE NODE_ID=#{NODE_ID} AND VERSION=#{VERSION}
+    </delete>
+
+    <!--部署表的节点删除-->
+    <delete id="delNodeOnDeploy" parameterType="map">
+        DELETE FROM DCF_NODE_DEPLOY_LIST
+        WHERE NODE_ID=#{NODE_ID} AND VERSION=#{VERSION}
+    </delete>
+
+    <!-- 操作日志表的记录 -->
+    <insert id="insertNodeHandleInfo">
+        INSERT INTO DCF_NODE_OPERATOR_LOG(OPERATOR_MODULE,OPERATOR_NAME,CREATED_DATE,CREATED_USER,LOG_CONTENT)
+        VALUES(
+        #{OPERATOR_MODULE},
+        #{OPERATOR_NAME},
+        NOW(),
+        #{CREATED_USER},
+        #{LOG_CONTENT}
+        )
+    </insert>
+
+    <!--查询启停表中的运行中的程序的数量-->
+    <select id="queryStartNodeCount" parameterType="map" resultType="map">
+          SELECT
+              COUNT(1) RUN_COUNT
+          FROM
+              DCF_NODE_START_LIST A
+            INNER JOIN DCF_NODE_DEPLOY_LIST B ON A.NODE_ID = B.NODE_ID AND A.VERSION =B.VERSION
+          WHERE
+              B.ID in (${DEPLOY_IDS}) AND A.STATE='1'
+    </select>
+
+    <update id="updateStateByDeployId" parameterType="map">
+          UPDATE DCF_NODE_START_LIST
+          SET STATE=IF(STATE=1,0,1)
+          WHERE NODE_ID=(SELECT NODE_ID FROM DCF_NODE_DEPLOY_LIST WHERE ID=#{DEPLOY_ID}) AND
+                VERSION=(SELECT VERSION FROM DCF_NODE_DEPLOY_LIST WHERE ID=#{DEPLOY_ID})
+    </update>
+
+</mapper>

@@ -1,0 +1,12 @@
+/*登陆Form样式*/
+.loginTable { border: #ababab solid 1px; text-align: center; font-size: 12px; border-collapse: collapse;}
+.loginTable tr th {border: #ababab solid 1px; word-wrap:   break-word;   text-align: right; font-weight: normal; background-color: #f6f9fa; padding: 2px; }
+.loginTable tr td {border: #ababab solid 1px; padding: 2px; line-height: 20px; background-color: #ffffff; }
+
+
+.loginTitle{
+	text-align: center;
+	font-weight: bold;
+	color: purple;
+	font-size: 14px;
+}

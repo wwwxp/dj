@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="roleMapper">
+
+    <!-- 插入角色 -->
+    <insert id="insertRole" parameterType="hashMap">
+	insert into
+	tb_bp_sys_role (role_id, role_name,type,description, state, state_date)
+	values(NEWID(),#{ROLE_NAME},#{TYPE},#{DESCRIPTION},#{STATE},CURRENT_TIMESTAMP)
+    </insert>
+    <!-- 角色查询 -->
+    <select id="qeuryRole" parameterType="hashMap" resultType="hashMap">
+	 SELECT ROLE_ID,
+	        ROLE_NAME,
+	        SUPER_ID,
+	        DESCRIPTION,
+	        CASE STATE WHEN '0' THEN  '停用' ELSE  '启用' END STATE_TIP,
+	        STATE, 
+	        DATE_FORMAT(STATE_DATE, '%Y-%m-%d %H:%i:%s') STATE_DATE,
+	        CREATOR,
+	        TYPE,
+	        CASE TYPE WHEN '1' THEN '业务角色' ELSE '系统角色' END TYPE_NAME,
+	        ROLE_LEVEL,1
+	        COMBINATE,
+	        LATN_ID,
+	        APPID
+	        FROM TB_BP_SYS_ROLE
+	        <where>
+		        <if test="ROLE_NAME != '' and ROLE_NAME != null">
+		            AND ROLE_NAME LIKE CONCAT('%',#{ROLE_NAME},'%')
+		        </if>
+		        <if test="ROLE_ID != null">
+		            AND ROLE_ID = #{ROLE_ID}
+		        </if>
+	        </where>
+    </select>
+
+    <!-- 删除员工的角色 -->
+    <delete id="delEmpeeRole" parameterType="hashMap">
+        DELETE FROM TB_BP_SYS_EMPEE_ROLE WHERE ROLE_ID IN(#{ROLE_ID})
+    </delete>
+
+    <!--删除角色权限 -->
+    <delete id="delRolePrivilege" parameterType="hashMap">
+        DELETE FROM TB_BP_SYS_ROLE_PRIVILEGE WHERE ROLE_ID IN(#{ROLE_ID})
+    </delete>
+
+    <!-- 删除角色 -->
+    <delete id="delRole" parameterType="hashMap">
+        DELETE FROM TB_BP_SYS_ROLE WHERE ROLE_ID IN(#{ROLE_ID})
+    </delete>
+
+    <!-- 更新角色 -->
+    <update id="updateRole" parameterType="hashMap">
+        UPDATE TB_BP_SYS_ROLE
+        SET ROLE_NAME=#{ROLE_NAME},DESCRIPTION=#{DESCRIPTION},STATE=#{STATE},TYPE=#{TYPE}
+        WHERE ROLE_ID=#{ROLE_ID}
+    </update>
+
+    <!-- 查询所有角色 -->
+    <select id="queryAllRole" parameterType="hashMap" resultType="map">
+        SELECT
+			S.ROLE_ID,
+			S.ROLE_NAME,
+			CASE S.LATN_ID
+		WHEN 888 THEN
+			'全国'
+		ELSE
+			'未知'
+		END LATN_NAME,
+		 S.DESCRIPTION
+		FROM
+	    TB_BP_SYS_ROLE S
+        WHERE 1=1 AND S.ROLE_NAME LIKE  CONCAT('%',#{ROLE_NAME},'%')
+    </select>
+
+    <!-- 查询员工角色 -->
+    <select id="queryEmpeeRole" parameterType="hashMap" resultType="map">
+        SELECT S.ROLE_ID,S.ROLE_NAME,T.ID
+        FROM TB_BP_SYS_EMPEE_ROLE T, TB_SYS_ROLE S
+        WHERE T.ROLE_ID = S.ROLE_ID
+        AND T.EMPEE_ID = #{EMPEE_ID}
+    </select>
+
+    <!-- 查询已有权限 -->
+    <select id="queryReadyPrivilege" parameterType="hashMap" resultType="map">
+        SELECT T.ID, T.PRIVILEGE_CODE, S.PRIVILEGE_ID
+        FROM TB_BP_SYS_ROLE_PRIVILEGE T, TB_BP_SYS_PRIVILEGE S
+        WHERE T.PRIVILEGE_CODE = S.PRIVILEGE_CODE
+        AND T.ROLE_ID =#{ROLE_ID}
+    </select>
+
+    <!-- 删除角色权限 -->
+    <delete id="delEmpeePrivilege" parameterType="hashMap">
+        DELETE FROM TB_BP_SYS_ROLE_PRIVILEGE WHERE ROLE_ID = #{ROLE_ID}
+    </delete>
+
+    <!-- 插入角色权限 -->
+    <insert id="insertEmpeePrivilege" parameterType="hashMap">
+        INSERT INTO TB_BP_SYS_ROLE_PRIVILEGE
+        VALUES (NEWID(),#{ROLE_ID},
+        (SELECT PRIVILEGE_CODE FROM TB_BP_SYS_PRIVILEGE WHERE PRIVILEGE_ID = #{PRIVILEGE_ID}),null,CURRENT_TIMESTAMP)
+    </insert>
+
+</mapper>
+
+
+
+
+
+
+
+
+

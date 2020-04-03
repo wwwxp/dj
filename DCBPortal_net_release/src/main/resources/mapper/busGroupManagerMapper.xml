@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="busGroupManagerMapper">
+    <select id="queryBusGroupInfo">
+        SELECT
+            GROUP_NAME,
+            GROUP_CODE,
+            GROUP_DESC,
+            DATE_FORMAT(CREATED_DATE,'%Y-%m-%d %H:%i:%s')
+        FROM
+            DCF_NODE_BUS_GROUP_CONFIG
+        <where>
+            <if test="GROUP_NAME!=null and GROUP_NAME!=''">
+                AND GROUP_NAME=#{GROUP_NAME}
+            </if>
+            <if test="GROUP_CODE!=null and GROUP_CODE!=''">
+                AND GROUP_CODE=#{GROUP_CODE}
+            </if>
+        </where>
+
+    </select>
+</mapper>

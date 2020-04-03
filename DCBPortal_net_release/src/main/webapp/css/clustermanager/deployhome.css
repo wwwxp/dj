@@ -1,0 +1,253 @@
+@charset "utf-8";
+/**每个部署分类div**/
+.classify_name{
+	font-family:'微软雅黑';
+	font-size:16px;
+	font-weight: bold;
+	margin: 0px;
+	padding:12px 0px 5px 10px;
+/*     color:gray; */
+    color:#1296db;
+    position:relative;
+    cursor: pointer;
+}
+.mini-tabs{
+	width: 100%;
+	height: 40px;
+	margin-top: 5px;
+	padding:0px;
+}
+.div_1{
+	min-height:40px;
+	margin:5px 5px 10px 5px;
+	padding-bottom: 10px;
+	height:auto;
+	border:1px dashed gray;
+}
+/**左侧部署分类名称div**/
+.div_2{
+	height:40px;
+	font-weight:bold;
+	font-size:14px;
+	padding-left:20px;
+    color:gray;
+    border-bottom:1px dashed #E6E6E6;
+}
+
+/**集群名称div**/
+.div_3{
+	float:left;
+	line-height:40px;
+	cursor:pointer;
+	width:90%;
+}
+.bus_img{
+	width:24px;
+	height:24px;
+	margin:8px 0px 0px 10px;
+}
+.delete_img{
+	height:18px;
+	width:18px;
+	margin-right:8px;
+	cursor:pointer;
+}
+/**中间详细部署**/
+.all_center{
+	margin:5px;
+	padding:0px;
+}
+.ul_host{
+	float:left;
+	width:100px;
+	height:100px;
+	margin:0px 0px 0px 0px;
+	text-align:center;
+	padding-left:0px;
+}
+.ul_host>li{
+	list-style-type:none;
+	font-size:10px;
+	width:100%;
+}
+
+.ul_host_img{
+	height:40px;
+	width:40px;
+	margin-top:10px;
+}
+
+.ul_host:hover{
+	background-color:#f1f1f1;
+}
+.ul_host_li{
+	height:40%;
+	width:100%;
+	text-align:left;
+	margin-left:9px;
+}
+
+.ul_host_common{
+	float: left;
+	margin: 10px 0px 5px 20px;
+	text-align: center;
+	background-color: #f1f1f1;
+	height: 35px;
+	padding-left:0px;
+	width:160px;
+	cursor:pointer;
+	color:#fff;
+}
+
+.ul_host_common>li{
+	list-style-type:none;
+	font-size:10px;
+	width:100%;
+	margin-top:6px;
+}
+
+.ul_host_common_img{
+	height:40px;
+	width:40px;
+	margin-top:10px;
+}
+
+.ul_host_common:hover{
+	background-color:#f1f1f1;
+}
+.ul_host_common_li{
+	height:40%;
+	width:100%;
+	text-align:left;
+	margin-left:9px;
+}
+
+/**右侧操作按钮div**/
+.operate_block{
+	float:right;
+	height:40px;
+    text-align:center;
+    margin-right:20px;
+}
+
+.operate_run_block{
+    float:right;
+    height:40px;
+    text-align:center;
+    margin-right:20px;
+}
+
+.operate_but{
+	font-family:"微软雅黑";
+	height:30px;
+	width:60px;
+	text-align: center;
+	background:#59BD5D;
+	border:#59BD5D;
+	border-radius:4px;
+	cursor:pointer;
+	font-size:14px;
+	color:white;
+	margin:5px 0px 0px 0px;
+	line-height:28px;
+}
+.operate_but:hover{
+	background:#64D168;
+}
+.operate_but1{
+	height:30px;
+	width:30px;
+	margin-top:5px;
+	cursor:pointer;
+}
+
+/** 最底部添加部署分类按钮div **/
+.add_button{
+	padding:0px 0px 0px 15px;
+	margin-top:8px;
+	font-weight:bold;
+	color:white;
+	height:30px;
+	width:120px;
+	font-size:14px;
+	background:#59BD5D url(../../images/deployHost/add1.png) no-repeat 10px center;
+	border:#59BD5D;
+	cursor:pointer;
+}
+.add_button:hover{
+	background:#64D168 url(../../images/deployHost/add1.png) no-repeat 10px center;
+}
+/** 右键样式 **/
+.right_click{
+	filter:alpha(opacity=90);
+	-moz-opacity:0.9;
+	-khtml-opacity: 0.9;
+	opacity:0.9;
+	padding-left:0px;
+	position:absolute;
+	height:96px;
+	width:70px;
+	background:#59BD5D;
+	color:#fff;
+	margin-top:-50px;
+	margin-left:65px;
+}
+.right_click>li{
+	cursor:pointer;
+	padding-left:10px;
+	text-align:left;
+	padding:5px 10px;
+}
+.right_click>li:hover{
+	background:#64D168;
+}
+
+/** addhostnotin.jsp里的css样式  **/
+.host_list{
+	margin-left:15px;
+	float:left;
+	height:80px;
+	width:160px;
+}
+
+/**deployhostnotin.jsp页面样式**/
+#processScan{
+	cursor:pointer;
+}
+
+#processScan:hover{
+	color:#1B3F91;
+}
+
+.tips_label_start{
+	margin-right: 15px;
+	margin-top:1px;
+	float: right;
+}
+.tips_div_start{
+	width: 16px;
+	height: 16px;
+	text-align:center; 
+	margin-right: 2px;
+	margin-top:3px; 
+	float: right;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

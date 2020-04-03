@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="topicConfig">
+	<!-- 查询Topic配置信息 --> 
+    <select id="queryTopicConfigList" parameterType="map" resultType="hashMap">
+   		SELECT A.TOPIC_NAME, 
+   			CONCAT(A.RQ_IP,':',A.RQ_PORT) IP, 
+   			A.RQ_CLUSTER_ID,
+   			A.RQ_VERSION,
+   			A.RQ_IP,
+   			A.RQ_PORT, 
+   			A.TOPIC_DESC,
+   			A.MQ_W,
+   			A.MQ_R,
+   			A.BUS_CLUSTER_ID,
+   			A.PROGRAM_CODE,
+   			B.PROGRAM_NAME,
+   			A.PROGRAM_ATTR,
+   			C.CLUSTER_NAME RQ_CLUSTER_NAME
+   		FROM DCF_TOPIC_CONFIG A LEFT JOIN DCF_PROGRAM_DEFINE B ON (A.PROGRAM_CODE = B.PROGRAM_CODE)
+   			LEFT JOIN DCF_SERVICE_TYPE C ON (A.RQ_CLUSTER_ID = C.CLUSTER_ID)
+   			JOIN DCF_BUS_RELATION_CLUSTER_LIST D ON (A.RQ_CLUSTER_ID = D.CLUSTER_ID)
+   		WHERE D.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+ 		<if test="topicName != null and topicName != ''">
+ 			AND A.TOPIC_NAME like CONCAT('%', #{topicName}, '%')
+ 		</if>
+ 		<if test="PROGRAM_CODE != null and PROGRAM_CODE != ''">
+ 			AND A.PROGRAM_CODE = #{PROGRAM_CODE}
+ 		</if>
+    </select>
+    
+    <!-- 查询Topology是否已经配置主备 -->
+    <select id="queryTopologyAttrList" parameterType="map" resultType="map">
+    	SELECT A.PROGRAM_CODE, A.PROGRAM_ATTR 
+		FROM DCF_TOPIC_CONFIG A
+		WHERE A.PROGRAM_CODE IS NOT NULL
+		  AND A.PROGRAM_CODE = #{PROGRAM_CODE}
+    </select>
+    
+    <!-- 查询Topic配置信息,用来查询是否存在TopicName --> 
+    <select id="queryTopicConfigListByName" parameterType="map" resultType="hashMap">
+   		SELECT A.TOPIC_NAME, A.RQ_CLUSTER_ID,
+			A.RQ_VERSION, A.RQ_IP, A.RQ_PORT, 
+   			A.TOPIC_DESC, A.MQ_W, A.MQ_R,
+			A.BUS_CLUSTER_ID, A.PROGRAM_CODE, A.PROGRAM_ATTR
+   		FROM DCF_TOPIC_CONFIG A
+   		WHERE A.TOPIC_NAME = #{topicName}
+    </select>
+    
+    <!-- 查询Topic配置RocketMq主机信息 -->
+    <select id="queryRocketMqHostList" parameterType="map" resultType="map">
+    	SELECT A.HOST_ID,B.SSH_USER, B.SSH_PASSWD, B.SSH_PORT, B.HOST_IP, B.SSH_USER, CONCAT(B.HOST_IP,'(',B.SSH_USER, ')') NAME
+		FROM DCF_DEPLOY_VERSION_UPGRADE A,DCF_HOST B, DCF_DEPLOY_INST_CONFIG C
+		WHERE A.HOST_ID = B.HOST_ID
+		  AND B.HOST_ID = C.HOST_ID
+		  AND A.CLUSTER_ID = C.CLUSTER_ID
+		  AND A.STATE = '1'
+		  AND B.HOST_STATE = '1'
+		  AND C.DEPLOY_FILE_TYPE = 'namesrv'
+		  AND C.STATUS = '1'
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND A.CLUSTER_ID = #{CLUSTER_ID}
+		  AND A.VERSION = #{VERSION}
+    </select>
+    
+    <!-- 查询部署版本 -->
+    <select id="queryRocketMqVersionList" parameterType="map" resultType="map">
+    	SELECT DISTINCT A.VERSION 
+		FROM DCF_DEPLOY_VERSION_UPGRADE A
+		WHERE A.STATE = '1'
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND A.CLUSTER_ID = #{CLUSTER_ID}
+    </select>
+    
+    <!-- 获取所有RocketMq集群列表 -->
+    <select id="queryRocketMqClusterList" parameterType="map" resultType="map">
+    	SELECT A.CLUSTER_ID, A.CLUSTER_CODE, A.CLUSTER_NAME, A.TARGET_SH_PATH,
+			 A.SOURCE_SH_FILE, A.TYPE, A.STATUS, A.SEQ, A.PERSONAL_CONF,
+			 A.CLUSTER_TYPE, A.CLUSTER_DEPLOY_PATH
+		FROM DCF_SERVICE_TYPE A JOIN DCF_BUS_RELATION_CLUSTER_LIST B ON (A.CLUSTER_ID = B.CLUSTER_ID)
+		WHERE A.STATUS = '1'
+		  AND B.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+       <if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+       	 AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+       </if>
+    </select>
+    
+    <!-- 查询所有的topology -->
+    <select id="queryTopologyList" parameterType="map" resultType="map">
+    	SELECT DISTINCT CONCAT(A.PROGRAM_CODE,'_', A.PROGRAM_GROUP) PROGRAM_VALUE,
+			   A.PROGRAM_CODE, A.PROGRAM_NAME, A.PROGRAM_GROUP
+		FROM DCF_PROGRAM_DEFINE A
+		WHERE A.PROGRAM_TYPE IN (SELECT CLUSTER_ELE_NAME FROM DCF_CLUSTER_ELE_DEFINE WHERE CLUSTER_ELE_RUN_JSTORM = '1')
+		  AND CONCAT(A.PROGRAM_CODE,'_', A.PROGRAM_GROUP) IS NOT NULL
+    </select>
+    
+    <!-- 查询Topic配置Zk主机信息，根据Topic名称过滤-->
+    <select id="queryTopicHostListByName" parameterType="map" resultType="map">
+    	SELECT A.HOST_IP,A.SSH_PORT, A.SSH_USER,A.SSH_PASSWD
+		FROM DCF_HOST A, DCF_HOST_DEPLOY B, DCF_TOPIC_CONFIG C
+		WHERE A.HOST_ID = B.HOST_ID
+		  <!-- AND A.HOST_IP = C.RQ_IP -->
+		 <!--  AND B.RUN_STATE = '1' -->
+		  AND B.CLUSTER_TYPE = 'rocketmq'
+		  <!-- AND C.RQ_IP = #{rq_ip} -->
+		  AND C.RQ_CLUSTER_ID = #{RQ_CLUSTER_ID}
+		  AND C.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		  <!-- <if test="topicName != null and topicName != ''">
+		  	AND C.TOPIC_NAME = #{topicName}
+		  </if> -->
+    </select>
+    
+    <!-- 查询RocketMq部署方式 -->
+    <select id="queryDeployIsClusterByCode" parameterType="map" resultType="map">
+    	SELECT A.CLUSTER_ID, A.CLUSTER_CODE, A.CLUSTER_DEPLOY_PATH
+    	FROM DCF_SERVICE_TYPE A JOIN DCF_BUS_RELATION_CLUSTER_LIST B ON (A.CLUSTER_ID = B.CLUSTER_ID)
+    	WHERE B.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+    		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+    
+    <!-- 查询Zookeeper信息 -->
+    <select id="queryZkList" parameterType="map" resultType="map">
+    	SELECT A.ID, B.HOST_IP, A.PORT HOST_PORT, A.NAME 
+		FROM DCF_HOST_DEPLOY A, DCF_HOST B
+		WHERE A.HOST_ID = B.HOST_ID
+		  AND A.STATE = '1'
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND A.CLUSTER_ID = #{CLUSTER_ID}
+    </select>
+    
+    <!-- 查询路由主备份主机信息 -->
+    <select id="queryRouteHostByCluster" parameterType="map" resultType="map">
+    	SELECT H.HOST_IP,
+    		H.HOST_ID,
+    		H.SSH_USER,
+    		H.SSH_PASSWD,
+    		H.SSH_PORT,
+    		C.CLUSTER_DEPLOY_PATH
+    	FROM DCF_HOST_DEPLOY D LEFT JOIN DCF_HOST H ON D.HOST_ID=H.HOST_ID
+    		LEFT JOIN DCF_SERVICE_TYPE C ON (D.CLUSTER_ID = C.CLUSTER_ID)
+    	WHERE D.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    		AND STATE=1
+   			AND D.CLUSTER_ID=#{CLUSTER_ID}
+    </select>
+
+	<!-- 添加Topic配置 -->
+	<insert id="addTopicConfig" parameterType="map">
+		INSERT INTO DCF_TOPIC_CONFIG(TOPIC_NAME, RQ_CLUSTER_ID, RQ_VERSION, RQ_IP, RQ_PORT, TOPIC_DESC, MQ_W, MQ_R, BUS_CLUSTER_ID, PROGRAM_CODE, PROGRAM_ATTR, CRT_DATE)
+			VALUES(#{topicName}, #{rq_cluster_id}, #{rq_version}, #{rq_ip}, #{rq_port}, #{topicDesc}, #{w_num}, #{r_num}, #{bus_cluster_id}, #{program_code}, #{program_attr}, NOW())
+	</insert>
+	
+	<!-- 删除Topic配置 -->
+	<delete id="delTopicConfig" parameterType="map">
+		DELETE FROM DCF_TOPIC_CONFIG 
+		WHERE TOPIC_NAME = #{topicName}
+	</delete>
+	
+	<!-- 查询topology程序列表 -->
+    <select id="queryTopologyNameList" parameterType="map" resultType="map">
+	    SELECT B.PROGRAM_NAME ,B.PROGRAM_CODE FROM DCF_PROGRAM_DEFINE B 
+	    WHERE B.PROGRAM_STATE = '1' 
+	    AND EXISTS (
+			SELECT A.CLUSTER_ELE_NAME FROM DCF_CLUSTER_ELE_DEFINE A 
+			WHERE  B.PROGRAM_TYPE = A.CLUSTER_ELE_NAME AND 
+				   A.CLUSTER_ELE_RUN_JSTORM = '1')
+    </select>
+</mapper>

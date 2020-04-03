@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务主集群和组件、业务程序管理配置文件 -->
+<mapper namespace="userProgramListMapper">
+	<!--查询业务角色列表-->
+	<select id="queryBusRoleList" parameterType="map" resultType="map">
+		SELECT A.ROLE_ID, A.ROLE_NAME, A.ROLE_STATE,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE,
+			A.REMARK
+		FROM DCF_BUS_ROLE A
+		WHERE 1=1
+		<if test="ROLE_NAME != null and ROLE_NAME != ''">
+			AND A.ROLE_NAME  LIKE CONCAT('%',#{ROLE_NAME},'%')
+		</if>
+	</select>
+	
+	<!--查询用户分配的业务程序列表-->
+	<select id="queryRoleProgramList" parameterType="map" resultType="map">
+		SELECT A.ROLE_ID, A.TASK_PROGRAM_ID,
+			B.ID, B.BUS_CLUSTER_ID, B.PROGRAM_CODE, B.PROGRAM_NAME, B.HOST_ID, B.CLUSTER_ID, B.PROGRAM_TYPE,
+			C.CLUSTER_TYPE, C.CLUSTER_NAME,
+			D.BUS_CLUSTER_NAME,
+			E.TASK_ID, E.VERSION
+		FROM DCF_BUS_PROGRAM_LIST A, DCF_TASK_PROGRAM B, DCF_SERVICE_TYPE C,
+			 DCF_BUS_MAIN_CLUSTER D, DCF_DEPLOY_TASK E
+		WHERE A.TASK_PROGRAM_ID = B.ID
+			AND B.BUS_CLUSTER_ID = D.BUS_CLUSTER_ID
+			AND B.CLUSTER_ID = C.CLUSTER_ID
+			AND B.TASK_ID = E.TASK_ID
+			AND D.BUS_CLUSTER_STATE = '1'
+			AND C.TYPE = '3'
+			<if test="ROLE_ID != null and ROLE_ID != ''">
+				AND A.ROLE_ID = #{ROLE_ID}
+			</if>
+			<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+				AND B.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+			</if>
+			<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+				AND C.CLUSTER_TYPE = #{CLUSTER_TYPE}
+			</if>
+			<if test="PROGRAM_NAME != null and PROGRAM_NAME != ''">
+				AND (B.PROGRAM_NAME LIKE CONCAT('%',#{PROGRAM_NAME},'%') OR B.PROGRAM_CODE = #{PROGRAM_NAME})
+			</if>
+		ORDER BY D.BUS_CLUSTER_NAME,B.PROGRAM_TYPE
+	</select>
+
+	<!--查询所有的业务程序实例-->
+	<select id="queryAllUserProgramList" parameterType="map" resultType="map">
+		SELECT B.ID, B.BUS_CLUSTER_ID, B.PROGRAM_CODE, B.PROGRAM_NAME,B.HOST_ID, B.CLUSTER_ID, B.PROGRAM_TYPE,
+			C.CLUSTER_TYPE, C.CLUSTER_NAME,
+			D.BUS_CLUSTER_NAME,
+			E.TASK_ID, E.VERSION
+		FROM  DCF_TASK_PROGRAM B, DCF_SERVICE_TYPE C, DCF_BUS_MAIN_CLUSTER D, DCF_DEPLOY_TASK E
+		WHERE B.BUS_CLUSTER_ID = D.BUS_CLUSTER_ID
+		AND B.CLUSTER_ID = C.CLUSTER_ID
+		AND B.TASK_ID = E.TASK_ID
+	  	AND D.BUS_CLUSTER_STATE = '1'
+		AND C.TYPE = '3'
+	</select>
+
+	<!--查询当前用户对应角色的业务queryAllUserProgramList程序实例-->
+	<select id="queryRoleUserProgramList" parameterType="map" resultType="map">
+		SELECT B.ID, B.BUS_CLUSTER_ID, B.PROGRAM_CODE, B.PROGRAM_NAME,B.HOST_ID, B.CLUSTER_ID, B.PROGRAM_TYPE,
+			C.CLUSTER_TYPE, C.CLUSTER_NAME,
+			D.BUS_CLUSTER_NAME,
+			E.TASK_ID, E.VERSION
+		FROM  DCF_TASK_PROGRAM B, DCF_SERVICE_TYPE C, DCF_BUS_MAIN_CLUSTER D, DCF_DEPLOY_TASK E,
+			  DCF_BUS_ROLE_MAIN_LIST F
+		WHERE B.BUS_CLUSTER_ID = D.BUS_CLUSTER_ID
+			AND B.BUS_CLUSTER_ID = F.BUS_CLUSTER_ID
+			AND B.CLUSTER_ID = C.CLUSTER_ID
+			AND B.TASK_ID = E.TASK_ID
+			AND D.BUS_CLUSTER_STATE = '1'
+			AND C.TYPE = '3'
+			AND F.ROLE_ID = #{ROLE_ID}
+	</select>
+
+	<!-- 查询业务程序列表 -->
+	<select id="queryUserBusProgramListForStart" parameterType="map" resultType="map">
+		SELECT DISTINCT A.ID, A.CLUSTER_ID, A.PROGRAM_CODE, A.PROGRAM_ALIAS, A.PROGRAM_DESC, A.CONFIG_FILE_PATH,
+			A.PROGRAM_NAME, A.LATN_ID, CONCAT(D.CONFIG_NAME,'(',A.LATN_ID,')') LATN_NAME, A.PROGRAM_TYPE, A.SCRIPT_SH_NAME,
+			A.CONFIG_FILE, A.HOST_ID, A.TASK_ID, A.RUN_STATE,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE,
+			B.PROGRAM_GROUP,
+			C.HOST_IP, C.SSH_USER,
+			K.VERSION,
+			M.BUS_CLUSTER_ID, M.BUS_CLUSTER_NAME,
+			N.CLUSTER_TYPE, N.CLUSTER_NAME,
+			P.CLUSTER_ELE_RUN_JSTORM RUN_JSTORM,
+			P.CLUSTER_ELE_PERSONAL_CONF DIFF_IP
+		FROM DCF_BUS_PROGRAM_LIST T JOIN DCF_TASK_PROGRAM A ON (T.TASK_PROGRAM_ID = A.ID)
+		JOIN DCF_BUS_USER_ROLE U ON (T.ROLE_ID = U.ROLE_ID)
+		JOIN DCF_PROGRAM_DEFINE B ON (A.PROGRAM_CODE = B.PROGRAM_CODE)
+		JOIN DCF_DEPLOY_TASK K ON (A.TASK_ID = K.TASK_ID)
+		JOIN DCF_BUS_MAIN_CLUSTER M ON(A.BUS_CLUSTER_ID = M.BUS_CLUSTER_ID)
+		JOIN DCF_SERVICE_TYPE N ON (A.CLUSTER_ID = N.CLUSTER_ID)
+		JOIN DCF_CLUSTER_ELE_DEFINE P ON (P.CLUSTER_ELE_NAME = N.CLUSTER_TYPE)
+		LEFT JOIN DCF_HOST C ON (A.HOST_ID = C.HOST_ID)
+		LEFT JOIN DCF_GROUP_CONFIG D ON (A.LATN_ID = D.CONFIG_VALUE AND D.GROUP_CODE = 'LATN_LIST')
+		WHERE U.EMPEE_ID = #{EMPEE_ID}
+		<if test="HOST_ID != null and HOST_ID != ''">
+			AND A.HOST_ID = #{HOST_ID}
+		</if>
+		<if test="QUERY_PROGRAM_NAME !=	null and QUERY_PROGRAM_NAME != ''">
+			AND (A.PROGRAM_NAME like  CONCAT('%', #{QUERY_PROGRAM_NAME}, '%')
+			OR A.PROGRAM_ALIAS like  CONCAT('%', #{QUERY_PROGRAM_NAME}, '%'))
+		</if>
+		<if test="QUERY_HOST_ID != null and QUERY_HOST_ID != ''">
+			AND A.HOST_ID = #{QUERY_HOST_ID}
+		</if>
+		<if test="QUERY_HOST_IDS != null and QUERY_HOST_IDS != ''">
+			AND A.HOST_ID IN (${QUERY_HOST_IDS})
+		</if>
+		<if test="QUERY_PROGRAM_STATE != null and QUERY_PROGRAM_STATE != ''">
+			AND A.RUN_STATE = #{QUERY_PROGRAM_STATE}
+		</if>
+		<if test="QUERY_LATN_ID != null and QUERY_LATN_ID != ''">
+			AND A.LATN_ID = #{QUERY_LATN_ID}
+		</if>
+		<if test="QUERY_LATN_IDS != null and QUERY_LATN_IDS != ''">
+			AND A.LATN_ID IN (${QUERY_LATN_IDS})
+		</if>
+		ORDER BY A.PROGRAM_NAME ASC, K.VERSION DESC, INET_ATON(C.HOST_IP) ASC
+	</select>
+
+	<!--删除用户分配权限 -->
+	<delete id="delUserProgramListByRole" parameterType="map">
+		DELETE FROM DCF_BUS_PROGRAM_LIST WHERE ROLE_ID = #{ROLE_ID}
+	</delete>
+
+	<!--批量添加业务程序用户权限 -->
+	<insert id="addUserProgramList" parameterType="java.util.List">
+		INSERT INTO DCF_BUS_PROGRAM_LIST(ROLE_ID, TASK_PROGRAM_ID)
+		<foreach collection="list" item="item" index="index" separator="union all">
+			(SELECT #{item.ROLE_ID},#{item.TASK_PROGRAM_ID} FROM DUAL)
+		</foreach>
+	</insert>
+
+	<!--查询业务版本列表-->
+	<select id="queryBusVersion" parameterType="map" resultType="map">
+		SELECT A.FILE_NAME, A.NAME, A.FILE_PATH, A.VERSION, A.FILE_TYPE, A.PACKAGE_TYPE
+		FROM DCF_FTP_FILE_SERVER A
+		WHERE A.FILE_TYPE = #{FILE_TYPE}
+		<if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+			AND A.PACKAGE_TYPE = #{PACKAGE_TYPE}
+		</if>
+		ORDER BY A.VERSION DESC
+	</select>
+
+	<!--查询角色关联的配置文件列表-->
+	<select id="queryRoleConfigList" parameterType="map" resultType="map">
+		SELECT A.ID, A.ROLE_ID, A.VERSION, A.PACKAGE_TYPE, A.BUS_CLUSTER_ID, A.FILE_PATH,A.CLUSTER_TYPE,A.FILE_NAME
+		FROM DCF_BUS_CONFIG_LIST A
+		WHERE A.ROLE_ID = #{ROLE_ID}
+		<if test="VERSION != null and VERSION != ''">
+			AND A.VERSION = #{VERSION}
+		</if>
+		<if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+			AND A.PACKAGE_TYPE = #{PACKAGE_TYPE}
+		</if>
+		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+			AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		</if>
+		<if test="FILE_PATH != null and FILE_PATH != ''">
+			AND A.FILE_NAME LIKE CONCAT('%', #{FILE_PATH}, '%')
+		</if>
+	</select>
+</mapper>

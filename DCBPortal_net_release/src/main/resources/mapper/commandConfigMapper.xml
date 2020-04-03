@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="commandConfigMapper">
+
+	<!-- 查询可用数据库连接池信息 -->
+	<select id="queryCMDConfig1" parameterType="hashMap" resultType="map">
+		SELECT
+			ID,
+			CMD_NAME,
+			CMD_CONTENT,
+			    (SELECT 
+            GROUP_CONCAT(b.EMPEE_NAME)
+        FROM
+            tb_bp_sys_empee b
+        WHERE
+            b.EMPEE_NAME IN (SELECT 
+                    c.EMPEE_NAME
+                FROM
+                    tb_bp_sys_empee c join dcf_cmd_empee_rel e
+                WHERE
+                    c.EMPEE_ID = e.EMPEE_ID
+                    and d.ID = e.CMD_ID)) AS USERS,
+			date_format(CRT_DATE, '%Y-%m-%d-%H:%i:%s') CRT_DATE
+		FROM
+			dcf_command_config  d
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="ID != null and CMD_ID != ''">
+				AND ID = #{ID}
+			</if>
+			<if test="CMD_NAME != null and CMD_NAME != ''">
+				AND CMD_NAME like CONCAT('%',#{CMD_NAME},'%')
+			</if>
+			<if test="CMD_CONTENT != null and CMD_CONTENT != ''">
+				AND CMD_CONTENT like CONCAT('%',#{CMD_CONTENT},'%')
+			</if>
+		</trim>
+		ORDER BY
+			CRT_DATE DESC
+	</select>
+
+	<select id="queryCMDConfig" parameterType="hashMap" resultType="map">
+		SELECT
+		d.ID,
+		d.CMD_NAME,
+		d.CMD_CONTENT,
+		date_format(d.CRT_DATE, '%Y-%m-%d-%H:%i:%s') CRT_DATE
+		FROM
+
+		dcf_command_config  d
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="ID != null and CMD_ID != ''">
+				AND ID = #{ID}
+			</if>
+			<if test="CMD_NAME != null and CMD_NAME != ''">
+				AND CMD_NAME like CONCAT('%',#{CMD_NAME},'%')
+			</if>
+
+		</trim>
+		ORDER BY
+		d.CRT_DATE DESC
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insertCMDById" parameterType="hashMap">
+		INSERT INTO dcf_command_config (
+			ID,
+			CMD_NAME,
+			CMD_CONTENT,
+			CRT_DATE
+		)
+		VALUES
+			(
+				NEWID(),
+				#{CMD_NAME},
+				#{CMD_CONTENT},
+				SYSDATE()
+			)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="updateCMDById" parameterType="hashMap">
+		UPDATE dcf_command_config
+		SET 
+			ID=#{ID},
+			CMD_NAME=#{CMD_NAME},
+			CRT_DATE=SYSDATE(),
+			CMD_CONTENT=#{CMD_CONTENT}
+		WHERE
+			ID = #{ID}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="deleteCMDById" parameterType="hashMap">
+		DELETE
+		FROM
+			dcf_command_config
+		WHERE
+			ID = #{ID}
+	</delete>
+	<!-- 删除 EmpeeCmd关系-->
+	<delete id="deleteEmpeeCmdRelation" parameterType="hashMap">
+		DELETE
+		FROM
+			dcf_cmd_empee_rel
+		WHERE
+			CMD_ID = #{CMD_ID}
+	</delete>
+		<!-- 添加 EmpeeCmd关系-->
+	<insert id="insertEmpeeCmdRelation" parameterType="hashMap">
+		INSERT INTO dcf_cmd_empee_rel (
+			ID,
+			CMD_ID,
+			EMPEE_ID
+		)
+		VALUES
+			(
+				NEWID(),
+				#{CMD_ID},
+				#{EMPEE_ID}
+			)
+	</insert>
+	    <select id="queryEmpee" parameterType="hashMap" resultType="map">
+        SELECT
+			T.EMPEE_ID,
+			(
+				SELECT
+					GROUP_CONCAT(b.role_name)
+				FROM
+					tb_bp_sys_role b
+				WHERE
+					b.role_id IN (
+						SELECT
+							c.role_id
+						FROM
+							tb_bp_sys_empee_role c
+						WHERE
+							c.empee_id = t.empee_id
+					)
+			) AS ROLE_NAME,
+			T.EMPEE_NAME,
+			T.EMPEE_ACCT,
+			T.EMPEE_ADDR_DESC,
+			(SELECT COUNT(0)  FROM dcf_cmd_empee_rel A WHERE A.EMPEE_ID = T.EMPEE_ID
+AND CMD_ID = #{CMD_ID}) AS HAS_CMD
+		FROM
+			tb_bp_sys_empee T
+		WHERE
+			T.STATE = 'G01'
+        <if test="EMPEE_NAME !=''">
+            and (T.empee_name like '%${EMPEE_NAME}%' or T.empee_acct like '%${EMPEE_NAME}%')
+        </if>
+        <if test="EMPEE_ID !=1">
+             AND T.EMPEE_ID != 1
+        </if>
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+

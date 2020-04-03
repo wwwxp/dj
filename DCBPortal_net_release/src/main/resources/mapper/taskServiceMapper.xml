@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--任务积压-->
+<mapper namespace="taskService">
+
+    <select id="queryTaskServiceList"  parameterType="map" resultType="map">
+        SELECT * FROM DCF_TASK_SERVICE GROUP BY CLUSTER_NAME,SERVICE_NAME
+    </select>
+
+    <!--插入集群任务积压服务信息-->
+    <insert id="insertTaskService" parameterType="map">
+        <selectKey resultType="String" keyProperty="TASK_SERVICE_ID" order="BEFORE">
+            SELECT NEWID()
+        </selectKey>
+        INSERT INTO DCF_TASK_SERVICE(TASK_SERVICE_ID,CLUSTER_NAME,SERVICE_NAME,TOTAL_EXEC_QUENE_SIZE,HOST_SIZE,CRT_DATE)
+        VALUES
+        (#{TASK_SERVICE_ID},#{CLUSTER_NAME},#{SERVICE_NAME},#{TOTAL_EXEC_QUENE_SIZE},#{HOST_SIZE},now())
+    </insert>
+
+    <update id="updateTaskService" parameterType="map">
+        UPDATE DCF_TASK_SERVICE SET TOTAL_EXEC_QUENE_SIZE = #{TOTAL_EXEC_QUENE_SIZE},HOST_SIZE=#{HOST_SIZE}
+        WHERE TASK_SERVICE_ID = #{TASK_SERVICE_ID}
+    </update>
+
+</mapper>

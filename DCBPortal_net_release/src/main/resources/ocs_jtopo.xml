@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow>
+  <sp id="sp" name="sp" ip="192.168.167.176" img="/images/jtopo/sp.gif" dragable="0">
+     <nets id="nets" name="网元" img="/images/jtopo/net.gif" visible="0" dragable="0">
+	      <net id="0" name="net1" ip="192.168.167.178" img="/images/jtopo/net.gif" dragable="0" />
+	      <net id="1" name="net2" ip="192.168.167.179" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="2" name="net3" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="3" name="net4" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="4" name="net5" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="5" name="net6" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="6" name="net7" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="7" name="net8" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="8" name="net9" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="9" name="net10" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="10" name="net11" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="11" name="net12" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="12" name="net13" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="13" name="net14" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="14" name="net15" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="15" name="net16" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="16" name="net17" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="17" name="net18" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="18" name="net19" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="19" name="net20" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="20" name="net21" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="21" name="net22" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="22" name="net23" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="23" name="net24" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="24" name="net25" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="25" name="net26" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="26" name="net27" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="27" name="net28" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="28" name="net29" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+	      <net id="29" name="net30" ip="192.168.167.176" img="/images/jtopo/net.gif" dragable="0"/>
+    </nets> 
+  </sp>  
+</flow>
+
+

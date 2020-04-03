@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="deployHome">
+    <!-- 查询不包含在类型分类下的主机信息 -->
+    <select id="queryHostNotInThisDeploy" parameterType="map" resultType="hashMap">
+       SELECT HOST_ID,HOST_IP,SSH_USER,HOST_NAME FROM DCF_HOST
+       WHERE SSH_USER = #{SSH_USER}
+       AND HOST_ID NOT IN (
+       		SELECT HOST_ID FROM DCF_HOST_DEPLOY
+			WHERE CLUSTER_ID = #{CLUSTER_ID}
+		)
+		ORDER BY INET_ATON(HOST_IP) ASC
+    </select>
+    
+     <!-- 查询某集群下的所有可用用户 -->
+    <select id="queryShellUserDeploy" parameterType="map" resultType="hashMap">
+       	SELECT DISTINCT T.SSH_USER
+		FROM DCF_HOST_DEPLOY Y JOIN DCF_HOST T ON Y.HOST_ID = T.HOST_ID
+		WHERE Y.CLUSTER_ID = #{CLUSTER_ID}
+    </select>
+    
+    <select id="queryShellUser" parameterType="map" resultType="hashMap">
+       SELECT DISTINCT
+			t.SSH_USER
+		FROM
+			DCF_HOST t
+    </select>
+    
+    <!-- 新增主机 -->
+    <insert id="insertChosenHost" parameterType="map">
+       INSERT INTO DCF_HOST_DEPLOY(ID,CODE,NAME,HOST_ID, CLUSTER_TYPE,
+      		STATE,RUN_STATE, CRT_DATE,CLUSTER_ID
+		) VALUES (NEWID(),NEWID(),#{NAME},#{HOST_ID},#{CLUSTER_TYPE},
+		<choose>
+            <when test="STATE != null and STATE != ''">
+            	#{STATE},
+            </when>
+            <otherwise>
+            	0,
+            </otherwise>
+        </choose>
+		0,
+        CURRENT_TIMESTAMP,#{CLUSTER_ID}
+        )
+    </insert>
+    
+    <!-- 查询类型（dcf_group_config） -->
+    <select id="queryConfigNameAndValue" parameterType="map" resultType="hashMap">
+       SELECT CONFIG_NAME,CONFIG_VALUE
+		FROM DCF_GROUP_CONFIG
+		WHERE GROUP_CODE='WEB_SERVICE_CATEGORY'
+		ORDER BY CONFIG_VALUE ASC
+    </select>
+    
+    <!-- 查询包含在类型分类下的主机信息  -->
+    <select id="queryHostByDeploy" parameterType="map" resultType="hashMap">
+		SELECT A.HOST_IP,
+			A.SSH_USER,
+			A.SSH_PASSWD,
+			A.SSH_PORT,
+			B.HOST_ID, 
+			B.ID,
+			B.NAME,
+			B.CLUSTER_TYPE,
+			B.STATE,
+			B.RUN_STATE,
+			B.VERSION,
+		    C.CLUSTER_ID,
+			C.CLUSTER_CODE,
+			C.CLUSTER_NAME,
+			C.CLUSTER_DEPLOY_PATH
+		FROM DCF_HOST A,DCF_HOST_DEPLOY B, DCF_SERVICE_TYPE C
+		WHERE A.HOST_ID=B.HOST_ID
+			AND B.CLUSTER_ID = C.CLUSTER_ID
+			AND B.CLUSTER_ID = #{CLUSTER_ID}
+	  		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		ORDER BY B.CLUSTER_TYPE ASC, C.CLUSTER_NAME ASC, INET_ATON(A.HOST_IP) ASC
+    </select>
+    
+    <!-- 删除分类下的主机 -->
+    <delete id="deleteHostInDeploy" parameterType="map">
+    	DELETE FROM DCF_HOST_DEPLOY 
+    	WHERE ID = #{ID}
+    </delete> 
+    
+    <!--主机管理, 删除主机 -->
+    <delete id="deleteDeployHostByHostId" parameterType="map">
+    	DELETE FROM DCF_HOST_DEPLOY WHERE HOST_ID=#{HOST_ID}
+    	<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+    		AND CLUSTER_ID = #{CLUSTER_ID}
+    	</if>
+    </delete>
+    
+     <!-- 查询业务类部署配置 -->
+     <select id="queryBusDeployConfig" resultType="hashMap">
+ 		SELECT G.*
+  		FROM (SELECT F.HOST_NAME, F.HOST_IP,F.SSH_USER, E.*
+          FROM DCF_HOST F JOIN (SELECT D.ID,
+                      D.CLUSTER_ID,
+                      D.HOST_ID,
+                      D.CLUSTER_TYPE,
+                      if((SELECT COUNT(1) CNT FROM DCF_BUSINESS_DEPLOY_LIST T 
+								WHERE T.CLUSTER_ID = D.CLUSTER_ID
+								  AND T.VERSION = #{VERSION}
+								  AND T.PACKAGE_TYPE = #{PACKAGE_TYPE}
+								  AND D.HOST_ID = T.HOST_ID) > 0, 1, 0) SUM_RUN,
+                      D.STATE,
+                      D.RUN_STATE,
+                      B.CLUSTER_NAME,
+					  B.CLUSTER_CODE,
+                      B.SEQ,
+                      D.VERSION,
+                      G.CLUSTER_ELE_RUN_JSTORM
+                 FROM DCF_SERVICE_TYPE B
+                 	RIGHT JOIN DCF_HOST_DEPLOY D ON D.CLUSTER_ID = B.CLUSTER_ID
+                 	LEFT JOIN DCF_BUS_RELATION_CLUSTER_LIST T ON (D.CLUSTER_ID = T.CLUSTER_ID AND T.CLUSTER_TYPE = D.CLUSTER_TYPE)
+                 	LEFT JOIN DCF_CLUSTER_ELE_DEFINE G ON (D.CLUSTER_TYPE = G.CLUSTER_ELE_NAME)
+                 WHERE D.CLUSTER_TYPE IN (SELECT CLUSTER_ELE_NAME 
+                							FROM DCF_CLUSTER_ELE_DEFINE WHERE CLUSTER_ELE_TYPE = '3')
+                  AND D.CLUSTER_TYPE = B.CLUSTER_TYPE
+                  AND T.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+                  AND B.CLUSTER_TYPE IN
+                      (SELECT J.CLUSTER_TYPE
+                         FROM DCF_DEPLOY_TASK J
+                        WHERE J.SERVER_ID IN
+                              (SELECT A.ID
+                                 FROM DCF_FTP_FILE_SERVER A
+                                WHERE A.FILE_TYPE = '2'
+                                  AND A.VERSION = #{VERSION}))) E
+            ON F.HOST_ID = E.HOST_ID) G
+ 		ORDER BY INET_ATON(G.HOST_IP) ASC, G.SEQ ASC
+    </select>
+    
+    
+    <!-- 更新 主机部署环境-->
+    <update id="updateHostStateEffective" parameterType="hashMap">
+       UPDATE DCF_HOST_DEPLOY D
+	   SET D.STATE = 1
+	   <if test="VERSION != null and VERSION != ''">
+	   		,D.VERSION = #{VERSION}
+	   </if>
+	 	WHERE D.HOST_ID = #{HOST_ID}
+		  AND D.CLUSTER_ID = #{CLUSTER_ID}
+    </update>
+    
+    <!-- 更新 主机部署端口-->
+    <update id="updateHostDeployPort" parameterType="hashMap">
+       UPDATE DCF_HOST_DEPLOY D
+	   SET D.PORT = #{PORT} 
+	   WHERE D.ID IN
+      <foreach collection="IDS" index="index" item="info" open="(" separator="," close=")">
+	    	 #{info.ID}
+	  </foreach>
+    </update>
+    
+    <!-- 根据主机ID批量查询主机信息 -->
+    <select id="queryHostById" parameterType="map" resultType="hashMap">
+       SELECT HOST_ID,
+     	HOST_IP,
+     	SSH_PORT,
+     	SSH_USER,
+     	SSH_PASSWD
+		FROM DCF_HOST WHERE HOST_ID  
+		<if test="hostParams!=null and hostParams!=''">
+			IN
+	  		<foreach collection="hostParams" item="item" open="(" separator="," close=")">
+	    		#{item.HOST_ID}
+	  		</foreach>
+	  	</if>
+    </select>
+     
+      <!-- 查询要部署的文件名 -->
+     <select id="queryOcsDeploy" parameterType="map" resultType="hashMap">
+     	SELECT B.CLUSTER_TYPE, B.DEFINE_FILE_NAME,B.TASK_NAME,B.SERVER_ID, A.NAME 
+			FROM DCF_FTP_FILE_SERVER A, DCF_DEPLOY_TASK B
+			WHERE A.ID = B.SERVER_ID
+			  AND A.FILE_TYPE = '2'
+			  AND A.VERSION = #{VERSION}
+			  AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+			  <if test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+			  	AND A.PACKAGE_TYPE = #{PACKAGE_TYPE}
+			  </if>
+     </select>
+             
+    <!-- 更新 主机部署环境-->
+    <update id="updateHostStateEffectiveById" parameterType="hashMap">
+       UPDATE DCF_HOST_DEPLOY D SET D.STATE = 1, D.VERSION=#{VERSION}
+       WHERE D.ID=#{ID}
+    </update>
+    
+    <!-- 查询部署配置 (获取所有业务类型每台主机是否已经部署，部署版本) -->
+    <select id="queryDeployHostAllCodeList" resultType="hashMap">
+    	SELECT A.HOST_ID, 
+    		   E.SSH_USER,
+    		   E.SSH_PASSWD,
+    		   E.SSH_PORT,
+			   E.HOST_IP,
+			   E.HOST_NET_CARD,
+			   CONCAT(E.HOST_IP,'(',E.SSH_USER,')') HOST_TEXT,
+			   A.ID,
+			   A.NAME,
+			   A.CLUSTER_TYPE,
+			   T.CLUSTER_NAME,
+			   T.CLUSTER_ID,
+			   T.CLUSTER_CODE,
+			   T.CLUSTER_DEPLOY_PATH,
+			   if((SELECT COUNT(1) CNT FROM DCF_DEPLOY_VERSION_UPGRADE B 
+			   		WHERE B.CLUSTER_TYPE = #{CLUSTER_TYPE} 
+			   		<if test='CLUSTER_ID !=null and CLUSTER_ID !="" '>
+						AND B.CLUSTER_ID = #{CLUSTER_ID}
+					</if>
+				      AND A.HOST_ID = B.HOST_ID) > 0, 1, 0) STATE,
+			   if((SELECT COUNT(1) CNT FROM DCF_DEPLOY_INST_CONFIG K 
+			   		WHERE K.DEPLOY_TYPE = #{CLUSTER_TYPE}
+			   		  <if test='CLUSTER_ID !=null and CLUSTER_ID !="" '>
+			   		  	AND K.CLUSTER_ID = #{CLUSTER_ID} 
+			   		  </if>
+			   		  AND K.STATUS = '1'
+				      AND A.HOST_ID = K.HOST_ID) > 0, 1, 0) RUN_STATE,
+			   D.VERSION,
+			   G.CLUSTER_ELE_TYPE
+		FROM DCF_HOST_DEPLOY A LEFT JOIN (SELECT C.HOST_ID, C.VERSION  
+									FROM DCF_DEPLOY_VERSION_UPGRADE C
+									WHERE C.CLUSTER_TYPE = #{CLUSTER_TYPE} 
+									ORDER BY C.HOST_ID, C.UPGRADE_TIME DESC LIMIT 1) D ON (A.HOST_ID = D.HOST_ID)
+		LEFT JOIN DCF_HOST E ON (A.HOST_ID = E.HOST_ID)
+		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID=A.CLUSTER_ID)
+		LEFT JOIN DCF_CLUSTER_ELE_DEFINE G ON (T.CLUSTER_TYPE = G.CLUSTER_ELE_NAME)
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		<if test='CLUSTER_ID !=null and CLUSTER_ID !="" '>
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test='HOST_IP !=null and HOST_IP !="" and SSH_USER !=null and SSH_USER !="" '>
+			AND E.HOST_IP=#{HOST_IP} AND E.SSH_USER=#{SSH_USER}
+		</if>
+		<if test='HOST_ID !=null and HOST_ID !="" '>
+			AND E.HOST_ID=#{HOST_ID} 
+		</if>
+		<if test='HOST_IP !=null and HOST_IP !="" '>
+			AND E.HOST_IP=#{HOST_IP} 
+		</if>
+		ORDER BY A.CLUSTER_TYPE ASC, T.CLUSTER_NAME ASC, INET_ATON(E.HOST_IP) ASC
+    </select>
+    
+    <!-- 业务部署查询主机列表 -->
+    <select id="queryBusDeployHostAllCodeList" resultType="hashMap">
+    	SELECT A.HOST_ID, 
+    		   E.SSH_USER,
+    		   E.SSH_PASSWD,
+    		   E.SSH_PORT,
+			   E.HOST_IP,
+			   CONCAT(E.HOST_IP,'(',E.SSH_USER,')') HOST_TEXT,
+			   A.ID,
+			   A.NAME,
+			   A.CLUSTER_TYPE,
+			   T.CLUSTER_NAME,
+			   T.CLUSTER_ID,
+			   T.CLUSTER_CODE,
+			   T.CLUSTER_DEPLOY_PATH,
+			   if((SELECT COUNT(1) CNT FROM DCF_BUSINESS_DEPLOY_LIST B 
+			   		WHERE B.CLUSTER_TYPE = #{CLUSTER_TYPE} 
+			   		<if test='CLUSTER_ID !=null and CLUSTER_ID !="" '>
+						AND B.CLUSTER_ID = #{CLUSTER_ID}
+					</if>
+				      AND A.HOST_ID = B.HOST_ID) > 0, 1, 0) STATE,
+			   if((SELECT COUNT(1) CNT FROM DCF_TASK_PROGRAM K 
+			   		WHERE K.PROGRAM_TYPE = #{CLUSTER_TYPE}
+			   		  <if test='CLUSTER_ID !=null and CLUSTER_ID !="" '>
+			   		  	AND K.CLUSTER_ID = #{CLUSTER_ID} 
+			   		  </if>
+			   		  AND K.RUN_STATE = '1'
+				      AND (A.HOST_ID = K.HOST_ID OR K.HOST_ID IS NULL)) > 0, 1, 0) RUN_STATE,
+			   G.CLUSTER_ELE_TYPE
+		FROM DCF_HOST_DEPLOY A
+		LEFT JOIN DCF_HOST E ON (A.HOST_ID = E.HOST_ID)
+		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID=A.CLUSTER_ID)
+		LEFT JOIN DCF_CLUSTER_ELE_DEFINE G ON (T.CLUSTER_TYPE = G.CLUSTER_ELE_NAME)
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		<if test='CLUSTER_ID !=null and CLUSTER_ID !="" '>
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test='HOST_IP !=null and HOST_IP !="" and SSH_USER !=null and SSH_USER !="" '>
+			AND E.HOST_IP=#{HOST_IP} AND E.SSH_USER=#{SSH_USER}
+		</if>
+		<if test='HOST_ID !=null and HOST_ID !="" '>
+			AND E.HOST_ID=#{HOST_ID} 
+		</if>
+		<if test='HOST_IP !=null and HOST_IP !="" '>
+			AND E.HOST_IP=#{HOST_IP} 
+		</if>
+		ORDER BY T.CLUSTER_TYPE ASC, T.CLUSTER_NAME ASC, INET_ATON(E.HOST_IP) ASC
+    </select>
+    
+    <!-- 查询部署配置 (获取所有业务类型每台主机是否已经部署，部署版本) -->
+    <select id="queryDeployHostByCodeAndHost" resultType="hashMap">
+    	SELECT A.HOST_ID, 
+    		   E.SSH_USER,
+    		   E.SSH_PASSWD,
+    		   E.SSH_PORT,
+			   E.HOST_IP,
+			   CONCAT(E.HOST_IP,'(',E.SSH_USER,')') HOST_TEXT,
+			   A.ID,
+			   A.NAME,
+			   A.CLUSTER_TYPE,
+			   T.CLUSTER_NAME,
+			   T.CLUSTER_ID,
+			   T.CLUSTER_CODE,
+			   T.CLUSTER_DEPLOY_PATH
+		FROM DCF_HOST_DEPLOY A
+		LEFT JOIN DCF_HOST E ON (A.HOST_ID = E.HOST_ID)
+		LEFT JOIN DCF_SERVICE_TYPE T ON (T.CLUSTER_ID=A.CLUSTER_ID)
+		WHERE T.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test='CLUSTER_CODE !=null and CLUSTER_CODE !="" '>
+			AND T.CLUSTER_CODE = #{CLUSTER_CODE}
+		</if>
+		<if test='HOST_IP !=null and HOST_IP !="" and SSH_USER !=null and SSH_USER !="" '>
+			AND E.HOST_IP=#{HOST_IP} AND E.SSH_USER=#{SSH_USER}
+		</if>
+		ORDER BY A.CLUSTER_TYPE ASC, T.CLUSTER_NAME ASC, INET_ATON(E.HOST_IP) ASC
+    </select>
+    
+    <!-- 查询部署配置 (获取当前业务类型每台主机是否已经部署，部署版本) -->
+    <select id="queryDeployHostList" resultType="hashMap">
+		SELECT A.ID,
+			   A.HOST_ID, 
+			   E.HOST_IP,
+			   E.HOST_NAME,
+			   A.CLUSTER_ID,
+			   if((SELECT COUNT(1) CNT FROM DCF_DEPLOY_VERSION_UPGRADE B 
+			   		WHERE B.CLUSTER_TYPE = #{CLUSTER_TYPE} 
+					  AND B.CLUSTER_ID = #{CLUSTER_ID}
+				  	  AND A.HOST_ID = B.HOST_ID) > 0, 1, 0) STATE,
+			   D.VERSION,
+		       DATE_FORMAT(D.UPGRADE_TIME,'%Y-%m-%d %H:%i:%s') AS DEPLOY_DATE,
+			   E.SSH_USER
+		FROM DCF_HOST_DEPLOY A LEFT JOIN (SELECT C.HOST_ID, C.VERSION, C.UPGRADE_TIME
+											FROM DCF_DEPLOY_VERSION_UPGRADE C
+											WHERE C.CLUSTER_TYPE = #{CLUSTER_TYPE} 
+									  		  AND C.CLUSTER_ID = #{CLUSTER_ID}
+									  		GROUP BY C.HOST_ID,C.VERSION,C.UPGRADE_TIME
+											ORDER BY C.HOST_ID, C.UPGRADE_TIME DESC
+											LIMIT 0,1) D ON (A.HOST_ID = D.HOST_ID)
+		LEFT JOIN DCF_HOST E ON (A.HOST_ID = E.HOST_ID)
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		AND A.CLUSTER_ID = #{CLUSTER_ID}
+		<if test="HOST_ID != null and HOST_ID != ''">
+		 AND A.HOST_ID = #{HOST_ID}
+		</if>
+		ORDER BY INET_ATON(E.HOST_IP) ASC
+    </select>
+    
+    <!-- 查询当前主机可部署的版本列表 -->
+    <select id="queryDeployVersionById" parameterType="map" resultType="map">
+    	SELECT A.ID,A.CLUSTER_TYPE,A.VERSION,A.UPGRADE_TIME
+		FROM DCF_RELEASE_VERSION_UPGRADE A
+		WHERE A.STATE = '1'
+		  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		ORDER BY A.VERSION*1 DESC
+    </select>
+    
+    <!-- 查询部署主机是否为该集群最后一个主机 -->
+    <select id="queryDeployListByClusterId" parameterType="map" resultType="map">
+    	SELECT B.ID
+		FROM DCF_HOST_DEPLOY B
+		WHERE B.CLUSTER_ID = #{CLUSTER_ID}
+		  AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+    
+    <!-- 添加业务部署信息 -->
+    <insert id="addBusinessDeployList" parameterType="map">
+    	INSERT INTO DCF_BUSINESS_DEPLOY_LIST(ID, CLUSTER_ID, CLUSTER_TYPE, HOST_ID, VERSION, DEPLOY_TIME, PACKAGE_TYPE)
+		VALUES(NEWID(), #{CLUSTER_ID}, #{CLUSTER_TYPE}, #{HOST_ID}, #{VERSION}, NOW(), #{PACKAGE_TYPE})
+    </insert>
+    
+    <!-- 查询当前集群已部署主机列表 -->
+    <select id="queryBusDeployHostList" parameterType="map" resultType="map">
+    	SELECT A.HOST_IP, B.CLUSTER_ID, B.CLUSTER_TYPE, B.HOST_ID, B.VERSION, B.DEPLOY_TIME, B.PACKAGE_TYPE
+		FROM DCF_HOST A, DCF_BUSINESS_DEPLOY_LIST B
+		WHERE A.HOST_ID = B.HOST_ID
+		  AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		  AND B.CLUSTER_ID = #{CLUSTER_ID}
+		  AND B.VERSION = #{VERSION}
+		ORDER BY B.DEPLOY_TIME DESC, INET_ATON(A.HOST_IP) ASC
+    </select>
+    
+    <!-- 查询当前业务版本是否已经部署过，如果部署过则不在添加数据，直接修改 -->
+    <select id="queryBusinessDeployList" parameterType="map" resultType="map">
+    	SELECT A.ID, A.CLUSTER_ID, A.CLUSTER_TYPE, A.HOST_ID, A.VERSION, A.DEPLOY_TIME, A.PACKAGE_TYPE
+    	FROM DCF_BUSINESS_DEPLOY_LIST A
+    	WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+    	  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    	  AND A.HOST_ID = #{HOST_ID}
+    	  AND A.VERSION = #{VERSION}
+    	  AND A.PACKAGE_TYPE = #{PACKAGE_TYPE}
+    </select>
+    
+    <!-- 修改部署最新时间 -->
+    <update id="updateBusinessDeployList" parameterType="map">
+    	UPDATE DCF_BUSINESS_DEPLOY_LIST SET DEPLOY_TIME = NOW()
+    	WHERE ID = #{ID}
+    </update>
+    
+    <!-- 查询版本切换配置文件分发主机列表 -->
+    <select id="querySwitchDeployHostList" parameterType="map" resultType="map">
+    	SELECT A.HOST_ID, A.HOST_IP, A.SSH_USER, A.SSH_PASSWD, A.SSH_PORT, C.CLUSTER_NAME, 
+    		B.CLUSTER_TYPE, C.CLUSTER_CODE, C.CLUSTER_DEPLOY_PATH
+		FROM DCF_HOST A RIGHT JOIN DCF_HOST_DEPLOY B ON A.HOST_ID = B.HOST_ID
+			LEFT JOIN DCF_SERVICE_TYPE C ON B.CLUSTER_ID = C.CLUSTER_ID
+			JOIN DCF_BUS_RELATION_CLUSTER_LIST D ON (C.CLUSTER_ID = D.CLUSTER_ID)
+			JOIN DCF_BUS_MAIN_CLUSTER E ON (D.BUS_CLUSTER_ID = E.BUS_CLUSTER_ID)
+		WHERE B.CLUSTER_TYPE IN (${CLUSTER_TYPE}) 
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND E.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+    </select>
+    
+    <!-- 查询当前集群类型部署版本 -->
+    <select id="queryClusterTypeDeployVersionList" parameterType="map" resultType="map">
+    	SELECT B.CLUSTER_TYPE, A.NAME, A.VERSION
+		FROM DCF_FTP_FILE_SERVER A RIGHT JOIN DCF_BUSINESS_DEPLOY_LIST B ON (A.VERSION = B.VERSION)
+		WHERE FILE_TYPE = '2'
+		AND B.CLUSTER_ID = #{CLUSTER_ID}
+		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+    
+    <!-- 查询当前集群部署主机以及部署版本 -->
+    <select id="queryDeployByClusterId" parameterType="map" resultType="map">
+    	SELECT A.NAME, A.VERSION, B.CLUSTER_TYPE, B.HOST_ID, C.SSH_USER, C.SSH_PASSWD, C.SSH_PORT, C.HOST_IP
+		FROM DCF_FTP_FILE_SERVER A RIGHT JOIN DCF_BUSINESS_DEPLOY_LIST B ON (A.VERSION = B.VERSION)
+		LEFT JOIN DCF_HOST C ON B.HOST_ID = C.HOST_ID
+		WHERE FILE_TYPE = '2'
+		AND B.CLUSTER_ID = #{CLUSTER_ID}
+		AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+    
+    <!-- 根据集群类型查询部署主机信息 -->
+    <select id="queryDeployHostByClusterType" parameterType="map" resultType="map">
+
+		<choose>
+			<!-- 业务 -->
+			<when test="PACKAGE_TYPE != null and PACKAGE_TYPE != ''">
+				SELECT
+				DISTINCT
+				E.VERSION,
+				B.CLUSTER_DEPLOY_PATH,
+				C.HOST_IP,
+				C.SSH_PORT,
+				C.SSH_USER,
+				C.SSH_PASSWD,
+				D.CLUSTER_ELE_TYPE
+				FROM
+				DCF_HOST_DEPLOY A,
+				DCF_SERVICE_TYPE B,
+				DCF_HOST C,
+				DCF_CLUSTER_ELE_DEFINE D,
+				DCF_BUSINESS_DEPLOY_LIST E
+				WHERE
+				A.CLUSTER_ID = B.CLUSTER_ID
+				AND A.HOST_ID = C.HOST_ID
+				AND A.CLUSTER_TYPE = D.CLUSTER_ELE_NAME
+				AND A.CLUSTER_TYPE = E.CLUSTER_TYPE
+				and e.PACKAGE_TYPE = #{PACKAGE_TYPE}
+				AND e.CLUSTER_TYPE = #{CLUSTER_TYPE}
+
+			</when>
+			<!-- 组件 -->
+			<otherwise>
+				SELECT
+				A.VERSION,
+				B.CLUSTER_DEPLOY_PATH,
+				C.HOST_IP,
+				C.SSH_PORT,
+				C.SSH_USER,
+				C.SSH_PASSWD,
+				D.CLUSTER_ELE_TYPE
+				FROM
+				DCF_HOST_DEPLOY A,
+				DCF_SERVICE_TYPE B,
+				DCF_HOST C,
+				DCF_CLUSTER_ELE_DEFINE D
+				WHERE A.CLUSTER_ID = B.CLUSTER_ID
+				AND A.HOST_ID = C.HOST_ID
+				AND A.CLUSTER_TYPE = D.CLUSTER_ELE_NAME
+				AND A.VERSION IS NOT NULL
+
+				AND A.CLUSTER_TYPE in (SELECT
+						CLUSTER_ELE_NAME
+					FROM
+						dcf_cluster_ele_define
+					WHERE
+						CLUSTER_ELE_TYPE = 1)
+			</otherwise>
+		</choose>
+    </select>
+    
+    
+    <!-- 查询组件部署情况 -->
+    <select id="queryComponentDeployList" parameterType="map" resultType="map">
+	    SELECT A.CLUSTER_ELE_NAME , COUNT(DISTINCT C.HOST_ID) COUNT, COUNT(DISTINCT D.INST_ID) INST_COUNT
+			FROM DCF_CLUSTER_ELE_DEFINE A 
+			LEFT JOIN DCF_SERVICE_TYPE B ON (A.CLUSTER_ELE_NAME = B.CLUSTER_TYPE)
+			LEFT JOIN DCF_HOST_DEPLOY C ON (A.CLUSTER_ELE_NAME = C.CLUSTER_TYPE)
+			LEFT JOIN DCF_DEPLOY_INST_CONFIG D ON (A.CLUSTER_ELE_NAME = D.DEPLOY_TYPE  AND D.`STATUS` = '1')
+			WHERE A.CLUSTER_ELE_TYPE = '1'
+			GROUP BY A.CLUSTER_ELE_NAME
+    </select>
+    
+    <!-- 查询业务部署情况 -->
+    <select id="queryAppDeployList" parameterType="map" resultType="map">
+    	 SELECT A.CLUSTER_APP_TYPE, D.CONFIG_NAME APP_NAME, COUNT(DISTINCT C.HOST_ID) COUNT, COUNT(DISTINCT D.ID) INST_COUNT
+			FROM DCF_CLUSTER_ELE_DEFINE A 
+			LEFT JOIN DCF_SERVICE_TYPE B ON (A.CLUSTER_ELE_NAME = B.CLUSTER_TYPE)
+			LEFT JOIN DCF_HOST_DEPLOY C ON (A.CLUSTER_ELE_NAME =C.CLUSTER_TYPE)
+			LEFT JOIN DCF_TASK_PROGRAM D ON (A.CLUSTER_ELE_NAME = D.PROGRAM_TYPE  AND D.RUN_STATE = '1')
+			LEFT JOIN (SELECT * FROM DCF_GROUP_CONFIG T WHERE T.GROUP_CODE = 'APP_TYPE_LIST') D ON (A.CLUSTER_APP_TYPE = D.CONFIG_VALUE)
+			WHERE A.CLUSTER_ELE_TYPE = '3'
+				  AND D.CONFIG_NAME IS NOT NULL
+			GROUP BY A.CLUSTER_APP_TYPE,D.CONFIG_NAME
+    </select>
+    
+    <!-- 初始化统计主机数量 -->
+    <select id="queryStatiscHostList" parameterType="map" resultType="map">
+		SELECT COUNT(DISTINCT A.HOST_ID) TOTAL_HOST, COUNT(DISTINCT B.HOST_ID) COM_HOST_COUNT, COUNT(DISTINCT C.HOST_ID) BUS_HOST_COUNT, COUNT(DISTINCT A.HOST_ID) USED_COUNT
+			FROM DCF_HOST A 
+				LEFT JOIN DCF_HOST_DEPLOY B ON (A.HOST_ID = B.HOST_ID 
+							AND B.CLUSTER_TYPE IN (SELECT CLUSTER_ELE_NAME FROM DCF_CLUSTER_ELE_DEFINE WHERE CLUSTER_ELE_TYPE = '1'))
+				LEFT JOIN DCF_HOST_DEPLOY C ON (A.HOST_ID = C.HOST_ID 
+							AND C.CLUSTER_TYPE IN (SELECT CLUSTER_ELE_NAME FROM DCF_CLUSTER_ELE_DEFINE WHERE CLUSTER_ELE_TYPE = '3'))
+				LEFT JOIN DCF_HOST_DEPLOY D ON (A.HOST_ID = D.HOST_ID)    
+	</select>
+    
+    <!-- 查询划分的主机列表 -->
+    <select id="queryPartitionHostList" parameterType="map" resultType="map">
+	    SELECT A.ID, A.CODE, A.NAME, A.HOST_ID,A.PORT, A.CLUSTER_TYPE, A.STATE, A.RUN_STATE, 
+			   B.HOST_NAME, B.HOST_IP, B.SSH_USER
+		FROM DCF_HOST_DEPLOY A, DCF_HOST B
+			WHERE A.HOST_ID = B.HOST_ID
+			  AND A.RUN_STATE != '1'
+			  AND A.CLUSTER_ID = #{CLUSTER_ID}
+			  AND A.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+
+	<!-- 根据业务集群ID查询对应的组件集群信息 -->
+	<select id="queryClusterByBusClusterId" parameterType="map" resultType="map">
+		SELECT T.CLUSTER_ID, T.CLUSTER_CODE, T.CLUSTER_TYPE, T.CLUSTER_NAME, MAX(K.VERSION) VERSION
+		FROM DCF_SERVICE_TYPE T, DCF_RELEASE_VERSION_UPGRADE K,
+		(SELECT A.CLUSTER_ID, A.CLUSTER_CODE, A.CLUSTER_TYPE, B.BUS_CLUSTER_ID
+		FROM DCF_SERVICE_TYPE A, DCF_BUS_RELATION_CLUSTER_LIST B
+		WHERE A.CLUSTER_ID = B.CLUSTER_ID
+		AND A.CLUSTER_ID = #{CLUSTER_ID}) M,
+		DCF_BUS_RELATION_CLUSTER_LIST N
+		WHERE T.CLUSTER_TYPE = K.CLUSTER_TYPE
+		AND M.BUS_CLUSTER_ID = N.BUS_CLUSTER_ID
+		AND N.CLUSTER_ID = T.CLUSTER_ID
+		AND N.CLUSTER_TYPE = 'JSTORM'
+		GROUP BY K.CLUSTER_TYPE,
+		T.CLUSTER_ID,
+		T.CLUSTER_CODE,
+		T.CLUSTER_TYPE,
+		T.CLUSTER_NAME
+	</select>
+
+	<!-- 查询组件最新版本号 -->
+	<select id="queryVersionByClusterId" parameterType="map" resultType="map">
+		SELECT A.ID, A.NAME, A.HOST_ID, A.CLUSTER_TYPE, A.RUN_STATE, A.CLUSTER_ID, A.VERSION,
+		B.HOST_IP, B.SSH_USER, B.SSH_PASSWD, B.HOST_NAME
+		FROM DCF_HOST_DEPLOY A, DCF_HOST B
+		WHERE A.HOST_ID = B.HOST_ID
+		AND A.CLUSTER_ID = #{CLUSTER_ID}
+		<!-- AND A.RUN_STATE = '1' -->
+		ORDER BY A.VERSION DESC;
+	</select>
+
+	<!-- 判断集群主机是否已经被划分 -->
+	<select id="queryHostPartitionByIp" parameterType="map" resultType="map">
+		SELECT A.ID, A.CODE, A.NAME, A.HOST_ID, A.CLUSTER_TYPE, A.STATE, A.RUN_STATE, A.CLUSTER_ID, A.VERSION
+		FROM DCF_HOST_DEPLOY A
+		WHERE A.CLUSTER_ID = #{CLUSTER_ID}
+		AND A.HOST_ID = #{HOST_ID}
+	</select>
+
+	<!-- 通过hostIP查询hostID -->
+	<select id="queryHostIDByHostIP" parameterType="map" resultType="map">
+		SELECT A.HOST_ID
+				FROM  DCF_HOST A,DCF_DEPLOY_VERSION_UPGRADE B,DCF_SERVICE_TYPE C
+		WHERE A.HOST_ID = B.HOST_ID AND B.CLUSTER_ID = C.CLUSTER_ID
+		AND A.HOST_IP=#{HOST_IP} AND C.CLUSTER_CODE=#{CLUSTER_CODE}
+    </select>
+
+	<!-- 新增划分主机并且返回ID -->
+	<insert id="insertChosenHostReturnKey" parameterType="map">
+		<selectKey keyProperty="ID" resultType="string" order="BEFORE">
+			SELECT NEWID() FROM DUAL
+		</selectKey>
+		INSERT INTO DCF_HOST_DEPLOY(ID,CODE,NAME,HOST_ID, CLUSTER_TYPE,
+		STATE,RUN_STATE, CRT_DATE,CLUSTER_ID
+		) VALUES (#{ID}, NEWID(),#{NAME},#{HOST_ID},#{CLUSTER_TYPE},
+		<choose>
+			<when test="STATE != null and STATE != ''">
+				#{STATE},
+			</when>
+			<otherwise>
+				0,
+			</otherwise>
+		</choose>
+		0,
+		CURRENT_TIMESTAMP,#{CLUSTER_ID}
+		)
+	</insert>
+</mapper>

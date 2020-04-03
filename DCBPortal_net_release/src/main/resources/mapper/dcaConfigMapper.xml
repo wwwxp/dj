@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dcaConfig">
+
+	<!-- 根据主机IP查询主机对应的所有端口号 -->
+    <select id="queryPortListByHost" parameterType="map" resultType="map">
+    	SELECT * FROM 
+		(SELECT A.ID, B.PORT, C.IP HOST_IP, 1 MASTER, NULL OWN_HOST_IP, NULL OWN_HOST_PORT
+		FROM DCA_SOURCES A,
+			DCA_SOURCES_EXTEND B,
+			DCA_HOSTS C
+		WHERE A.ID = B.SOURCE_ID
+		  AND B.HOST_ID = C.HOST_ID
+		  AND B.IS_MASTER = 1
+		  AND B.STATE = 1
+		UNION
+		SELECT B.ID, B.PORT, B.HOST_IP, 0 MASTER, A.HOST_IP OWN_HOST_IP, A.PORT OWN_HOST_PORT
+		FROM (
+				SELECT A.ID, B. PORT, C.IP HOST_IP
+				FROM DCA_SOURCES A,
+					DCA_SOURCES_EXTEND B,
+					DCA_HOSTS C
+				WHERE A.ID = B.SOURCE_ID
+				  AND B.HOST_ID = C.HOST_ID
+				  AND B.IS_MASTER = 1
+				  AND B.STATE = 1
+			) A,
+			(
+				SELECT A.ID, B. PORT, C.IP HOST_IP
+				FROM DCA_SOURCES A,
+					 DCA_SOURCES_EXTEND B,
+					 DCA_HOSTS C
+				WHERE A.ID = B.SOURCE_ID
+				  AND B.HOST_ID = C.HOST_ID
+				  AND B.IS_MASTER = 0
+				  AND B.STATE = 1
+			) B WHERE A.ID = B.ID
+		) T 
+		WHERE T.HOST_IP = #{HOST_IP}
+		<if test="EXCLUDE_PORT != null and EXCLUDE_PORT != ''">
+			AND T.PORT NOT IN (${EXCLUDE_PORT})
+		</if>
+		ORDER BY T.PORT ASC
+    </select> 
+</mapper>

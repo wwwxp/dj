@@ -1,0 +1,28 @@
+#!/usr/bin/expect
+
+set proc_id [lindex $argv 0]
+set time_out [lindex $argv 1]
+
+set timeout 5 
+spawn acsql  
+	expect "Command>"
+	send "hbshm -c hss -p $proc_id;\r"
+	expect "please input YES or NO to continue:"
+	send "yes\r"
+        set timeout $time_out
+        expect {
+           "LM_ERROR" {
+            expect "Command>"
+            send "quit;\r"
+            exit 1
+          }
+          "OK! Create IPC for procId $proc_id succeeded!" {
+            expect "Command>"
+            send "quit;\r"
+            exit 0
+          }
+          "Command>" {
+            send "quit;\r"
+            exit 1
+          }
+        }

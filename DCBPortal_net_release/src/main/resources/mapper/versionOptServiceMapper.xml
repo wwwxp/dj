@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 集群元素定义表 -->
+<mapper namespace="versionOptService">
+    <!--查询业务部署列表-->
+    <select id="queryNodeTypeCfg" parameterType="map" resultType="map">
+        SELECT
+        ID,
+        `NAME`,
+        `CODE`,
+        DIFF_CFG,
+        RUN_WEB,
+        BUS_GROUP_ID,
+        START_VERSION,
+        CURR_VERSION,
+        DEFAULT_PATH,
+        CREATED_DATE,
+        CREATED_USER,
+        UPDATE_DATE,
+        UPDATE_USER,
+        CONTEXT_CFG,
+        `DESC`,
+        CONCAT(NAME,'[',CODE,']') TYPE_INFO,
+        CONCAT(NAME,'([',CODE,']|[',IF(CURR_VERSION is NULL OR CURR_VERSION='',concat(START_VERSION,']'),concat(CURR_VERSION,']+1'))) VERSION_INFO
+        FROM
+        dcf_node_type_config
+        <where>
+            <if test="NAME != null and NAME != ''">
+                and NAME like connect CONCAT('%',#{NAME},'%')
+            </if>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+        </where>
+    </select>
+    <!-- 更新业务版本类型 -->
+    <update id="updateNodeTypeCfgVersion" parameterType="hashMap">
+		UPDATE dcf_node_type_config
+		SET
+		  CURR_VERSION = #{CURR_VERSION},
+		  UPDATE_DATE = NOW(),
+		  UPDATE_USER = #{UPDATE_USER}
+		WHERE
+	    ID = #{ID}
+	</update>
+
+    <insert id="insertNodeTypeVersionListTbl" parameterType="hashMap">
+		INSERT INTO dcf_node_type_version_list (
+			FILE_NAME,
+			FILE_PATH,
+			CFG_PATH,
+			VERSION,
+			UPLOAD_USER,
+			NODE_TYPE_ID,
+			UPLOAD_DATE,
+            IS_FULL_VERSION,
+			FILE_DESC
+		)
+		VALUES
+			(
+				#{FILE_NAME},
+				#{FILE_PATH},
+				#{CFG_PATH},
+				#{VERSION},
+				#{UPLOAD_USER},
+				#{NODE_TYPE_ID},
+		        NOW(),
+		        #{IS_FULL_VERSION},
+				#{FILE_DESC}
+			)
+	</insert>
+
+    <update id="updateNodeTypeVersionListTbl"  parameterType="hashMap">
+        UPDATE dcf_node_type_version_list
+        SET upload_DATE = NOW(),upload_user = #{EMPEE_ID},FILE_DESC = LEFT(concat(#{FILE_DESC},FILE_DESC),500)
+        WHERE NODE_TYPE_ID= #{NODE_TYPE_ID}
+        and  VERSION = #{VERSION}
+        and ID = #{ID}
+    </update>
+
+
+    <select id="queryNodeTypeVersionListTbl" parameterType="map" resultType="map">
+        SELECT ID,
+        FILE_NAME,
+        FILE_PATH,
+        CFG_PATH,
+        VERSION,
+        UPLOAD_USER,
+        NODE_TYPE_ID,
+        UPLOAD_DATE,
+        FILE_DESC
+        FROM DCF_NODE_TYPE_VERSION_LIST
+        <where>
+            <if test="ID != null and ID != ''">
+                and ID = #{ID}
+            </if>
+            <if test="VERSION != null and VERSION != ''">
+                and VERSION = #{VERSION}
+            </if>
+            <if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+                and NODE_TYPE_ID = #{NODE_TYPE_ID}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteNodeTypeVersionById">
+        DELETE FROM DCF_NODE_TYPE_VERSION_LIST
+        WHERE ID = #{ID}
+    </delete>
+
+    <select id="queryNodeTypeVersionDetail" parameterType="map" resultType="map">
+        SELECT
+        A.ID,
+        A.FILE_NAME,
+        A.FILE_PATH,
+        A.VERSION,
+        A.UPLOAD_USER,
+        A.NODE_TYPE_ID,
+        A.IS_FULL_VERSION,
+        DATE_FORMAT(A.UPLOAD_DATE,'%Y-%m-%d %H:%i:%s') UPLOAD_DATE,
+        A.FILE_DESC,
+        A.CFG_PATH,
+        B.NAME,
+        B.CODE,
+        B.RUN_WEB,
+        B.CONTEXT_CFG
+        FROM DCF_NODE_TYPE_VERSION_LIST A,dcf_node_type_config B
+        where
+        A.NODE_TYPE_ID = B.ID
+        <if test="ID != null and ID != ''">
+            and A.ID = #{ID}
+        </if>
+        <if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+            and A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+        </if>
+        <if test="NAME != null and NAME != ''">
+            and B.NAME = #{NAME}
+        </if>
+        <if test="CODE != null and CODE != ''">
+            and B.CODE = #{CODE}
+        </if>
+        <if test="VERSION != null and VERSION != ''">
+            and A.VERSION = #{VERSION}
+        </if>
+        order by NAME,CODE,VERSION DESC
+    </select>
+
+    <!-- 查询节点版本部署表 -->
+    <select id="queryNodeDeployListTbl" parameterType="map" resultType="map">
+        SELECT
+        ID,
+        NODE_TYPE_ID,
+        VERSION,
+        NODE_ID,
+        CREATED_DATE,
+        CREATED_USER,
+        UPDATE_DATE,
+        UPDATE_USER
+        FROM
+        dcf_node_deploy_list
+        where
+        NODE_TYPE_ID = #{NODE_TYPE_ID}
+        AND VERSION = #{VERSION}
+        <if test="ID != null and ID != ''">
+            AND ID = #{ID}
+        </if>
+    </select>
+    <!-- 删除节点信息 部署表 -->
+    <delete id="deleteNodeDeployListTbl" parameterType="map">
+        delete from dcf_node_deploy_list
+        where
+        NODE_TYPE_ID = #{NODE_TYPE_ID}
+        AND VERSION = #{VERSION}
+        <if test="ID != null and ID != ''">
+            AND ID = #{ID}
+        </if>
+    </delete>
+    <!-- 查询部署信息 -->
+    <select id="queryNodeDeployVersionDetail" parameterType="map" resultType="map">
+        SELECT
+        a.ID,
+        a.VERSION,
+        a.NODE_TYPE_ID,
+        a.NODE_ID,
+        c.FILE_NAME,
+        c.FILE_PATH,
+        b.NODE_PATH,
+        b.NODE_DESC,
+        b.NODE_NAME,
+        c.CFG_PATH,
+        e.CONTEXT_CFG,
+        d.HOST_IP,
+        d.HOST_NET_CARD,
+        d.SSH_PORT,
+        d.SSH_USER,
+        d.SSH_PASSWD
+        FROM
+        dcf_node_deploy_list a,
+        dcf_node_config b,
+        dcf_node_type_config e,
+        dcf_node_type_version_list c,
+        dcf_host d
+        WHERE
+        a.NODE_ID = b.ID
+        AND e.ID = a.NODE_TYPE_ID
+        AND a.NODE_TYPE_ID = c.NODE_TYPE_ID
+        AND a.VERSION = c.VERSION
+        AND b.NODE_HOST_ID = d.HOST_ID
+        AND
+        a.NODE_TYPE_ID = #{NODE_TYPE_ID}
+        <if test="VERSION != null and VERSION != ''">
+        AND a.VERSION = #{VERSION}
+        </if>
+        <if test="NODE_ID != null and NODE_ID != ''">
+            AND b.ID = #{NODE_ID}
+        </if>
+    </select>
+
+    <!-- 查询主机信息 -->
+    <select id="queryHostInfoById" parameterType="map" resultType="map">
+        SELECT
+            HOST_ID,
+            HOST_NAME,
+            HOST_IP,
+            HOST_NET_CARD,
+            SSH_PORT,
+            SSH_USER,
+            SSH_PASSWD,
+            CORE_COUNT,
+            MEM_SIZE,
+            STORE_SIZE,
+            HOST_STATE,
+            CRT_DATE,
+            HOST_NET_CARD1
+        FROM
+            dcf_host
+        where HOST_ID = #{HOST_ID}
+    </select>
+
+    <!-- 查询启停程序表 -->
+    <select id="queryNodeStartList" parameterType="map" resultType="map">
+        SELECT
+        ID,
+        NODE_ID,
+        NODE_TYPE_ID,
+        VERSION,
+        START_CMD,
+        CHECK_CMD,
+        STOP_CMD,
+        STATE,
+        CREATED_DATE,
+        CREATED_USER,
+        UPDATE_DATE,
+        UPDATE_USER
+        FROM
+        DCF_NODE_START_LIST
+        <where>
+            <if test="NODE_TYPE_ID != null and NODE_TYPE_ID != ''">
+                AND NODE_TYPE_ID = #{NODE_TYPE_ID}
+            </if>
+            <if test="VERSION != null and VERSION != ''">
+                AND VERSION = #{VERSION}
+            </if>
+            <if test="ID != null and ID != ''">
+                AND ID = #{ID}
+            </if>
+        </where>
+    </select>
+
+    <!-- 删除版本的启停记录 -->
+    <delete id="deleteNodeStartList" parameterType="map">
+        DELETE FROM DCF_NODE_START_LIST
+        WHERE
+            NODE_TYPE_ID = #{NODE_TYPE_ID}
+            AND VERSION = #{VERSION}
+        <if test="NODE_ID != null and NODE_ID != ''">
+            AND NODE_ID = #{NODE_ID}
+        </if>
+    </delete>
+
+    <insert id="insertNodeOptLog" parameterType="map">
+            INSERT INTO dcf_node_operator_log (
+                OPERATOR_MODULE,
+                OPERATOR_NAME,
+                CREATED_DATE,
+                CREATED_USER,
+                LOG_CONTENT
+            )
+            VALUES
+                (
+                    #{OPERATOR_MODULE},
+                    #{OPERATOR_NAME},
+                    NOW(),
+                    #{CREATED_USER},
+                    #{LOG_CONTENT}
+                );
+    </insert>
+    <!-- 集群管理，查询集群的类型的节点-->
+    <select id="queryClusterNodeCfg" parameterType="map" resultType="map">
+        SELECT
+          a.ID,
+            NODE_NAME,
+            NODE_PATH,
+            NODE_HOST_ID,
+          a.NODE_TYPE_ID,
+          b.HOST_NAME,
+            b.HOST_IP
+        FROM
+            dcf_node_config a,
+            dcf_host b
+        WHERE
+          a.NODE_HOST_ID = b.HOST_ID
+          and a.NODE_TYPE_ID = #{NODE_TYPE_ID}
+    </select>
+    <!-- 配置修改,查询程序部署节点的信息，不区分版本 -->
+    <select id="queryNodeDeployInfoForUpdateCfg" parameterType="map" resultType="map">
+        SELECT
+        A.NODE_NAME,
+        A.ID,
+        A.NODE_TYPE_ID,
+		B.VERSION,
+        C.HOST_IP,
+        CONCAT(A.NODE_NAME,'[',C.HOST_IP,']') DEPLOY_NODE_INFO
+        FROM
+        DCF_NODE_CONFIG A,
+        DCF_NODE_DEPLOY_LIST B,
+        DCF_HOST C
+        WHERE
+        A.ID = B.NODE_ID
+        AND A.NODE_HOST_ID = C.HOST_ID
+		AND B.VERSION =  #{VERSION}
+		AND A.NODE_TYPE_ID = #{NODE_TYPE_ID}
+    </select>
+
+    <!-- 配置修改，查询节点类型部署版本-->
+    <select id="queryDeployVersionByNodeTypeId" parameterType="map" resultType="map">
+        select distinct VERSION
+        from dcf_node_deploy_list
+        where NODE_TYPE_ID = #{NODE_TYPE_ID}
+    </select>
+
+    <update id="updateNodeTypeCfgContextCfg" parameterType="map">
+        UPDATE dcf_node_type_config
+        SET CONTEXT_CFG = #{CONTEXT_CFG}
+        WHERE
+            ID = #{NODE_TYPE_ID}
+        AND (CONTEXT_CFG IS NULL OR CONTEXT_CFG = '')
+    </update>
+
+    <select id="queryNodePathInfoById" parameterType="map" resultType="map">
+		SELECT
+            A.ID NODE_ID,
+            A.NODE_NAME,
+		    A.NODE_PATH,
+			B.HOST_IP,
+			B.SSH_PORT,
+			B.SSH_USER,
+			B.SSH_PASSWD
+		FROM DCF_NODE_CONFIG A
+		  INNER JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+		WHERE A.ID IN
+		  <foreach collection="NODE_IDS" open="(" separator="," item="NODE_ID" close=")">
+              #{NODE_ID}
+          </foreach>
+	</select>
+</mapper>

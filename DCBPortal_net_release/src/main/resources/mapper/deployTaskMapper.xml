@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="deployTask">
+    <!--判断代码是否重复-->
+    <select id="queryMuitlCode" parameterType="map" resultType="hashMap">
+         SELECT COUNT(1) SUM FROM DCF_DEPLOY_TASK
+         WHERE  TASK_CODE = #{TASK_CODE}
+         <if test="FLAG == 'update'">  
+			AND TASK_ID &lt;&gt; #{TASK_ID}
+         </if> 
+    </select>
+    
+    <!-- 新增主机-->
+    <insert id="insertTask" parameterType="hashMap">
+       INSERT INTO DCF_DEPLOY_TASK(TASK_ID,TASK_CODE,TASK_NAME,
+      		DEFINE_FILE_NAME,CRT_DATE,CLUSTER_TYPE,SERVER_ID, VERSION)
+		VALUES(NEWID(),#{TASK_CODE},#{TASK_NAME},
+		      #{DEFINE_FILE_NAME},CURRENT_TIMESTAMP,#{CLUSTER_TYPE},#{SERVER_ID}, #{VERSION})
+    </insert>
+    
+    <!-- 查询任务列表 --> 
+    <select id="queryBusTaskList" parameterType="map" resultType="hashMap">
+    	SELECT A.TASK_ID, A.TASK_CODE, A.TASK_NAME, A.DEFINE_FILE_NAME, A.CLUSTER_TYPE,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE,
+			A.SERVER_ID, A.VERSION, 
+			B.FILE_NAME,
+			<!-- GROUP_CONCAT(B.FILE_NAME, ' ') FILE_NAME, -->
+			B.NAME,
+			B.PACKAGE_TYPE, 
+			GROUP_CONCAT(G.PROGRAM_NAME, ": ", CAST(G.PROGRAM_LIST AS CHAR)) RUN_PROGRAM,
+			GROUP_CONCAT(G.PROGRAM_NAME) PROGRAM_NAME
+    	FROM DCF_DEPLOY_TASK A LEFT JOIN DCF_FTP_FILE_SERVER B ON (A.SERVER_ID = B.ID)
+    	LEFT JOIN DCF_FTP_CLUSTER_CONFIG HH ON A.SERVER_ID = HH.SERVICE_ID
+    		 LEFT JOIN (SELECT K.PROGRAM_NAME, K.TASK_ID, COUNT(K.PROGRAM_CODE) PROGRAM_LIST
+							FROM DCF_TASK_PROGRAM K 
+							WHERE K.RUN_STATE = '1'
+							<if test="HOST_ID != null and HOST_ID != ''">
+								AND K.HOST_ID  = #{HOST_ID}
+							</if>
+							AND K.CLUSTER_ID = #{CLUSTER_ID}
+							GROUP BY K.PROGRAM_CODE,K.PROGRAM_NAME,K.BUS_CLUSTER_ID,K.TASK_ID) G ON (G.TASK_ID = A.TASK_ID)
+		WHERE A.CLUSTER_TYPE = #{CLUSTER_TYPE} 
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			 AND HH.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+
+		AND A.VERSION IN (SELECT DISTINCT VERSION FROM DCF_BUSINESS_DEPLOY_LIST 
+							WHERE CLUSTER_ID = #{CLUSTER_ID} 
+							  AND CLUSTER_TYPE = #{CLUSTER_TYPE})
+		GROUP BY A.TASK_ID,A.TASK_CODE,
+			A.TASK_NAME,
+			A.DEFINE_FILE_NAME,
+			A.CLUSTER_TYPE,
+		  	A.SERVER_ID,
+			A.VERSION,
+			B.FILE_NAME,
+			B. NAME,
+			B.PACKAGE_TYPE					  
+		ORDER BY CRT_DATE DESC, A.VERSION DESC
+    </select>
+    
+    <!-- 根据server_id查询该版本下的业务包 -->
+    <select id="queryVersionAndBusPackage" parameterType="map" resultType="hashMap">
+		SELECT A.NAME,A.DESCRIPTION,A.FILE_NAME,A.VERSION,
+			DATE_FORMAT(A.CRT_DATE,'%Y-%m-%d %H:%i:%s') AS CRT_DATE, B.CLUSTER_TYPE
+		FROM DCF_FTP_FILE_SERVER A LEFT JOIN DCF_DEPLOY_TASK B ON A.ID=B.SERVER_ID
+		WHERE A.FILE_TYPE=2
+    </select>
+
+    <!-- 通过serverId删除 主机下的task -->
+    <delete id="delTaskByServerId" parameterType="hashMap">
+      DELETE FROM DCF_DEPLOY_TASK WHERE SERVER_ID=#{ID}
+    </delete>
+    
+    <!-- 更新 主机DEPLOY STATE 状态 -->
+    <update id="updateDeployState" parameterType="hashMap">
+		UPDATE DCF_HOST_DEPLOY D SET D.STATE = '0', D.VERSION = NULL  
+		WHERE D.VERSION = (SELECT A.VERSION FROM DCF_FTP_FILE_SERVER A WHERE A.ID = #{ID}) 
+    </update>
+    
+    <!-- 获取集群主机列表 -->
+	<select id="queryHostList" parameterType="map" resultType="hashMap">
+		SELECT 
+       		H.HOST_ID,
+       		H.HOST_IP,
+       		H.HOST_NAME,
+          	H.SSH_USER,
+          	H.SSH_PASSWD,
+          	H.SSH_PORT,
+          	D.CLUSTER_TYPE
+		FROM DCF_HOST H RIGHT JOIN DCF_HOST_DEPLOY D  ON H.HOST_ID = D.HOST_ID
+      	WHERE D.CLUSTER_ID = #{CLUSTER_ID}
+      	  AND D.CLUSTER_TYPE = #{CLUSTER_TYPE}
+    </select>
+    
+      <!--判断代码-->
+    <select id="queryTaskCodeByServiceId" parameterType="map" resultType="hashMap">
+         SELECT TASK_CODE FROM DCF_DEPLOY_TASK
+         WHERE TASK_CODE = #{TASK_CODE}
+           AND SERVER_ID = #{SERVER_ID}  
+    </select>
+
+	<!--获取包信息-->
+	<select id="queryPackageInfo" parameterType="map" resultType="hashMap">
+		SELECT B.`NAME`,B.PACKAGE_TYPE FROM DCF_DEPLOY_TASK A LEFT JOIN DCF_FTP_FILE_SERVER B
+		ON A.SERVER_ID = B.ID
+		WHERE A.TASK_ID = #{TASK_ID}
+	</select>
+	
+	  <!-- 版本切换,更新task的TASK_CODE,TASK_NAME -->
+    <update id="updateDeployTaskFileName" parameterType="hashMap">
+       UPDATE DCF_DEPLOY_TASK D
+	   SET DEFINE_FILE_NAME =#{DEFINE_FILE_NAME},TASK_NAME = #{TASK_NAME},CRT_DATE=CURRENT_TIMESTAMP
+	 WHERE TASK_CODE=#{TASK_CODE} AND SERVER_ID = #{SERVER_ID}
+	 
+    </update>
+    
+</mapper>

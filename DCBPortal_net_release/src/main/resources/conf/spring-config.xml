@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+         http://www.springframework.org/schema/context 
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+         http://www.springframework.org/schema/tx 
+         http://www.springframework.org/schema/tx/spring-tx-4.0.xsd 
+         http://www.springframework.org/schema/aop 
+         http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+         http://www.springframework.org/schema/mvc 
+         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd 
+         http://www.springframework.org/schema/task 
+         http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+	<!--注解扫描目录配置-->
+	<context:component-scan base-package="com.tydic,com.alibaba.jstorm" />
+	<!-- end -->
+	
+    <!--定时任务开关-->
+     <task:annotation-driven />  
+
+	
+
+	<!-- properties配置文件 -->
+	<bean class="com.tydic.bp.core.utils.properties.SystemProperty">
+        <property name="locations">
+            <list> 
+                 <!-- <value>file:jdbc.properties</value> 
+                 <value>file:system.properties</value>  -->
+               <value>classpath:jdbc.properties</value>
+                <value>classpath:system.properties</value>
+            </list>
+        </property>
+	</bean>
+	<!-- end -->
+
+	<!-- 备份定时器配置 -->
+	<!-- <task:scheduled-tasks>
+		<task:scheduled ref="backupService" method="backupConfig" cron=" 0 0 */3 * * ?" />
+	</task:scheduled-tasks> -->
+
+	<!-- 定时调度管理对象 -->
+	<bean id="quartzManager" class="com.tydic.bp.QuartzManagerImpl" scope="singleton">
+		<constructor-arg type="int" name="threadCount" value="10"/>
+	</bean>
+	
+    <!-- 导入其他spring配置文件 -->
+    <import resource="spring-datasource.xml"></import>
+    <import resource="spring-bp-log.xml"></import>
+	<import resource="spring-loginuser-interceptor.xml"></import>
+
+</beans>

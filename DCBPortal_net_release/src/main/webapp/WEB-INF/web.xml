@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- 乱码过滤器-->
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>
+            org.springframework.web.filter.CharacterEncodingFilter
+        </filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <listener>
+    	<listener-class>com.tydic.bp.common.utils.listener.RSAKeyListener</listener-class>
+    </listener>
+    
+    <!-- 启动log4j -->
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>/WEB-INF/log4j.properties</param-value>
+    </context-param>
+    <context-param>
+        <param-name>log4jRefreshInterval</param-name>
+        <param-value>6000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>DCBPortal_net_release.root</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+             org.springframework.web.util.Log4jConfigListener
+        </listener-class>
+    </listener>
+    <!-- end -->
+
+
+    <!-- 启动Spring容器 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:conf/spring-config.xml
+        </param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    <!-- end -->
+    <!-- spring mvc容器和servlet的定义 -->
+    <servlet>
+        <servlet-name>springMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 这里的参数如果不配置，则默认查找web-inf下的{servlet-name}-servlet.xml文件 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:conf/spring-mvc.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springMVC</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!--druid内置监控 -->
+    <servlet>
+        <servlet-name>DruidStatView</servlet-name>
+        <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DruidStatView</servlet-name>
+        <url-pattern>/druid/*</url-pattern>
+    </servlet-mapping>
+    <!-- END -->
+
+    <!-- session登录用户认证过滤-->
+    <filter>
+        <filter-name>loginFilter</filter-name>
+        <filter-class>com.tydic.filter.LoginFilter</filter-class>
+        <init-param>
+            <param-name>whiteList</param-name>
+            <param-value>
+                /index.jsp,/css/,/images/,/js/,/public/common/,/login
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>indexPage</param-name>
+            <param-value>
+                index.jsp
+            </param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>loginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- END -->
+    <!--访问不到页面的统一处理-->
+
+
+<!--    &lt;!&ndash;  ****************************** sso单点登录集成   start ***************************** &ndash;&gt;-->
+<!--    &lt;!&ndash; 用于ajax跨域访问 &ndash;&gt;-->
+<!--    &lt;!&ndash;-->
+<!--    <filter>-->
+<!--        <filter-name>accessControlFilter</filter-name>-->
+<!--        <filter-class>com.tydic.dsf.filter.AccessControlFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>accessControlFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+<!--    &ndash;&gt;-->
+<!--    <context-param>-->
+<!--        <param-name>configurationStrategy</param-name>-->
+<!--        <param-value>PROPERTY_FILE</param-value>-->
+<!--    </context-param>-->
+<!--    <context-param>-->
+<!--        <param-name>configFileLocation</param-name>-->
+<!--        <param-value>sso.properties</param-value>-->
+<!--    </context-param>-->
+
+<!--    &lt;!&ndash; 用于单点退出，该过滤器用于实现单点登出功能，可选配置 &ndash;&gt;-->
+<!--    <listener>-->
+<!--        <listener-class>-->
+<!--            org.jasig.cas.client.session.SingleSignOutHttpSessionListener-->
+<!--        </listener-class>-->
+<!--    </listener>-->
+
+<!--    &lt;!&ndash; 该过滤器用于实现单点登出功能，可选配置。 &ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>CAS Single Sign Out Filter</filter-name>-->
+<!--        <filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>CAS Single Sign Out Filter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+<!--    &lt;!&ndash; 该过滤器负责用户的认证工作，必须启用它 &ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>CASFilter</filter-name>-->
+<!--        <filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>CASFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+<!--    &lt;!&ndash; 该过滤器负责对Ticket的校验工作，必须启用它 &ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>CAS Validation Filter</filter-name>-->
+<!--        <filter-class>-->
+<!--            org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter-->
+<!--        </filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>CAS Validation Filter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+<!--    &lt;!&ndash; 该过滤器负责实现HttpServletRequest请求的包裹， 比如允许开发者通过HttpServletRequest的getRemoteUser()方法获得SSO登录用户的登录名，可选配置。 &ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>-->
+<!--        <filter-class>-->
+<!--            org.jasig.cas.client.util.HttpServletRequestWrapperFilter-->
+<!--        </filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+<!--    &lt;!&ndash; 该过滤器负责把ticket验证后产生的Assertion放入ThreadLocal中，以便 不能访问web层的资源使用。该过滤器可以使得开发者可以通过org.jasig.cas.client.util.AssertionHolder来获取用户的登录名。比如AssertionHolder.getAssertion().getPrincipal().getName()。 &ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>CAS Assertion Thread Local Filter</filter-name>-->
+<!--        <filter-class>org.jasig.cas.client.util.AssertionThreadLocalFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>CAS Assertion Thread Local Filter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+<!--    &lt;!&ndash; ======================== 单点登录结束 ======================== &ndash;&gt;-->
+
+<!--    &lt;!&ndash;crm sso 集成获取不到用户信息&ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>casSSOFilter</filter-name>-->
+<!--        <filter-class>com.tydic.filter.CasSSOFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>casSSOFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+<!--    &lt;!&ndash;  ****************************** sso单点登录集成   end ***************************** &ndash;&gt;-->
+    
+     <!--SSO 过滤器
+
+    <filter>
+        <filter-name>SSOFilter</filter-name>
+        <filter-class>com.tydic.filter.SSOFilter</filter-class>
+        <init-param>
+            <param-name>whiteList</param-name> 
+            <param-value>
+                /index.jsp,*.ico,/css/*,/images/*,/js/*,/public/common/*,/jsp/login/*,/login**
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>validateCookie</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ajaxPass</param-name>
+            <param-value>false</param-value>
+        </init-param> 
+        <init-param>
+            <param-name>menuUltraVires</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+        	<param-name>csrfTokenFlag</param-name>
+        	<param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ssoServerAddr</param-name>
+            <param-value>http://192.168.167.64:8083</param-value>
+        </init-param>
+        <init-param>
+            <param-name>appid</param-name>
+            <param-value>101</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>SSOFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>-->
+    
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/jsp/404.jsp</location>
+    </error-page>
+
+    <!-- Session失效时间配置 -->
+    <session-config>
+        <session-timeout>360</session-timeout>
+    </session-config>
+    <!-- END -->
+
+    <!-- 禁掉不安全的请求，只保留 get 与 post -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>DCBPortal_net_release</web-resource-name>
+            <url-pattern>/*</url-pattern>
+            <http-method>PUT</http-method>
+            <http-method>DELETE</http-method>
+            <http-method>HEAD</http-method>
+            <http-method>OPTIONS</http-method>
+            <http-method>TRACE</http-method>
+        </web-resource-collection>
+        <auth-constraint></auth-constraint>
+    </security-constraint>
+</web-app>

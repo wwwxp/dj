@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 弹性伸缩策略配置 -->
+<mapper namespace="expendStrategyConfig">
+	<!-- 新增策略配置 -->
+	<insert id="addExpendStrategyConfig" parameterType="map">
+		<selectKey resultType="String" keyProperty="STRATEGY_ID" order="BEFORE">
+     		SELECT NEWID()
+     	</selectKey>
+		INSERT INTO DCF_EXPAND_STRATEGY_CONFIG(STRATEGY_ID, CLUSTER_ID, TASK_PROGRAM_ID, OPERATOR_TYPE,
+			QUOTA_TYPE,CONDITION_PARAM,CONDITION_VALUE, CONDITION_COUNT, HOST_COUNT, STATE, CRT_DATE,BACKUP_HOSTS,IS_RULE)
+		VALUES(#{STRATEGY_ID}, #{CLUSTER_ID}, #{TASK_PROGRAM_ID}, #{OPERATOR_TYPE}, 
+			#{QUOTA_TYPE}, #{CONDITION_PARAM}, #{CONDITION_VALUE}, #{CONDITION_COUNT}, #{HOST_COUNT},
+			 #{STATE}, NOW(),#{BACKUP_HOSTS},#{IS_RULE})
+	</insert>
+	
+	<!-- 删除策略配置 -->
+	<delete id="delExpendStrategyConfig" parameterType="map">
+		DELETE FROM DCF_EXPAND_STRATEGY_CONFIG WHERE STRATEGY_ID = #{STRATEGY_ID}
+	</delete>
+	
+	<delete id="delExpendJobBus" parameterType="map">
+		DELETE FROM DCF_JOB_TASK_BUS WHERE BUS_ID = #{STRATEGY_ID}
+	</delete>
+	
+	<!-- 修改策略配置 -->
+	<update id="updateExpendStrategyConfig" parameterType="map">
+		UPDATE DCF_EXPAND_STRATEGY_CONFIG SET QUOTA_TYPE = #{QUOTA_TYPE}, CONDITION_PARAM = #{CONDITION_PARAM},
+			CONDITION_VALUE = #{CONDITION_VALUE}, CONDITION_COUNT = #{CONDITION_COUNT}, HOST_COUNT = #{HOST_COUNT}
+		WHERE STRATEGY_ID = #{STRATEGY_ID}
+	</update>
+	
+	<!-- 修改策略配置 -->
+	<update id="updateExpendTimingConfig" parameterType="map">
+		UPDATE DCF_EXPAND_STRATEGY_CONFIG SET  HOST_COUNT = #{HOST_COUNT},BACKUP_HOSTS =#{BACKUP_HOSTS},
+		IS_RULE =#{IS_RULE},STATE =#{STATE}
+		WHERE STRATEGY_ID = #{STRATEGY_ID}
+	</update>
+	
+	<!-- 修改策略配置 -->
+	<update id="updateExpendManualConfig" parameterType="map">
+		UPDATE DCF_EXPAND_STRATEGY_CONFIG SET  HOST_COUNT = #{HOST_COUNT},BACKUP_HOSTS =#{BACKUP_HOSTS}
+		WHERE STRATEGY_ID = #{STRATEGY_ID}
+	</update>
+	
+	<!-- 查询策略配置 -->
+	<select id="queryExpendStrategyConfigList" parameterType="map" resultType="map">
+		SELECT A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,
+			A.QUOTA_TYPE, A.CONDITION_PARAM, A.CONDITION_VALUE, A.BACKUP_HOSTS, 
+			A.CONDITION_COUNT, A.HOST_COUNT, A.STATE, 
+			date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM DCF_EXPAND_STRATEGY_CONFIG A LEFT JOIN DCF_TASK_PROGRAM B ON (A.TASK_PROGRAM_ID = B.ID)
+		WHERE B.RUN_STATE = '1'
+		<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID}
+		</if>
+		<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+			AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+		</if>
+	</select>
+	
+	<!-- 获取集群节点列表 -->
+	<select id="queryClusterNodeList" parameterType="map" resultType="map">
+		SELECT A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,A.QUOTA_TYPE,
+			B.ID,B.HOST_ID, B.CLUSTER_TYPE, B.VERSION,
+			C.HOST_NAME, C.HOST_IP,
+			D.CLUSTER_CODE
+		FROM DCF_EXPAND_STRATEGY_CONFIG A, DCF_HOST_DEPLOY B, DCF_HOST C, DCF_SERVICE_TYPE D
+		WHERE A.CLUSTER_ID = B.CLUSTER_ID
+		  AND B.HOST_ID = C.HOST_ID
+		  AND A.CLUSTER_ID = D.CLUSTER_ID
+		  	<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+		  		AND A.CLUSTER_ID = #{CLUSTER_ID}
+		  	</if>
+		  	<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+				AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+			</if>
+		  ORDER BY A.CLUSTER_ID
+	</select>
+	
+	<!-- 获取业务程序对应的策略规则 -->
+	<select id="queryProgramNodeList" parameterType="map" resultType="map">
+		SELECT A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,A.QUOTA_TYPE,
+			A.CONDITION_PARAM, A.CONDITION_VALUE, A.BACKUP_HOSTS, A.CONDITION_COUNT, A.HOST_COUNT, A.STATE, A.IS_RULE,
+			D.CLUSTER_CODE,D.CLUSTER_TYPE
+		FROM DCF_EXPAND_STRATEGY_CONFIG A, DCF_SERVICE_TYPE D, DCF_TASK_PROGRAM C
+		WHERE A.CLUSTER_ID = D.CLUSTER_ID
+			AND A.TASK_PROGRAM_ID = C.ID
+			AND NOT EXISTS(SELECT * FROM DCF_FORECAST_REPORT T 
+					WHERE A.TASK_PROGRAM_ID = T.TASK_PROGRAM_ID
+					  AND A.STRATEGY_ID = T.STRATEGY_ID 
+					  AND T.PREDICTION_TIME >= NOW())
+		  	<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+		  		AND A.CLUSTER_ID = #{CLUSTER_ID}
+		  	</if>
+		  	<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+				AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+			</if>
+		  ORDER BY A.CLUSTER_ID
+	</select>
+	
+	<!-- 查询策略配置 -->
+	<select id="queryStrategyConfigById" parameterType="map" resultType="map"> 
+     	SELECT A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,
+			A.QUOTA_TYPE, A.CONDITION_PARAM, A.CONDITION_VALUE, A.BACKUP_HOSTS, 
+			A.CONDITION_COUNT, A.HOST_COUNT, A.STATE, IS_RULE,
+			date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE,B.PROGRAM_NAME,B.PROGRAM_TYPE
+		FROM DCF_EXPAND_STRATEGY_CONFIG A LEFT JOIN DCF_TASK_PROGRAM B ON A.TASK_PROGRAM_ID =B.ID
+		WHERE 1=1 
+		<if test="STRATEGY_ID != null and STRATEGY_ID != ''">
+			AND A.STRATEGY_ID = #{STRATEGY_ID}
+		</if>
+	</select>
+	
+	<!-- 查询策略配置 -->
+	<select id="queryExpendStrategyConfigById" parameterType="map" resultType="map">
+		SELECT A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,A.BACKUP_HOSTS,A.IS_RULE,
+			A.QUOTA_TYPE,A.CONDITION_PARAM,A.CONDITION_VALUE, A.CONDITION_COUNT, A.HOST_COUNT, A.STATE, 
+			date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE,C.TASK_NAME ,C.ID JOB_ID
+		FROM DCF_EXPAND_STRATEGY_CONFIG A LEFT JOIN DCF_JOB_TASK_BUS B ON A.STRATEGY_ID = B.BUS_ID
+    LEFT JOIN DCF_JOB_TASK_CONFIG C ON B.TASK_ID = C.ID 
+		WHERE 1=1
+		<if test="STRATEGY_ID != null and STRATEGY_ID != ''">
+			AND A.STRATEGY_ID = #{STRATEGY_ID}
+		</if>
+	</select>
+	
+	
+	<!-- 查询策略配置 -->
+	<select id="queryTimingConfigList" parameterType="map" resultType="map">
+		SELECT  A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,
+			A.QUOTA_TYPE, A.CONDITION_PARAM, A.CONDITION_VALUE, A.BACKUP_HOSTS, 
+			A.CONDITION_COUNT, A.HOST_COUNT, A.STATE, A.IS_RULE,
+				CASE A.IS_RULE WHEN  1 THEN '是' WHEN 0 THEN '否'  ELSE '否' END RULE_DESC,
+			date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE,B.TASK_NAME,B.TASK_TYPE,
+      date_format(B.CRON_START_TIME, '%Y-%m-%d %H:%i:%s') CRON_START_TIME,
+      date_format(B.CRON_END_TIME, '%Y-%m-%d %H:%i:%s') CRON_END_TIME,B.CRON_DESC,B.CRON_EXP
+		FROM DCF_EXPAND_STRATEGY_CONFIG A
+		LEFT JOIN DCF_JOB_TASK_BUS C ON A.STRATEGY_ID = C.BUS_ID
+		 LEFT JOIN DCF_JOB_TASK_CONFIG B ON C.TASK_ID = B.ID
+		WHERE 1=1
+		<if test="STRATEGY_ID != null and STRATEGY_ID != ''">
+			AND A.STRATEGY_ID = #{STRATEGY_ID}
+		</if>
+		<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID}
+		</if>
+		<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+			AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+		</if>
+	</select>
+	
+	
+	<!-- 查询要扩展的机器 -->
+	<select id="queryExpandHostList" parameterType="map" resultType="map">
+		SELECT A.HOST_ID,a.HOST_NAME,a.HOST_IP,
+				a.SSH_PORT,a.SSH_USER,a.SSH_PASSWD, a.HOST_STATE,
+				CONCAT(a.HOST_IP,'(',a.SSH_USER,')') HOST_TEXT,
+				CASE a.HOST_STATE WHEN  1 THEN '启用' WHEN 0 THEN '失效'  END HOST_STATE_DESC,
+				a.CORE_COUNT,a.MEM_SIZE,a.STORE_SIZE FROM DCF_HOST A 
+				WHERE A.HOST_ID NOT IN(
+				SELECT B.HOST_ID FROM DCF_HOST_DEPLOY B WHERE B.CLUSTER_ID=#{CLUSTER_ID}
+				AND B.STATE ='1')
+				  <if test="HOST_IP != null and HOST_IP != ''">  
+                    AND A.HOST_IP = #{HOST_IP}
+                 
+                </if>
+		 
+	</select>
+	
+		<!-- 查询要收缩的机器 -->
+	<select id="queryDownHostList" parameterType="map" resultType="map">
+		SELECT A.HOST_ID,a.HOST_NAME,a.HOST_IP,
+				a.SSH_PORT,a.SSH_USER,a.SSH_PASSWD, a.HOST_STATE,
+				CONCAT(a.HOST_IP,'(',a.SSH_USER,')') HOST_TEXT,
+				CASE a.HOST_STATE WHEN  1 THEN '启用' WHEN 0 THEN '失效'  END HOST_STATE_DESC,
+				a.CORE_COUNT,a.MEM_SIZE,a.STORE_SIZE FROM DCF_HOST A 
+				WHERE A.HOST_ID  IN(
+				SELECT B.HOST_ID FROM DCF_HOST_DEPLOY B WHERE B.CLUSTER_ID=#{CLUSTER_ID}
+				AND B.STATE ='1')
+		   <if test="HOST_IP != null and HOST_IP != ''">  
+                    AND A.HOST_IP = #{HOST_IP}
+                 
+                </if>
+	</select>
+	
+	<!-- 查询策略配置 -->
+	<select id="queryRuleList" parameterType="map" resultType="map">
+		 SELECT A.STRATEGY_ID, A.OPERATOR_TYPE,A.CLUSTER_ID,A.TASK_PROGRAM_ID,A.CONDITION_PARAM,QUOTA_TYPE,
+		 A.CONDITION_VALUE,A.CONDITION_COUNT 
+		 FROM DCF_EXPAND_STRATEGY_CONFIG A 
+		 WHERE A.CLUSTER_ID= #{CLUSTER_ID} 
+		   AND A.OPERATOR_TYPE=#{OPERATOR_TYPE} 
+		   AND A.TASK_PROGRAM_ID =#{TASK_PROGRAM_ID}
+		   <if test="CURR_STARTEGY_ID != null and CURR_STARTEGY_ID != ''">
+		   		AND A.STRATEGY_ID = #{CURR_STARTEGY_ID}
+		   </if>
+	</select>
+	
+	<!-- 查询策略配置 -->
+	<select id="queryConfigList" parameterType="map" resultType="map">
+		SELECT A.STRATEGY_ID, A.CLUSTER_ID, A.TASK_PROGRAM_ID, A.OPERATOR_TYPE,
+			A.QUOTA_TYPE, A.CONDITION_PARAM, A.CONDITION_VALUE, A.BACKUP_HOSTS, 
+			A.CONDITION_COUNT, A.HOST_COUNT, A.STATE, 
+			date_format(A.CRT_DATE, '%Y-%m-%d %H:%i:%s') CRT_DATE
+		FROM DCF_EXPAND_STRATEGY_CONFIG A 
+		WHERE 1=1
+		<if test="CLUSTER_ID != null and CLUSTER_ID != ''">
+			AND A.CLUSTER_ID = #{CLUSTER_ID}
+		</if>
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.TASK_PROGRAM_ID = #{TASK_PROGRAM_ID}
+		</if>
+		<if test="OPERATOR_TYPE != null and OPERATOR_TYPE != ''">
+			AND A.OPERATOR_TYPE = #{OPERATOR_TYPE}
+		</if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="logLevelCfg">
+
+	<!-- 查询 配置列表 -->
+	<select id="queryList" parameterType="map" resultType="map">
+		SELECT C.PRO_ID,C.PRO_KEY,C.PRO_VALUE,C.PRO_DESC FROM DCF_LOG_LEVEL_CFG C
+		<where>
+			<if test="PRO_KEY != null and PRO_KEY != ''">
+				AND C.PRO_KEY LIKE CONCAT('%', #{PRO_KEY}, '%')
+			</if>
+		</where>
+		ORDER BY C.PRO_KEY ASC
+	</select>
+
+	<!-- 修改日志级别配置 -->
+	<update id="updateLogLevel" parameterType="hashMap">
+		UPDATE DCF_LOG_LEVEL_CFG
+		SET PRO_KEY = #{PRO_KEY} ,PRO_VALUE=#{PRO_VALUE} ,PRO_DESC = #{PRO_DESC}
+		WHERE PRO_ID=#{PRO_ID}
+	</update>
+
+	<!-- 删除日志级别配置 -->
+	<delete id="delLogLevel" parameterType="hashMap">
+		DELETE from DCF_LOG_LEVEL_CFG where PRO_ID=#{PRO_ID}
+	</delete>
+
+	<!-- 添加日志级别配置 -->
+	<insert id="insertLogLevel" parameterType="hashMap">
+		INSERT INTO DCF_LOG_LEVEL_CFG(PRO_ID,PRO_KEY,PRO_VALUE,PRO_DESC)
+		VALUES(NEWID(),#{PRO_KEY},#{PRO_VALUE},#{PRO_DESC})
+	</insert>
+</mapper>

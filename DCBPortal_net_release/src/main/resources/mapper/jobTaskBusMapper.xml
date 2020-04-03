@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jobTaskBus">
+
+   	<!-- 添加记录 -->
+	<insert id="insert" parameterType="hashMap">
+		INSERT INTO DCF_JOB_TASK_BUS(ID,TASK_ID,BUS_TYPE,BUS_ID, EXTENDED_FIELD)
+		VALUES(NEWID(),#{TASK_ID},#{BUS_TYPE},#{BUS_ID}, #{EXTENDED_FIELD})
+	</insert>
+	
+	<!-- 更新记录 -->
+	<update id="update" parameterType="hashMap">
+		UPDATE
+		DCF_JOB_TASK_BUS
+		SET
+		TASK_ID = #{TASK_ID}
+		WHERE
+		BUS_ID = #{BUS_ID}
+	</update>
+	
+	<!-- 查询中间关系表 -->
+	<select id="queryDSATaskJobRelation" parameterType="hashMap"
+		resultType="map">
+		SELECT ID,TASK_ID,BUS_TYPE,BUS_ID
+		 FROM DCF_JOB_TASK_BUS 
+		WHERE BUS_ID =#{BUS_ID} AND BUS_TYPE = #{BUS_TYPE}
+	</select>	
+	
+	<!-- 根据预测预测报告ID删除定时任务 -->
+	<delete id="delJobTaskByReportId" parameterType="map">
+		DELETE FROM DCF_JOB_TASK_BUS WHERE EXTENDED_FIELD = #{EXTENDED_FIELD} AND BUS_TYPE = #{BUS_TYPE}
+	</delete>
+	
+	<!-- 查询定时任务 -->
+	<select id="queryJobTaskByID" parameterType="map" resultType="map">
+		SELECT ID,TASK_ID,BUS_TYPE,BUS_ID, EXTENDED_FIELD 
+		FROM DCF_JOB_TASK_BUS 
+		WHERE BUS_TYPE = #{BUS_TYPE}
+		AND EXTENDED_FIELD = #{EXTENDED_FIELD}
+	</select>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="hashMap">
+		DELETE FROM DCF_JOB_TASK_BUS WHERE BUS_ID=#{BUS_ID}
+	</delete>
+
+    <!-- 删除配置的任务 -->
+	<delete id="deleteTaskRecords" parameterType="list">
+		DELETE FROM DCF_JOB_LIST WHERE ID in
+        <foreach collection="list" open="(" separator="," close=")" item="row">#{row.ID}</foreach>
+	</delete>
+	
+</mapper>

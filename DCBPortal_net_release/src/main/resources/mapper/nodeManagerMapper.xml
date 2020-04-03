@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nodeManagerMapper">
+
+    <select id="queryLoginInfo" parameterType="map" resultType="map">
+        SELECT
+            HOST_ID,
+            HOST_IP,
+            SSH_USER,
+            SSH_PASSWD
+        FROM DCF_HOST
+
+    </select>
+
+    <select id="queryLoginInfoByIds" parameterType="map" resultType="map">
+        SELECT
+            HOST_ID,
+            HOST_IP,
+            SSH_USER,
+            SSH_PASSWD
+        FROM DCF_HOST
+        WHERE HOST_ID IN
+        <foreach collection="HOST_IDS" item="HOST_ID" open="(" separator="," close=")">
+            #{HOST_ID}
+        </foreach>
+    </select>
+
+    <!-- 查找主机的IP地址 -->
+    <select id="queryHostIp" parameterType="map" resultType="map">
+          SELECT
+               HOST_IP,
+               CONCAT(HOST_IP,CONCAT('(',SSH_USER,')')) HOST_IP_USER,
+               SSH_USER,
+               HOST_ID NODE_HOST_ID
+          FROM DCF_HOST
+          ORDER BY HOST_IP ASC
+    </select>
+
+    <!-- 查找主机的IP地址 -->
+    <select id="queryHostInfoById" parameterType="map" resultType="map">
+          SELECT
+               HOST_IP,
+               SSH_USER,
+               HOST_ID NODE_HOST_ID
+          FROM DCF_HOST
+          WHERE HOST_ID IN
+          <foreach collection="HOST_IP_USER" item="ID" open="(" close=")" separator=",">
+              #{ID}
+          </foreach>
+          ORDER BY HOST_IP ASC
+    </select>
+
+    <!-- 查找节点信息表中的IP地址 -->
+    <select id="queryHostIpOnNode" parameterType="map" resultType="map">
+        SELECT
+          DISTINCT
+          B.HOST_IP,
+          CONCAT(B.HOST_IP,CONCAT('(',SSH_USER,')')) HOST_IP_USER,
+          B.SSH_USER,
+          A.NODE_HOST_ID
+        FROM DCF_NODE_CONFIG A
+          LEFT JOIN DCF_HOST B ON A.NODE_HOST_ID=B.HOST_ID
+        <where>
+            <if test="NODE_NAME!=null and NODE_NAME!=''">
+                AND A.NODE_NAME like '%${NODE_NAME}%'
+            </if>
+            <if test="NODE_TYPE_ID!=null and NODE_TYPE_ID!=''">
+                AND A.NODE_TYPE_ID=#{NODE_TYPE_ID}
+            </if>
+        </where>
+        ORDER BY B.HOST_IP ASC
+    </select>
+
+    <!-- 查找节点信息表中的节点类型-->
+    <select id="queryNodeTypeOnNode" parameterType="map" resultType="map">
+          SELECT
+            DISTINCT
+            A.NODE_TYPE_ID,
+            CONCAT(B.NAME,'(',B.CODE,')') NODE_TYPE_TEXT
+          FROM
+            DCF_NODE_CONFIG A
+          INNER JOIN DCF_NODE_TYPE_CONFIG B ON A.NODE_TYPE_ID = B.ID
+          ORDER BY NODE_TYPE_TEXT
+    </select>
+
+    <!-- 查找节点信息表中的节点名称 -->
+    <select id="queryNodeNameOnNode" parameterType="map" resultType="map">
+          SELECT
+              DISTINCT
+              NODE_NAME
+          FROM
+              DCF_NODE_CONFIG A
+          <where>
+              <if test="NODE_TYPE_ID!=null and NODE_TYPE_ID!=''">
+                  AND A.NODE_TYPE_ID=#{NODE_TYPE_ID}
+              </if>
+          </where>
+          ORDER BY NODE_NAME
+    </select>
+
+    <!-- 查询业务组 -->
+    <select id="queryBusGroup" parameterType="map" resultType="map">
+         SELECT
+              GROUP_NAME,
+              ID,
+              ID BUS_GROUP_ID
+         FROM DCF_NODE_BUS_GROUP_CONFIG
+         ORDER BY GROUP_NAME ASC
+    </select>
+
+
+    <!-- 查询NODE配置表中的业务组 -->
+    <select id="queryBusGroupOnNode" parameterType="map" resultType="map">
+         SELECT
+              DISTINCT
+              B.GROUP_NAME,
+              B.ID,
+              A.BUS_GROUP_ID
+         FROM DCF_NODE_CONFIG A
+         INNER JOIN DCF_NODE_BUS_GROUP_CONFIG B ON A.BUS_GROUP_ID=B.ID
+        <where>
+            <if test="NODE_NAME!=null and NODE_NAME!=''">
+                AND A.NODE_NAME like '%${NODE_NAME}%'
+            </if>
+            <if test="NODE_TYPE_ID!=null and NODE_TYPE_ID!=''">
+                AND A.NODE_TYPE_ID=#{NODE_TYPE_ID}
+            </if>
+        </where>
+         ORDER BY B.GROUP_NAME ASC
+    </select>
+
+    <!--查询节点信息-->
+    <select id="queryNodeInfo"  parameterType="map" resultType="map">
+	    SELECT
+	        A.ID,
+	        A.NODE_NAME,
+	        CONCAT(B.HOST_IP,CONCAT('(',B.SSH_USER,')')) HOST_IP_USER,
+            B.HOST_IP,
+            B.SSH_USER,
+            A.NODE_HOST_ID,
+	        CONCAT(C.NAME,'(',C.CODE,')') NODE_TYPE,
+            A.NODE_TYPE_ID,
+	        A.NODE_PATH,
+	        A.BUS_GROUP_ID,
+            D.GROUP_NAME,
+            A.NODE_STATE,
+	        CASE A.NODE_STATE
+              WHEN 0 THEN '无效'
+              WHEN 1 THEN '有效'
+              ELSE ''
+            END NODE_STATE_NAME,
+	        A.NODE_DESC
+	    FROM DCF_NODE_CONFIG A
+	      LEFT JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+          LEFT JOIN DCF_NODE_TYPE_CONFIG C ON A.NODE_TYPE_ID = C.ID
+          LEFT JOIN DCF_NODE_BUS_GROUP_CONFIG D ON A.BUS_GROUP_ID=D.ID
+        <where>
+            <if test="ID!=null and ID!=''">
+                AND A.ID=#{ID}
+            </if>
+            <if test="NODE_NAME!=null and NODE_NAME!=''">
+                AND A.NODE_NAME like '%${NODE_NAME}%'
+            </if>
+            <if test="NODE_HOST_ID!=null and NODE_HOST_ID!=''">
+                AND A.NODE_HOST_ID=#{NODE_HOST_ID}
+            </if>
+            <if test="BUS_GROUP_ID!=null and BUS_GROUP_ID!=''">
+                AND A.BUS_GROUP_ID=#{BUS_GROUP_ID}
+            </if>
+            <if test="NODE_TYPE_ID!=null and NODE_TYPE_ID!=''">
+                AND A.NODE_TYPE_ID=#{NODE_TYPE_ID}
+            </if>
+        </where>
+        ORDER BY B.HOST_IP,NODE_TYPE
+    </select>
+
+    <!-- 出查询节点类型 -->
+    <select id="queryNodeType" parameterType="map" resultType="map">
+         SELECT
+              CONCAT(`NAME`,'(',CODE,')') NODE_TYPE,
+              ID NODE_TYPE_ID,
+              CODE
+         FROM DCF_NODE_TYPE_CONFIG
+         ORDER BY NODE_TYPE ASC
+    </select>
+
+    <!-- 出查询节点类型 -->
+    <select id="queryNodeTypeByNodeTypeId" parameterType="map" resultType="map">
+         SELECT
+              `NAME` NODE_TYPE,
+              ID NODE_TYPE_ID,
+              CODE
+         FROM DCF_NODE_TYPE_CONFIG
+         WHERE ID IN
+         <foreach collection="NODE_TYPE" item="ID" open="(" close=")" separator=",">
+              #{ID}
+         </foreach>
+
+         ORDER BY NODE_TYPE ASC
+    </select>
+
+    <!--查询节点路径-->
+    <select id="queryNodePath" parameterType="map" resultType="map">
+         SELECT
+              DEFAULT_PATH NODE_PATH
+         FROM DCF_NODE_TYPE_CONFIG
+    </select>
+
+    <!--通过主机ID、节点路径，查询节点信息-->
+    <select id="queryNodeByHostIdAndNodePath" parameterType="map" resultType="map">
+         SELECT
+              ID,NODE_NAME
+         FROM DCF_NODE_CONFIG
+         WHERE NODE_HOST_ID IN (SELECT HOST_ID FROM DCF_HOST WHERE HOST_IP =(SELECT HOST_IP FROM DCF_HOST WHERE HOST_ID=#{HOST_IP}))
+                AND (NODE_PATH=#{NODE_PATH}
+                OR NODE_PATH=CONCAT(#{NODE_PATH},'/')
+                OR CONCAT(NODE_PATH,'/')=#{NODE_PATH})
+         <if test="ID!=null and ID!=''">
+                AND ID!=#{ID}
+         </if>
+
+    </select>
+
+    <!--节点信息的插入-->
+    <insert id="insertNode" parameterType="map">
+        INSERT INTO DCF_NODE_CONFIG(NODE_NAME,NODE_HOST_ID,NODE_TYPE_ID,NODE_PATH,START_CMD,STOP_CMD,CHECK_CMD,NODE_STATE,BUS_GROUP_ID,NODE_DESC)
+        VALUES(#{NODE_NAME},#{HOST_IP},#{NODE_TYPE},#{NODE_PATH},#{START_CMD},#{STOP_CMD},#{CHECK_CMD},1
+      <choose>
+            <when test="GROUP_NAME!=null and GROUP_NAME!=''">
+                ,#{GROUP_NAME}
+            </when>
+            <otherwise>
+                ,NULL
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="NODE_DESC!=null and NODE_DESC!=''">
+                ,#{NODE_DESC}
+            </when>
+            <otherwise>
+               ,NULL
+            </otherwise>
+        </choose>
+      )
+    </insert>
+
+    <!--节点信息的修改-->
+    <update id="updateNode" parameterType="map">
+        UPDATE DCF_NODE_CONFIG
+        SET NODE_NAME=#{NODE_NAME},NODE_HOST_ID=#{HOST_IP},NODE_TYPE_ID=#{NODE_TYPE},NODE_PATH=#{NODE_PATH},
+        <choose>
+            <when test="GROUP_NAME!=null and GROUP_NAME!=''">
+                BUS_GROUP_ID=#{GROUP_NAME},
+            </when>
+            <otherwise>
+                BUS_GROUP_ID=NULL,
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="NODE_STATE!=null and NODE_STATE!=''">
+                NODE_STATE=#{NODE_STATE},
+            </when>
+            <otherwise>
+                NODE_STATE=NULL,
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="NODE_DESC!=null and NODE_DESC!=''">
+                NODE_DESC=#{NODE_DESC}
+            </when>
+            <otherwise>
+                NODE_DESC=NULL
+            </otherwise>
+        </choose>
+        WHERE ID=#{ID}
+    </update>
+
+    <select id="queryNodeByNodeTypeId" parameterType="map" resultType="map">
+          SELECT * FROM DCF_NODE_DEPLOY_LIST
+          WHERE NODE_TYPE_ID=#{NODE_TYPE} AND NODE_ID=#{ID}
+    </select>
+
+    <select id="queryNodeHostIdAndNodePath" parameterType="map" resultType="map">
+
+        SELECT
+        B.HOST_IP,
+        A.NODE_PATH,
+        A.NODE_HOST_ID
+        FROM DCF_NODE_CONFIG A
+        INNER JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+        WHERE
+        B.HOST_IP IN (SELECT DISTINCT HOST_IP FROM DCF_HOST
+        WHERE HOST_ID IN
+        <foreach collection="HOST_IP_USER" item="ID" open="(" close=")" separator=",">
+            #{ID}
+        </foreach>
+        )
+
+    </select>
+
+    <!--DCF_NODE_CONFIG表的删除-->
+    <delete id="delNode" parameterType="map">
+          DELETE FROM DCF_NODE_CONFIG
+          WHERE ID=#{ID}
+    </delete>
+
+    <!--部署节点表的删除-->
+    <delete id="delNodeDeployList" parameterType="map">
+          DELETE FROM DCF_NODE_DEPLOY_LIST
+          WHERE NODE_TYPE_ID=#{NODE_TYPE_ID} AND NODE_ID=#{ID}
+    </delete>
+
+    <!--启停节点表的删除-->
+    <delete id="delNodeStartList" parameterType="map">
+          DELETE FROM DCF_NODE_START_LIST
+          WHERE NODE_TYPE_ID=#{NODE_TYPE_ID} AND NODE_ID=#{ID}
+    </delete>
+
+    <!--集群类型元素表的删除-->
+    <delete id="delNodeClusterEleConfig" parameterType="map">
+          DELETE FROM DCF_NODE_CLUSTER_ELE_CONFIG
+          WHERE NODE_ID=#{ID}
+    </delete>
+
+    <!-- 操作日志表的记录 -->
+    <insert id="insertNodeHandleInfo" parameterType="map">
+        insert into dcf_node_operator_log(OPERATOR_MODULE,OPERATOR_NAME,CREATED_DATE,CREATED_USER,LOG_CONTENT)
+        values(
+        #{OPERATOR_MODULE},
+        #{OPERATOR_NAME},
+        now(),
+        #{CREATED_USER},
+        #{LOG_CONTENT}
+        )
+    </insert>
+
+    <!--根据NODE_ID和NODE_TYPE_ID,从而运行表中查询运行状态-->
+    <select id="queryStateByNode" parameterType="map" resultType="map">
+      SELECT STATE FROM DCF_NODE_START_LIST
+      WHERE NODE_ID=#{ID} AND NODE_TYPE_ID=#{NODE_TYPE_ID}
+    </select>
+
+    <!--获得部署表数据-->
+    <select id="queryNodeTypeTable" parameterType="map" resultType="map">
+        SELECT ID,NODE_TYPE_ID,VERSION,NODE_ID FROM DCF_NODE_DEPLOY_LIST
+        where NODE_ID IN
+        <foreach collection="NODE_IDS" item="NODE_ID" open="(" separator="," close=")">
+            #{NODE_ID}
+        </foreach>
+    </select>
+
+    <!--获得启动表数据-->
+    <select id="queryNodeStartTable" parameterType="map" resultType="map">
+        SELECT ID,NODE_TYPE_ID,VERSION,NODE_ID,START_CMD,CHECK_CMD,STOP_CMD,STATE
+        FROM DCF_NODE_START_LIST
+        where NODE_ID IN
+        <foreach collection="NODE_IDS" item="NODE_ID" open="(" separator="," close=")">
+            #{NODE_ID}
+        </foreach>
+    </select>
+
+    <select id="queryNodeTypeInfoById" parameterType="map" resultType="map">
+        SELECT RUN_WEB
+            FROM DCF_NODE_TYPE_CONFIG
+        WHERE
+            ID = #{NODE_TYPE_ID}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+

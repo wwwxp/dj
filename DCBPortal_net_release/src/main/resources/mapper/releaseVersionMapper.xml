@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="releaseVersion">
+     <!-- 查询集群配置 --> 
+    <select id="queryReleaseVersion" parameterType="map" resultType="hashMap">
+		SELECT ID,CLUSTER_TYPE,VERSION,UPGRADE_TIME,STATE FROM DCF_RELEASE_VERSION_UPGRADE
+		WHERE 1=1
+		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+				AND CLUSTER_TYPE = #{CLUSTER_TYPE}
+		</if>
+		<if test="VERSION != null and VERSION != ''">
+				AND VERSION = #{VERSION}
+		</if>
+		<if test="STATE != null and STATE != ''">
+				AND STATE = #{STATE}
+		</if>
+    </select>
+    
+    <!-- 新增集群 -->
+    <insert id="insertyReleaseVersion" parameterType="map">
+    	INSERT INTO DCF_RELEASE_VERSION_UPGRADE(ID,CLUSTER_TYPE,VERSION,UPGRADE_TIME,STATE)
+		VALUES(NEWID(),#{CLUSTER_TYPE},#{VERSION},now(),#{STATE})
+    </insert>
+    
+    <!-- 新增集群 -->
+    <insert id="insertBatchReleaseVersion" parameterType="java.util.List">
+    	INSERT INTO DCF_RELEASE_VERSION_UPGRADE(ID,CLUSTER_TYPE,VERSION,UPGRADE_TIME,STATE)
+		VALUES
+		<foreach  collection='list' item="item" index="index"  separator=",">
+			(NEWID(),#{item.CLUSTER_TYPE},#{item.VERSION},now(),#{item.STATE})
+		</foreach>
+    </insert>
+    
+    <!-- 删除集群 -->
+    <delete id="deleteReleaseVersion" parameterType="hashMap">
+      DELETE FROM DCF_RELEASE_VERSION_UPGRADE WHERE VERSION=#{VERSION}
+    </delete>
+    
+    <!-- 更新集群-->
+    <update id="updateReleaseVersion" parameterType="hashMap">
+		UPDATE DCF_RELEASE_VERSION_UPGRADE
+		SET STATE={#STATE}
+		WHERE CLUSTER_TYPE=#{CLUSTER_TYPE} 
+		  AND VERSION=#{VERSION}
+    </update>
+</mapper>

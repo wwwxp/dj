@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nodeClusterManager">
+    <!-- 集群管理 start -->
+    <select id="queryDeployedNodeType" parameterType="map" resultType="map">
+        SELECT
+          DISTINCT
+          CONCAT(B.`NAME`,'(',B.CODE,')') NODE_TYPE_NAME,
+          A.NODE_TYPE_ID
+        FROM DCF_NODE_DEPLOY_LIST A
+        INNER JOIN DCF_NODE_TYPE_CONFIG B ON A.NODE_TYPE_ID=B.ID
+        <if test="NODE_TYPE_IDS!=null">
+            WHERE B.ID NOT IN
+            <foreach collection="NODE_TYPE_IDS" item="NODE_TYPE_ID" open="(" separator="," close=")">
+                  #{NODE_TYPE_ID}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 通过NODE_TYPE_ID查询节点信息-->
+    <select id="queryNodesByNodeType" parameterType="map" resultType="map">
+        SELECT
+            A.ID NODE_ID,
+            A.NODE_NAME,
+            CONCAT(B.HOST_IP,':',A.NODE_PATH) NODE_PATH_INFO
+        FROM
+            DCF_NODE_CONFIG A
+        LEFT JOIN DCF_HOST B ON A.NODE_HOST_ID = B.HOST_ID
+        WHERE A.NODE_TYPE_ID=#{NODE_TYPE_ID}
+    </select>
+
+    <!-- 集群表的新增 -->
+    <insert id="insertCluster" parameterType="map">
+        <selectKey keyProperty="NEWEST_CLUSTER_ID" resultType="string" order="AFTER">
+            SELECT LAST_INSERT_ID() NEWEST_CLUSTER_ID;
+        </selectKey>
+
+        INSERT INTO
+        DCF_NODE_CLUSTER_CONFIG(NODE_CLUSTER_NAME,NODE_CLUSTER_CODE,NODE_CLUSTER_STATE,CREATED_DATE,CREATED_USER,NODE_CLUSTER_DESC)
+        VALUES(#{NODE_CLUSTER_NAME},#{NODE_CLUSTER_CODE},#{NODE_CLUSTER_STATE},NOW(),#{CREATED_USER}
+        <choose>
+            <when test="NODE_CLUSTER_DESC != null and NODE_CLUSTER_DESC != ''">
+                ,#{NODE_CLUSTER_DESC}
+            </when>
+            <otherwise>
+                ,NULL
+            </otherwise>
+        </choose>
+        );
+    </insert>
+
+    <!-- 集群类型配置表的新增 -->
+    <insert id="insertNodeClusterType" parameterType="map">
+        <selectKey keyProperty="CLUSTER_TYPE_ID" resultType="string" order="AFTER">
+            SELECT LAST_INSERT_ID() CLUSTER_TYPE_ID;
+        </selectKey>
+
+        INSERT INTO
+        DCF_NODE_CLUSTER_TYPE_CONFIG(NODE_CLUSTER_ID,NODE_TYPE_ID,NODE_TYPE_ALIAS)
+        VALUES(#{NODE_CLUSTER_ID},#{NODE_TYPE_ID}
+        <choose>
+            <when test="NODE_TYPE_ALIAS != null and NODE_TYPE_ALIAS != ''">
+                ,#{NODE_TYPE_ALIAS}
+            </when>
+            <otherwise>
+                ,NULL
+            </otherwise>
+        </choose>
+        );
+    </insert>
+
+    <!-- 集群类型节点元素配置表的新增 -->
+    <insert id="insertNodeClusterEle" parameterType="map">
+
+        INSERT INTO DCF_NODE_CLUSTER_ELE_CONFIG(NODE_ID,CLUSTER_TYPE_ID)
+        VALUES(#{NODE_ID},#{CLUSTER_TYPE_ID});
+
+    </insert>
+
+    <!-- 判断集群的编码是否重复 -->
+    <select id="queryClusterExistsByCode" parameterType="map" resultType="map">
+        SELECT
+          COUNT(1) CLUSTER_COUNT
+        FROM DCF_NODE_CLUSTER_CONFIG
+        WHERE
+            NODE_CLUSTER_CODE = #{NODE_CLUSTER_CODE}
+        <if test="ID!=null and ID!=''">
+            AND ID != #{ID}
+        </if>
+    </select>
+
+    <!-- 查询所有的集群名称 -->
+    <select id="queryClusterName" parameterType="map" resultType="map">
+        SELECT DISTINCT NODE_CLUSTER_NAME FROM DCF_NODE_CLUSTER_CONFIG
+    </select>
+
+    <!-- 查询所有的集群编码 -->
+    <select id="queryClusterCode" parameterType="map" resultType="map">
+        SELECT NODE_CLUSTER_CODE FROM DCF_NODE_CLUSTER_CONFIG
+        <where>
+            <if test="NODE_CLUSTER_NAME!=null and NODE_CLUSTER_NAME!=''">
+                AND NODE_CLUSTER_NAME like '%${NODE_CLUSTER_NAME}%'
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询集群信息 -->
+    <select id="queryClusterInfo" parameterType="map" resultType="map">
+        SELECT
+          A.ID,
+          A.NODE_CLUSTER_NAME,
+          A.NODE_CLUSTER_CODE,
+          if(A.NODE_CLUSTER_STATE=1,'有效','无效') NODE_CLUSTER_STATE,
+          A.NODE_CLUSTER_DESC,
+          DATE_FORMAT(A.CREATED_DATE,'%Y-%m-%d %H:%i:%s') CREATED_DATE
+        FROM
+          DCF_NODE_CLUSTER_CONFIG A
+        <where>
+            <if test="NODE_CLUSTER_NAME!=null and NODE_CLUSTER_NAME!=''">
+                AND A.NODE_CLUSTER_NAME like '%${NODE_CLUSTER_NAME}%'
+            </if>
+            <if test="NODE_CLUSTER_CODE!=null and NODE_CLUSTER_CODE!=''">
+                AND A.NODE_CLUSTER_CODE = #{NODE_CLUSTER_CODE}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询出集群所有的类型 -->
+    <select id="queryClusterNodeTypeInfo" parameterType="map" resultType="map">
+        SELECT
+            DISTINCT
+            B.NODE_CLUSTER_ID,
+            C.NAME NODE_TYPE_INFO
+--             CONCAT(C.NAME,'(',C.CODE,')') NODE_TYPE_INFO
+        FROM
+            DCF_NODE_CLUSTER_CONFIG A
+            INNER JOIN DCF_NODE_CLUSTER_TYPE_CONFIG B ON B.NODE_CLUSTER_ID = A.ID
+            INNER JOIN DCF_NODE_TYPE_CONFIG C ON B.NODE_TYPE_ID = C.ID
+        <where>
+            <if test="NODE_CLUSTER_NAME!=null and NODE_CLUSTER_NAME!=''">
+                AND A.NODE_CLUSTER_NAME like '%${NODE_CLUSTER_NAME}%'
+            </if>
+            <if test="NODE_CLUSTER_CODE!=null and NODE_CLUSTER_CODE!=''">
+                AND A.NODE_CLUSTER_CODE = #{NODE_CLUSTER_CODE}
+            </if>
+        </where>
+    </select>
+
+    <sql id="loopClusterIds">
+        <foreach collection="IDS" item="ID" open="(" separator="," close=")" >
+            #{ID}
+        </foreach>
+    </sql>
+
+    <!-- 删除多个集群Id的对应的集群程序节点-->
+    <delete id="deleteClusterNode" parameterType="map">
+        DELETE FROM DCF_NODE_CLUSTER_ELE_CONFIG
+        WHERE CLUSTER_TYPE_ID IN
+        (SELECT ID FROM DCF_NODE_CLUSTER_TYPE_CONFIG
+          WHERE NODE_CLUSTER_ID IN
+              <include refid="loopClusterIds" ></include>
+          )
+    </delete>
+
+    <!-- 删除多个集群Id的对应的集群程序类型-->
+    <delete id="deleteClusterNodeType" parameterType="map">
+        DELETE FROM DCF_NODE_CLUSTER_TYPE_CONFIG
+        WHERE NODE_CLUSTER_ID IN
+          <include refid="loopClusterIds" ></include>
+    </delete>
+
+    <!--删除多个集群-->
+    <delete id="deleteCluster" parameterType="map">
+        DELETE FROM  DCF_NODE_CLUSTER_CONFIG
+        WHERE ID IN
+        <include refid="loopClusterIds" ></include>
+    </delete>
+
+    <!--根据集群ID，删除对应集群程序节点-->
+    <delete id="deleteNodeByClusterId" parameterType="map">
+        DELETE FROM DCF_NODE_CLUSTER_ELE_CONFIG
+        WHERE CLUSTER_TYPE_ID IN
+        (SELECT ID FROM DCF_NODE_CLUSTER_TYPE_CONFIG
+        WHERE NODE_CLUSTER_ID = #{ID}
+        )
+    </delete>
+
+    <!--根据集群ID，删除集群程序类型-->
+    <delete id="deleteTypeByClusterId" parameterType="map">
+        DELETE FROM DCF_NODE_CLUSTER_TYPE_CONFIG
+        WHERE NODE_CLUSTER_ID = #{ID}
+    </delete>
+
+    <!-- 根据集群Id，查询集群 -->
+    <select id="queryClusterById" parameterType="map" resultType="map">
+        SELECT
+          NODE_CLUSTER_NAME,
+          NODE_CLUSTER_CODE,
+          NODE_CLUSTER_DESC,
+          ID
+        FROM
+          dcf_node_cluster_config
+        WHERE
+          ID = #{CLUSTER_ID}
+    </select>
+
+    <!-- 根据集群Id，查询程序类型 -->
+    <select id="queryNodeTypeByClusterId" parameterType="map" resultType="map">
+        SELECT
+            A.NODE_TYPE_ID,
+            A.NODE_TYPE_ALIAS,
+            A.ID
+        FROM
+            DCF_NODE_CLUSTER_TYPE_CONFIG A
+            INNER JOIN DCF_NODE_CLUSTER_CONFIG B ON A.NODE_CLUSTER_ID = B.ID
+        WHERE
+            B.ID = #{CLUSTER_ID}
+    </select>
+
+    <!-- 根据集群Id，查询程序节点 -->
+    <select id="queryNodeByClusterId" parameterType="map" resultType="map">
+        SELECT
+          A.NODE_ID,
+          CONCAT(C.HOST_IP,':',B.NODE_PATH) NODE_PATH_INFO,
+          A.CLUSTER_TYPE_ID
+        FROM dcf_node_cluster_ele_config A
+          INNER JOIN dcf_node_config B ON A.NODE_ID = B.ID
+          INNER JOIN DCF_HOST C ON B.NODE_HOST_ID = C.HOST_ID
+        WHERE
+          A.CLUSTER_TYPE_ID IN
+          (SELECT ID FROM DCF_NODE_CLUSTER_TYPE_CONFIG WHERE NODE_CLUSTER_ID = #{CLUSTER_ID})
+    </select>
+
+    <!-- 集群表的更新 -->
+    <update id="updateCluster" parameterType="map">
+        update dcf_node_cluster_config
+        set
+            NODE_CLUSTER_NAME = #{NODE_CLUSTER_NAME},
+            NODE_CLUSTER_CODE = #{NODE_CLUSTER_CODE},
+            NODE_CLUSTER_DESC = #{NODE_CLUSTER_DESC}
+        where ID = #{ID}
+    </update>
+
+
+    <!-- 集群管理 end-->
+
+    <!-- 集群视图 start -->
+    <!-- 1查询集群 -->
+    <select id="queryNodeClusterConfig" parameterType="map" resultType="map">
+        SELECT
+        `ID`,
+        `NODE_CLUSTER_NAME`,
+        `NODE_CLUSTER_CODE`,
+        `NODE_CLUSTER_DESC`,
+        `NODE_CLUSTER_STATE`,
+        `CREATED_DATE`,
+        `CREATED_USER`
+        FROM
+        dcf_node_cluster_config
+        <where>
+            <if test="ID != null and ID != ''">
+                ID = #{ID}
+            </if>
+        </where>
+    </select>
+    <!-- 2查询集群下的程序类型 -->
+    <select id="queryClusterTypeCfg" parameterType="map" resultType="map">
+        SELECT
+             a.`ID`,
+             a.`NODE_CLUSTER_ID`,
+             a.`NODE_TYPE_ID`,
+             a.`NODE_TYPE_ALIAS`,
+             b.NAME,b.CODE,b.CURR_VERSION
+        FROM
+            dcf_node_cluster_type_config a,dcf_node_type_config b
+        WHERE a.NODE_TYPE_ID = b.ID
+        and a.NODE_CLUSTER_ID = #{NODE_CLUSTER_ID}
+    </select>
+    <!-- 3)节点名称(节点ip)[运行状态]版本 -->
+    <select id="queryClusterTypeNodeDetailCfg" parameterType="map" resultType="map">
+        SELECT
+          a.CLUSTER_TYPE_ID,
+          a.NODE_ID,
+          b.NODE_NAME,
+          c.HOST_IP,
+          d.VERSION,
+          d.ID DEPLOY_ID,
+          e.STATE
+        FROM
+            dcf_node_cluster_ele_config a
+          INNER JOIN dcf_node_config b on a.NODE_ID = b.ID
+          INNER JOIN dcf_host c on b.NODE_HOST_ID = c.HOST_ID
+          LEFT JOIN dcf_node_deploy_list d on a.NODE_ID = d.NODE_ID and b.NODE_TYPE_ID = d.NODE_TYPE_ID
+          LEFT JOIN dcf_node_start_list e on e.NODE_ID = d.NODE_ID and e.NODE_TYPE_ID = d.NODE_TYPE_ID and d.VERSION = e.VERSION
+          WHERE 1=1
+          and a.CLUSTER_TYPE_ID = #{CLUSTER_TYPE_ID}
+          ORDER BY a.CLUSTER_TYPE_ID,d.version desc,c.HOST_IP,e.STATE desc
+    </select>
+
+    <!-- 查询集群部署的情况，用于刷新节点状态 -->
+    <select id="queryClusterDeployListForRefeash" parameterType="map" resultType="map">
+        SELECT
+            C.NODE_ID,
+            D.NODE_TYPE_ID,
+            D.VERSION,
+            D.ID DEPLOY_ID
+        FROM
+            DCF_NODE_CLUSTER_TYPE_CONFIG A,
+            DCF_NODE_CLUSTER_ELE_CONFIG C,
+            DCF_NODE_DEPLOY_LIST D
+        WHERE
+            A.ID = C.CLUSTER_TYPE_ID
+        AND C.NODE_ID = D.NODE_ID
+        AND A.NODE_CLUSTER_ID = #{NODE_CLUSTER_ID}
+    </select>
+    <!-- 集群视图 end -->
+
+</mapper>

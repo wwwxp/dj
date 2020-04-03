@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 集群配置表操作SQL -->
+<mapper namespace="clusterConfig">
+     <!-- 查询集群配置 --> 
+    <select id="queryCluster" parameterType="map" resultType="hashMap">
+    	SELECT C.CLUSTER_ID, C.CLUSTER_CODE, C.CLUSTER_NAME, C.CLUSTER_TYPE, C.TYPE, C.STATUS
+	 	FROM DCF_SERVICE_TYPE C
+	 	WHERE C.STATUS = '1'
+	 	<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+	 		AND C.CLUSTER_TYPE = #{CLUSTER_TYPE}
+	 	</if>
+	 	<if test="CLUSTER_NAME != null and CLUSTER_NAME != ''">
+		 	AND C.CLUSTER_NAME LIKE  CONCAT('%',#{CLUSTER_NAME},'%')
+		</if>
+		<if test="CLUSTER_CODE != null and CLUSTER_CODE != ''">
+			AND C.CLUSTER_CODE = #{CLUSTER_CODE}
+		</if>
+		<if test="TYPE != null and TYPE != ''">
+			AND TYPE = #{TYPE}
+		</if>
+    </select>
+   
+    <!-- ftp文件上传,查询所有文件信息 --> 
+    <select id="queryFileInfo" parameterType="map" resultType="hashMap">
+    	SELECT ID,FILE_NAME,FILE_PATH,FILE_TYPE,CRT_DATE FROM DCF_FTP_FILE_SERVER
+    </select>
+    
+    <!-- ftp文件上传,删除文件信息 -->
+    <delete id="deleteFileInfo" parameterType="hashMap">
+      	DELETE FROM DCF_FTP_FILE_SERVER WHERE ID=#{ID}
+    </delete>
+    
+    <!-- ftp文件上传,上传文件并保存信息到数据库 -->
+    <insert id="insertFileInfo" parameterType="map">
+    	INSERT INTO DCF_FTP_FILE_SERVER(ID,
+    	<if test="FILE_NAME != NULL AND FILE_NAME != ''">
+		 	FILE_NAME,
+		</if>
+    	<if test="FILE_PATH != NULL AND FILE_PATH != ''">
+		 	FILE_PATH,
+		</if>
+    	<if test="FILE_TYPE != NULL AND FILE_TYPE != ''">
+		 	FILE_NAME,
+		</if>
+    		CRT_DATE
+    		) VALUES(
+    		NEWID(),
+    	<if test="FILE_NAME != NULL AND FILE_NAME != ''">
+		 	#{FILE_NAME},
+		</if>
+    	<if test="FILE_PATH != NULL AND FILE_PATH != ''">
+		 	#{FILE_PATH},
+		</if>
+    	<if test="FILE_TYPE != NULL AND FILE_TYPE != ''">
+		 	#{FILE_NAME},
+		</if>
+    		CURRENT_TIMESTAMP)
+    </insert>
+    
+    <!-- 获取Nimbus集群信息 -->
+    <select id="queryNimbusClusterList" parameterType="map" resultType="map">
+		SELECT
+		A.HOST_IP,
+		A.HOST_ID, 
+		A.SSH_PORT,
+    	A.SSH_USER,
+    	A.SSH_PASSWD,
+		D.DEPLOY_FILE_TYPE,
+		D.DEPLOY_TYPE,
+		D.FILE_PATH
+		FROM DCF_HOST A, DCF_DEPLOY_INST_CONFIG D
+		WHERE A.HOST_ID=D.HOST_ID
+		AND D.DEPLOY_FILE_TYPE = 'nimbus'
+		AND D.DEPLOY_TYPE = 'jstorm'
+	  AND D.STATUS = '1' 
+    </select>
+    
+</mapper>

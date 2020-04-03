@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 业务主集群和组件、业务程序管理配置文件 -->
+<mapper namespace="busMainCluster">
+	<!-- 查询业务主集群信息 -->
+	<select id="queryBusMainClusterList" parameterType="map" resultType="map">
+		SELECT
+			A.BUS_CLUSTER_ID,
+			A.BUS_CLUSTER_NAME,
+			A.BUS_CLUSTER_CODE,
+			A.BUS_CLUSTER_SEQ,
+			date_format(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+			A.BUS_CLUSTER_STATE,
+			group_concat(B.CLUSTER_NAME) BUS_CLUSTER_LIST,
+			A.BUS_CLUSTER_TYPE,
+			A.BUS_VERSION_SWITCH_TYPE,
+			T.BUS_SWITCH_PAGE_URL,
+			T.SWITCH_CONFIG_FILE,
+			T.SWITCH_CLUSTER_TYPE
+		FROM
+			DCF_BUS_MAIN_CLUSTER A LEFT JOIN DCF_VERSION_SWITCH_CONFIG T ON (A.BUS_VERSION_SWITCH_TYPE = T.BUS_SWITCH_TYPE)
+		LEFT JOIN (
+			SELECT
+				A.BUS_CLUSTER_ID,
+				A.CLUSTER_ID,
+				B.CLUSTER_NAME
+			FROM DCF_BUS_RELATION_CLUSTER_LIST A
+				 LEFT JOIN DCF_SERVICE_TYPE B ON A.CLUSTER_ID = B.CLUSTER_ID
+		) B ON A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+		WHERE 1 = 1
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		GROUP BY
+			A.BUS_CLUSTER_ID,
+			A.BUS_CLUSTER_NAME,
+			A.BUS_CLUSTER_CODE,
+			A.BUS_CRT_TIME,
+			A.BUS_CLUSTER_STATE,
+			A.BUS_CLUSTER_TYPE,
+			A.BUS_VERSION_SWITCH_TYPE,
+			T.BUS_SWITCH_PAGE_URL,
+			T.SWITCH_CONFIG_FILE,
+			T.SWITCH_CLUSTER_TYPE
+		ORDER BY
+		    A.BUS_CLUSTER_SEQ ASC,
+			A.BUS_CLUSTER_NAME
+	</select>
+	
+	<!-- 查询业务主集群信息 -->
+	<select id="queryBusMainClusterListByState" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID,
+		A.BUS_CLUSTER_NAME,
+		A.BUS_CLUSTER_CODE,
+		DATE_FORMAT(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+		A.BUS_CLUSTER_STATE,
+		B.BUS_SWITCH_TYPE,
+		B.BUS_SWITCH_PAGE_URL,
+		B.SWITCH_CONFIG_FILE
+		FROM DCF_BUS_MAIN_CLUSTER A LEFT JOIN DCF_VERSION_SWITCH_CONFIG B ON (A.BUS_VERSION_SWITCH_TYPE = B.BUS_SWITCH_TYPE)
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		ORDER BY A.BUS_CLUSTER_SEQ ASC, A.BUS_CLUSTER_NAME
+	</select>
+
+	<!-- 查询业务主集群信息 -->
+	<select id="queryRoleBusMainClusterListByState" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID,
+		A.BUS_CLUSTER_NAME,
+		A.BUS_CLUSTER_CODE,
+		DATE_FORMAT(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+		A.BUS_CLUSTER_STATE,
+		B.BUS_SWITCH_TYPE,
+		B.BUS_SWITCH_PAGE_URL,
+		B.SWITCH_CONFIG_FILE
+		FROM DCF_BUS_MAIN_CLUSTER A LEFT JOIN DCF_VERSION_SWITCH_CONFIG B ON (A.BUS_VERSION_SWITCH_TYPE = B.BUS_SWITCH_TYPE)
+		JOIN DCF_BUS_ROLE_MAIN_LIST C ON (A.BUS_CLUSTER_ID = C.BUS_CLUSTER_ID)
+		JOIN DCF_BUS_USER_ROLE D ON (C.ROLE_ID = D.ROLE_ID)
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		<if test="EMPEE_ID != null and EMPEE_ID != ''">
+			AND D.EMPEE_ID = #{EMPEE_ID}
+		</if>
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="ROLE_ID != null and ROLE_ID != ''">
+			AND D.ROLE_ID = #{ROLE_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		ORDER BY A.BUS_CLUSTER_SEQ ASC, A.BUS_CLUSTER_NAME
+	</select>
+
+	<!-- 查询业务主集群关联Jstorm集群 -->
+	<select id="queryBusMainClusterRelationJstormList" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID, A.BUS_CLUSTER_NAME, A.BUS_CLUSTER_CODE,DATE_FORMAT(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME, A.BUS_CLUSTER_STATE,
+			   C.CLUSTER_CODE, C.CLUSTER_NAME
+		FROM DCF_BUS_MAIN_CLUSTER A 
+			 LEFT JOIN DCF_BUS_RELATION_CLUSTER_LIST B ON (A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID)
+		     LEFT JOIN DCF_SERVICE_TYPE C ON (B.CLUSTER_ID = C.CLUSTER_ID)
+			<if test="PERMISSION_SWITCH != null and PERMISSION_SWITCH !='' and PERMISSION_SWITCH !='no'">
+				JOIN DCF_BUS_ROLE_MAIN_LIST T ON (A.BUS_CLUSTER_ID = T.BUS_CLUSTER_ID)
+				JOIN DCF_BUS_USER_ROLE M ON (T.ROLE_ID = M.ROLE_ID)
+			</if>
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		  AND B.CLUSTER_TYPE = #{CLUSTER_TYPE}
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		<if test="PERMISSION_SWITCH != null and PERMISSION_SWITCH !='' and PERMISSION_SWITCH !='no'">
+			AND M.EMPEE_ID = #{EMPEE_ID}
+		</if>
+		ORDER BY BUS_CLUSTER_SEQ ASC
+	</select>
+	
+	<!-- 查询业务主集群关联子业务集群 -->
+	<select id="queryBusMainClusterRelationChildrenList" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID, A.BUS_CLUSTER_NAME, A.BUS_CLUSTER_CODE, A.BUS_CRT_TIME, A.BUS_CLUSTER_STATE,
+			   C.CLUSTER_CODE, C.CLUSTER_NAME,C.CLUSTER_TYPE
+		FROM DCF_BUS_MAIN_CLUSTER A 
+			 LEFT JOIN DCF_BUS_RELATION_CLUSTER_LIST B ON (A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID)
+		     LEFT JOIN DCF_SERVICE_TYPE C ON (B.CLUSTER_ID = C.CLUSTER_ID)
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		<if test="CLUSTER_TYPE != null and CLUSTER_TYPE != ''">
+			AND B.CLUSTER_TYPE IN (${CLUSTER_TYPE})
+		</if>
+	</select>
+	
+	<!-- 添加业务主集群信息 -->
+	<insert id="addBusMainCluster" parameterType="map">
+		INSERT INTO DCF_BUS_MAIN_CLUSTER
+		  (BUS_CLUSTER_ID,
+		   BUS_CLUSTER_NAME,
+		   BUS_CLUSTER_CODE,
+		   BUS_CLUSTER_SEQ,
+		   BUS_CRT_TIME,
+		   BUS_CLUSTER_TYPE)
+		VALUES
+		  (#{BUS_CLUSTER_ID},
+		   #{BUS_CLUSTER_NAME},
+		   #{BUS_CLUSTER_CODE},
+		   #{BUS_CLUSTER_SEQ},
+		   NOW(),
+		   #{BUS_CLUSTER_TYPE})
+	</insert>
+
+	<!-- 修改业务主集群信息 -->
+	<update id="updateBusMainCluster" parameterType="map">
+		UPDATE DCF_BUS_MAIN_CLUSTER
+		   SET BUS_CLUSTER_NAME  = #{BUS_CLUSTER_NAME},
+		       BUS_CLUSTER_CODE  = #{BUS_CLUSTER_CODE},
+		       BUS_CLUSTER_TYPE  = #{BUS_CLUSTER_TYPE},
+		       BUS_CLUSTER_SEQ  = #{BUS_CLUSTER_SEQ}
+		 WHERE BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+	</update>
+
+	<!-- 删除业务主集群信息 -->
+	<delete id="delBusMainCluster" parameterType="map">
+		DELETE FROM DCF_BUS_MAIN_CLUSTER WHERE BUS_CLUSTER_ID in
+		<foreach collection="list" open="(" separator="," close=")" item="item">
+			#{item.BUS_CLUSTER_ID}
+		</foreach>
+	</delete>
+	
+	<select id="queryMainBusCode" parameterType="map" resultType="map">
+		SELECT BUS_CLUSTER_CODE FROM dcf_bus_main_cluster where BUS_CLUSTER_NAME = #{BUS_CLUSTER_NAME} AND BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+	</select>
+
+	<!--修改主集群信息，先查询原数据-->
+	<select id="queryUpdateMainClusterInfo" parameterType="map" resultType="hashMap">
+		SELECT
+			BUS_CLUSTER_ID,
+			BUS_CLUSTER_NAME,
+			BUS_CLUSTER_CODE,
+			BUS_CLUSTER_TYPE,
+			BUS_CLUSTER_SEQ
+		FROM
+			DCF_BUS_MAIN_CLUSTER
+		<where>
+			<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+				AND BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+			</if>
+		</where>
+		ORDER BY BUS_CLUSTER_SEQ ASC, BUS_CLUSTER_NAME
+	</select>
+
+	<!-- 查询业务集群信息 -->
+	<select id="queryBusClusterInfo" parameterType="map" resultType="hashMap">
+		SELECT
+			CLUSTER_ID,CLUSTER_NAME,CLUSTER_CODE,CLUSTER_TYPE
+		FROM
+			DCF_SERVICE_TYPE
+		WHERE
+			TYPE = 3
+		AND CLUSTER_ID IN (
+			SELECT
+				CLUSTER_ID
+			FROM
+				DCF_BUS_RELATION_CLUSTER_LIST
+			WHERE
+				BUS_CLUSTER_ID IN (
+					SELECT
+						BUS_CLUSTER_ID
+					FROM
+						dcf_bus_main_cluster
+					WHERE
+						BUS_CLUSTER_NAME = #{BUS_CLUSTER_NAME}
+					AND BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+				)
+		)
+	</select>
+
+	<!--查询用户集群配置信息-->
+	<select id="getUserBusMainClusterInfo" parameterType="map" resultType="hashMap">
+		SELECT A.BUS_CLUSTER_ID,
+		A.BUS_CLUSTER_NAME,
+		A.BUS_CLUSTER_CODE,
+	  	A.BUS_CLUSTER_SEQ,
+		DATE_FORMAT(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+		A.BUS_CLUSTER_STATE,
+		B.BUS_SWITCH_TYPE,
+		B.BUS_SWITCH_PAGE_URL,
+		B.SWITCH_CONFIG_FILE
+		FROM DCF_BUS_MAIN_CLUSTER A LEFT JOIN DCF_VERSION_SWITCH_CONFIG B ON (A.BUS_VERSION_SWITCH_TYPE = B.BUS_SWITCH_TYPE)
+		<if test="PERMISSION_SWITCH != null and PERMISSION_SWITCH !='' and PERMISSION_SWITCH !='no'">
+			JOIN DCF_BUS_ROLE_MAIN_LIST C ON (A.BUS_CLUSTER_ID = C.BUS_CLUSTER_ID)
+			JOIN DCF_BUS_USER_ROLE D ON (C.ROLE_ID = D.ROLE_ID)
+		</if>
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		<if test="PERMISSION_SWITCH != null and PERMISSION_SWITCH !='' and PERMISSION_SWITCH !='no'">
+			AND D.EMPEE_ID = #{EMPEE_ID}
+		</if>
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		GROUP BY A.BUS_CLUSTER_ID
+		ORDER BY A.BUS_CLUSTER_SEQ ASC, A.BUS_CLUSTER_NAME
+	</select>
+
+
+	<!-- 查询业务主集群信息 -->
+	<select id="queryUserBusMainClusterListByState" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID,
+		A.BUS_CLUSTER_NAME,
+		A.BUS_CLUSTER_CODE,
+		A.BUS_CLUSTER_SEQ,
+		DATE_FORMAT(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+		A.BUS_CLUSTER_STATE,
+		B.BUS_SWITCH_TYPE,
+		B.BUS_SWITCH_PAGE_URL,
+		B.SWITCH_CONFIG_FILE
+		FROM DCF_BUS_MAIN_CLUSTER A LEFT JOIN DCF_VERSION_SWITCH_CONFIG B ON (A.BUS_VERSION_SWITCH_TYPE = B.BUS_SWITCH_TYPE)
+		LEFT JOIN DCF_BUS_ROLE_MAIN_LIST C  ON(A.BUS_CLUSTER_ID = C.BUS_CLUSTER_ID)
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		<if test="ROLE_ID != null and ROLE_ID != ''">
+			AND C.ROLE_ID = #{ROLE_ID}
+		</if>
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		ORDER BY A.BUS_CLUSTER_SEQ ASC, A.BUS_CLUSTER_NAME
+	</select>
+
+
+	<!-- 查询角色业务主集群信息 -->
+	<select id="queryRoleBusMainClusterList" parameterType="map" resultType="map">
+		SELECT A.BUS_CLUSTER_ID,
+		A.BUS_CLUSTER_NAME,
+		A.BUS_CLUSTER_CODE,
+		A.BUS_CLUSTER_SEQ,
+		DATE_FORMAT(A.BUS_CRT_TIME, '%Y-%m-%d %H:%i:%s') BUS_CRT_TIME,
+		A.BUS_CLUSTER_STATE,
+		B.BUS_SWITCH_TYPE,
+		B.BUS_SWITCH_PAGE_URL,
+		B.SWITCH_CONFIG_FILE
+		FROM DCF_BUS_MAIN_CLUSTER A
+		LEFT JOIN DCF_VERSION_SWITCH_CONFIG B ON (A.BUS_VERSION_SWITCH_TYPE = B.BUS_SWITCH_TYPE)
+		JOIN DCF_BUS_ROLE_MAIN_LIST C ON (A.BUS_CLUSTER_ID = C.BUS_CLUSTER_ID)
+		WHERE A.BUS_CLUSTER_STATE = '1'
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="ROLE_ID != null and ROLE_ID != ''">
+			AND C.ROLE_ID = #{ROLE_ID}
+		</if>
+		<if test="BUS_CLUSTER_NAME != null and BUS_CLUSTER_NAME != ''">
+			AND A.BUS_CLUSTER_NAME LIKE CONCAT('%',#{BUS_CLUSTER_NAME},'%')
+		</if>
+		<if test="BUS_CLUSTER_CODE != null and BUS_CLUSTER_CODE != ''">
+			AND A.BUS_CLUSTER_CODE = #{BUS_CLUSTER_CODE}
+		</if>
+		ORDER BY A.BUS_CLUSTER_SEQ ASC, A.BUS_CLUSTER_NAME
+	</select>
+
+	<!--查询权限集群信息-->
+	<select id="queryRoleMainClusterInfo" parameterType="map" resultType="hashMap">
+		SELECT
+			A.BUS_CLUSTER_ID,
+			A.BUS_CLUSTER_NAME,
+			A.BUS_CLUSTER_CODE,
+			A.BUS_CLUSTER_TYPE,
+			A.BUS_CLUSTER_SEQ
+		FROM
+			DCF_BUS_MAIN_CLUSTER A,DCF_BUS_ROLE_MAIN_LIST B
+		WHERE A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+		<if test="ROLE_ID != null and ROLE_ID != ''">
+			AND B.ROLE_ID=#{ROLE_ID}
+		</if>
+		ORDER BY A.BUS_CLUSTER_SEQ ASC
+	</select>
+
+
+	<!-- 查询运行在Topology中任务实例 -->
+	<select id="queryTaskProgramRunTopology" parameterType="map" resultType="map">
+		SELECT A.CLUSTER_ID, A.CLUSTER_NAME, A.CLUSTER_TYPE, A.CLUSTER_CODE, A.TYPE,
+		B.ID TASK_PROGRAM_ID, B.PROGRAM_CODE, B.PROGRAM_NAME, B.PROGRAM_TYPE,B.TASK_ID,B.RUN_STATE,
+		C.TASK_CODE, C.VERSION
+		FROM DCF_SERVICE_TYPE A, DCF_TASK_PROGRAM B, DCF_DEPLOY_TASK C, DCF_CLUSTER_ELE_DEFINE D
+		WHERE (A.CLUSTER_TYPE = D.CLUSTER_ELE_NAME AND D.CLUSTER_ELE_RUN_JSTORM= 1 AND  A.TYPE = '3')
+		AND (A.CLUSTER_ID = B.CLUSTER_ID AND A.CLUSTER_TYPE = B.PROGRAM_TYPE)
+		AND B.TASK_ID = C.TASK_ID
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND B.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+
+		<!-- AND D.CLUSTER_ELE_RUN_JSTORM = '1' -->
+		ORDER BY A.CLUSTER_TYPE, C.VERSION DESC
+	</select>
+
+	<!-- 查询业务程序对应的包类型 -->
+	<select id="queryProgramPackageType" parameterType="map" resultType="map">
+		SELECT A.ID,A.BUS_CLUSTER_ID, A.CLUSTER_ID,A.PROGRAM_CODE, A.PROGRAM_NAME,
+		B.VERSION, B.PACKAGE_TYPE,B.NAME,
+		D.BUS_CLUSTER_CODE
+		FROM DCF_TASK_PROGRAM A, DCF_FTP_FILE_SERVER B, DCF_DEPLOY_TASK C, DCF_BUS_MAIN_CLUSTER D
+		WHERE A.TASK_ID = C.TASK_ID
+		AND B.ID = C.SERVER_ID
+		AND A.BUS_CLUSTER_ID = D.BUS_CLUSTER_ID
+		AND A.ID = #{TASK_PROGRAM_ID}
+	</select>
+
+	<!-- 查询业务程序配置相关信息 -->
+	<select id="queryTaskProgram" parameterType="map" resultType="map">
+		SELECT A.ID, A.BUS_CLUSTER_ID, A.CLUSTER_ID, A.PROGRAM_CODE, A.PROGRAM_NAME, A.SCRIPT_SH_NAME,A.CONFIG_FILE,A.TASK_ID,A.RUN_STATE,
+		B.BUS_CLUSTER_NAME, B.BUS_CLUSTER_CODE,
+		C.CLUSTER_NAME, C.CLUSTER_TYPE,C.CLUSTER_CODE, C.CLUSTER_DEPLOY_PATH,
+		D.TASK_CODE, D.TASK_NAME, D.SERVER_ID, D.VERSION,
+		E.FILE_NAME,E.PACKAGE_TYPE,E.NAME
+		FROM DCF_TASK_PROGRAM A, DCF_BUS_MAIN_CLUSTER B, DCF_SERVICE_TYPE C, DCF_DEPLOY_TASK D,DCF_FTP_FILE_SERVER E
+		WHERE A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+		AND A.CLUSTER_ID = C.CLUSTER_ID
+		AND A.TASK_ID = D.TASK_ID
+		AND D.SERVER_ID = E.ID
+		AND A.ID = #{TASK_PROGRAM_ID}
+	</select>
+
+	<!-- 查询业务程序配置相关信息 -->
+	<select id="queryTaskProgramByIdAndRunState" parameterType="map" resultType="map">
+		SELECT  A.ID FROM DCF_TASK_PROGRAM A WHERE
+		A.CLUSTER_ID=#{CLUSTER_ID}
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.ID=#{TASK_PROGRAM_ID}
+		</if>
+
+		AND A.RUN_STATE =1
+	</select>
+
+	<!-- 删除任务下的程序-->
+	<delete id="delHostDeployBYHostId" parameterType="hashMap">
+		DELETE from DCF_HOST_DEPLOY  WHERE CLUSTER_ID = #{CLUSTER_ID_BUS} AND HOST_ID=#{HOST_ID}
+	</delete>
+
+	<!-- 删除任务下的程序-->
+	<delete id="delHostDeployUpgrateBYHostId" parameterType="hashMap">
+		DELETE from DCF_DEPLOY_VERSION_UPGRADE  WHERE CLUSTER_ID = #{CLUSTER_ID_BUS} AND HOST_ID=#{HOST_ID}
+	</delete>
+	<!-- 更新  运行状态-->
+	<update id="updateHostDeployBYHostId" parameterType="hashMap">
+		UPDATE DCF_HOST_DEPLOY SET STATE = 0,VERSION=NULL
+		WHERE CLUSTER_ID = #{CLUSTER_ID} AND HOST_ID=#{HOST_ID}
+	</update>
+
+	<!-- 查询当前运行的Topology -->
+	<select id="queryRunningTopologyList" parameterType="map" resultType="map">
+		SELECT A.ID, A.BUS_CLUSTER_ID, A.CLUSTER_ID, A.PROGRAM_CODE,
+		CONCAT(A.PROGRAM_NAME,' (', F.PROGRAM_GROUP, ')') PROGRAM_TEXT,
+		A.PROGRAM_NAME, A.PROGRAM_TYPE, A.TASK_ID, A.RUN_STATE,
+		B.BUS_CLUSTER_NAME, B.BUS_CLUSTER_CODE,
+		C.CLUSTER_CODE, C.CLUSTER_NAME, C.CLUSTER_TYPE, C.CLUSTER_DEPLOY_PATH,
+		D.TASK_CODE, D.TASK_NAME, D.VERSION,
+		E.CLUSTER_ELE_RUN_JSTORM RUN_JSTORM,
+		F.PROGRAM_GROUP
+		FROM DCF_TASK_PROGRAM A, DCF_BUS_MAIN_CLUSTER B, DCF_SERVICE_TYPE C,
+		DCF_DEPLOY_TASK D, DCF_CLUSTER_ELE_DEFINE E, DCF_PROGRAM_DEFINE F
+		WHERE A.BUS_CLUSTER_ID = B.BUS_CLUSTER_ID
+		AND A.CLUSTER_ID = C.CLUSTER_ID
+		AND A.TASK_ID = D.TASK_ID
+		AND A.PROGRAM_TYPE = E.CLUSTER_ELE_NAME
+		AND A.PROGRAM_CODE = F.PROGRAM_CODE
+		AND E.CLUSTER_ELE_RUN_JSTORM = '1'
+		AND F.PROGRAM_GROUP IS NOT NULL
+		AND F.PROGRAM_GROUP != ''
+		<if test="BUS_CLUSTER_ID != null and BUS_CLUSTER_ID != ''">
+			AND A.BUS_CLUSTER_ID = #{BUS_CLUSTER_ID}
+		</if>
+		<if test="PROGRAM_GROUP != null and PROGRAM_GROUP != ''">
+			AND F.PROGRAM_GROUP = #{PROGRAM_GROUP}
+		</if>
+		<if test="RUN_STATE != null and RUN_STATE != ''">
+			AND A.RUN_STATE = #{RUN_STATE}
+		</if>
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.ID != #{TASK_PROGRAM_ID}
+		</if>
+		ORDER BY F.PROGRAM_GROUP
+	</select>
+
+	<!-- 查询运行Toplogy主机节点列表 -->
+	<select id="queryRunningTopologyNodeList" parameterType="map" resultType="map">
+		SELECT A.ID, A.BUS_CLUSTER_ID, A.CLUSTER_ID, A.PROGRAM_CODE, A.PROGRAM_NAME, A.PROGRAM_TYPE, A.TASK_ID, A.RUN_STATE,
+		B.HOST_ID, C.HOST_IP, C.HOST_NAME
+		FROM DCF_TASK_PROGRAM A, DCF_HOST_DEPLOY B, DCF_HOST C
+		WHERE A.CLUSTER_ID = B.CLUSTER_ID
+		AND B.HOST_ID = C.HOST_ID
+		AND B.VERSION IS NOT NULL
+		<if test="TASK_PROGRAM_ID != null and TASK_PROGRAM_ID != ''">
+			AND A.ID = #{TASK_PROGRAM_ID}
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,103 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/*全局定义*/
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td{margin:0;padding:0}
+body{font-family:"微软雅黑";-webkit-text-size-adjust:100%;color:#333;font-size:14px;}
+h1,h2,h3,h4,h5,h6{font-size:100%;}
+address,cite,dfn,em,i,var,caption{font-style:normal;}
+ul,ol,li{list-style:none;}a,a img,button {cursor:pointer;}
+button,input,textarea{font-size:100%;border:none;background:none;}
+table{border-collapse:collapse;border-spacing:0;}
+img,input,spsx,button,textarea{border:0;vertical-align:middle;}
+a{text-transform:none;text-decoration:none;}
+*{outline:0;outline:none;}
+textarea{resize:none;}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 5px solid transparent;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+}
+
+::-webkit-scrollbar-thumb {
+  min-height: 20px;
+  background-clip: content-box;
+  box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*浮动*/
+.fl{float:left;}.fr{float:right;}
+.clear{clear:both;height:0px;overflow: hidden;margin:0;padding:0;font-size:0;}
+.clearfix:after{content:"lina";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix{display:inline-block;}
+
+/*间距*/
+.mt10{margin-top:10px !important;}
+.mt30{margin-top:30px !important;}
+.lina-main{padding:20px;}
+
+/*tab切换*/
+.tabNav{overflow:hidden;zoom:1;border-bottom:1px solid #e1e1e1;margin-bottom:10px;}
+.tabNav a{display:block;float:left;margin-right:20px;cursor:pointer;text-decoration:none;color:#333;padding:0 10px;line-height:34px;}
+.tabNav .hover a{color:#0891d3;border-bottom:2px solid #0891d3;}
+.tabCnt .hover{display:block;}
+.tabPane{display:none;zoom:1;}
+
+/*左右布局*/
+.leftMain{float:left;width:60%;}
+.rightMain{float:right;width:39%;}
+
+/*主机进程*/
+.host dl{float:left;width:49%;height:294px;}
+.host dt{height:78px;color:#fff;text-align:center;}
+.host dl.blueBg{border:1px solid #0891d3;border-radius:2px;background:#f2f9fd;}
+.host dl.blueBg dt{background:#0891d3;}
+.host dl.greenBg{border:1px solid #74c685;border-radius:2px;background:#eefdf1;float:right;}
+.host dl.greenBg dt{background:#74c685;}
+.host dt p{width:50%;float:left;font:14px/30px "微软雅黑";margin-top:9px;}
+.host dt p span{display:block;font-size:18px;}
+.host dd{margin:10px;}
+.host-table{font:14px/30px "微软雅黑"; text-align:left;}
+.host dl.blueBg .host-table th{font-weight:normal;color:#0891d3;}
+.host dl.greenBg .host-table th{font-weight:normal;color:#74c685;}
+.host-table i{line-height:30px;vertical-align:middle;}
+.page{text-align:center;margin-top:15px;}
+.page a{width:24px;height:24px;display:inline-block;line-height:24px;}
+.host dl.blueBg .page a{border:1px solid #0891d3;color:#0891d3;}
+.host dl.blueBg .page a:hover{background:#0891d3;color:#fff;}
+.host dl.greenBg .page a{border:1px solid #74c685;color:#74c685;}
+.host dl.greenBg .page a:hover{background:#74c685;color:#fff;}
+
+/*点状图*/
+.Graph{border:1px solid #e1e1e1;border-radius:2px;padding:10px;height:274px;}
+.gy-sel{width:300px;height:26px;border:1px solid #e1e1e1;background:#fff;color:#999;font:12px/16px "微软雅黑";cursor:pointer;}
+
+/*资源占比TOP5*/
+.top5{height:330px;}
+.top5 h3{font:16px/40px "微软雅黑";border-bottom:2px solid #e1e1e1;}
+.top5 h3 a{float:right;color:#0891d3;}
+.top5 li{float:left;width:33.33%;text-align:center;}
+.mapchartContainer{height:280px;}
+
+/*table2*/
+.tableBox-lina{width:100%;background:#fff;color:#333;font:14px/40px "微软雅黑";text-align:center;}
+.tableBox-lina th{height:40px;line-height:40px;border-bottom:2px solid #e1e1e1;}
+.tablehead-lina{overflow-y:scroll;height:42px;}
+.tablebody-lina{overflow-y:scroll;height:290px;}
+.lh40{line-height:40px !important; text-align:center !important;width:25% !important;}
+.host-table th{text-align:left;}
+
